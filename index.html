@@ -80,6 +80,27 @@
   .desc { font-size: 14px; color: #555; line-height: 1.65; margin-top: 12px; }
 
   footer { text-align: center; padding: 24px; font-size: 13px; color: #aaa; }
+
+  @media (max-width: 600px) {
+    header { padding: 24px 16px; }
+    header h1 { font-size: 22px; }
+    header p { font-size: 13px; }
+
+    .filter { padding: 16px 12px 12px; gap: 6px; }
+    .filter button { padding: 6px 13px; font-size: 13px; }
+
+    .grid {
+      grid-template-columns: 1fr;
+      padding: 8px 12px 40px;
+      gap: 12px;
+    }
+
+    .card { padding: 16px; }
+    .yaku-name { font-size: 16px; }
+    .han-badge { font-size: 11px; padding: 3px 8px; }
+    .closed-tag { font-size: 10px; }
+    .desc { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
