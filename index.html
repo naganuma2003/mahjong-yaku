@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>麻雀 役一覧</title>
-<meta name="description" content="麻雀の基本20役をまとめた一覧。翻数・鳴き可否・説明つき。">
+<meta name="description" content="麻雀の全役をまとめた一覧。翻数・鳴き可否・説明つき。役満も収録。">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -31,6 +31,10 @@
   .filter button.active, .filter button:hover {
     background: #388e3c; color: white;
   }
+  .filter button.yakuman-btn { border-color: #b45309; color: #b45309; }
+  .filter button.yakuman-btn.active, .filter button.yakuman-btn:hover {
+    background: #b45309; color: white;
+  }
 
   .grid {
     display: grid;
@@ -47,6 +51,7 @@
     transition: transform 0.15s, box-shadow 0.15s;
   }
   .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.11); }
+  .card.is-yakuman { border-left: 4px solid #d97706; }
 
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 
@@ -59,6 +64,12 @@
     background: #e8f5e9; color: #2e7d32;
     font-weight: 700; font-size: 12px;
     padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .han-badge.ym {
+    background: #fef3c7; color: #92400e;
+  }
+  .han-badge.dym {
+    background: #fee2e2; color: #991b1b;
   }
   .closed-tag {
     background: #fff3e0; color: #e65100;
@@ -75,7 +86,7 @@
 
 <header>
   <h1>🀄 麻雀 役一覧</h1>
-  <p>基本20役のルールと翻数をまとめました</p>
+  <p>基本役・役満を含む全役のルールと翻数をまとめました</p>
 </header>
 
 <div class="filter">
@@ -83,17 +94,21 @@
   <button onclick="filter('1', this)">1翻</button>
   <button onclick="filter('2', this)">2翻</button>
   <button onclick="filter('3', this)">3翻以上</button>
+  <button class="yakuman-btn" onclick="filter('yakuman', this)">役満</button>
   <button onclick="filter('closed', this)">門前限定</button>
 </div>
 
 <div class="grid" id="grid"></div>
 
-<footer>基本役20種。役満は含みません。</footer>
+<footer>役満のダブル役満扱い・人和の採否はルールによって異なります。</footer>
 
 <script>
 const yaku = [
+  // 1翻
   { name:"立直", reading:"リーチ", han:"1翻", closed:true,
     desc:"門前でテンパイしたときに宣言できる。宣言後は手牌を変えられない。" },
+  { name:"ダブル立直", reading:"ダブルリーチ", han:"2翻", closed:true,
+    desc:"第一ツモ番（最初の自分の捨て牌）でリーチを宣言する。通常のリーチより1翻高い。" },
   { name:"一発", reading:"イッパツ", han:"1翻", closed:true,
     desc:"リーチ後、次の自分のツモ番が来る前に和了する。" },
   { name:"門前清自摸和", reading:"メンゼンツモ", han:"1翻", closed:true,
@@ -104,6 +119,8 @@ const yaku = [
     desc:"すべて順子で構成し、雀頭が役牌でなく、待ちが両面待ち。鳴き不可。" },
   { name:"一盃口", reading:"イーペーコー", han:"1翻", closed:true,
     desc:"同じ牌の並びの順子が2組。門前限定。" },
+  { name:"二盃口", reading:"リャンペーコー", han:"3翻", closed:true,
+    desc:"一盃口が2組、つまり同じ順子の組が2ペア。門前限定。七対子と複合しない。" },
   { name:"役牌（白）", reading:"ハク", han:"1翻", closed:false,
     desc:"三元牌「白」の刻子または槓子。" },
   { name:"役牌（發）", reading:"ハツ", han:"1翻", closed:false,
@@ -112,6 +129,15 @@ const yaku = [
     desc:"三元牌「中」の刻子または槓子。" },
   { name:"役牌（自風・場風）", reading:"ヤクハイ", han:"1翻", closed:false,
     desc:"自分の席風牌または場の風牌の刻子。" },
+  { name:"嶺上開花", reading:"リンシャンカイホウ", han:"1翻", closed:false,
+    desc:"槓子を作った後、嶺上牌（補充牌）でツモ和了する。" },
+  { name:"槍槓", reading:"チャンカン", han:"1翻", closed:false,
+    desc:"他家が加槓した牌でロン和了する。" },
+  { name:"海底撈月", reading:"ハイテイ", han:"1翻", closed:false,
+    desc:"最後のツモ牌でツモ和了する。" },
+  { name:"河底撈魚", reading:"ホウテイ", han:"1翻", closed:false,
+    desc:"最後の捨て牌でロン和了する。" },
+  // 2翻
   { name:"七対子", reading:"チートイツ", han:"2翻", closed:true,
     desc:"7種類の対子で手牌を構成する。同じ牌を4枚使うのは不可。" },
   { name:"対々和", reading:"トイトイ", han:"2翻", closed:false,
@@ -126,30 +152,70 @@ const yaku = [
     desc:"ツモで揃えた暗刻（暗槓含む）を3組持つ。" },
   { name:"三色同刻", reading:"サンショクドウコウ", han:"2翻", closed:false,
     desc:"マン・ピン・ソーの3種で、同じ数字の刻子を1組ずつ揃える。" },
+  { name:"三槓子", reading:"サンカンツ", han:"2翻", closed:false,
+    desc:"3組の槓子を含む。" },
+  { name:"小三元", reading:"ショウサンゲン", han:"2翻", closed:false,
+    desc:"白・發・中のうち2種を刻子、1種を雀頭にする。役牌2翻と合計4翻になる。" },
+  // 3翻以上
   { name:"混一色", reading:"ホンイツ", han:"門前3翻／鳴き2翻", closed:false,
     desc:"1種類の数牌と字牌のみで手牌を構成する。" },
   { name:"純全帯么九", reading:"ジュンチャン", han:"門前3翻／鳴き2翻", closed:false,
     desc:"すべての面子と雀頭に1・9牌を含む。字牌は使わない。" },
   { name:"清一色", reading:"チンイツ", han:"門前6翻／鳴き5翻", closed:false,
     desc:"1種類の数牌のみで手牌を構成する。字牌は一切含まない。" },
+  // 役満
+  { name:"国士無双", reading:"コクシムソウ", han:"役満", closed:true,
+    desc:"マン・ピン・ソーの1と9、字牌（東南西北白發中）の13種を1枚ずつ揃え、そのうち1種を雀頭にする。" },
+  { name:"九蓮宝燈", reading:"チューレンポウトウ", han:"役満", closed:true,
+    desc:"同じ種類の数牌で1112345678999を構成し、さらに同じ種類の牌を1枚加えて和了する。" },
+  { name:"四暗刻", reading:"スーアンコウ", han:"役満", closed:true,
+    desc:"4組すべての面子をツモで揃えた暗刻にする。単騎待ちはダブル役満扱いのルールも。" },
+  { name:"大三元", reading:"ダイサンゲン", han:"役満", closed:false,
+    desc:"白・發・中の三元牌すべての刻子または槓子を揃える。" },
+  { name:"小四喜", reading:"ショウスーシー", han:"役満", closed:false,
+    desc:"東・南・西・北のうち3種を刻子、1種を雀頭にする。" },
+  { name:"大四喜", reading:"ダイスーシー", han:"ダブル役満", closed:false,
+    desc:"東・南・西・北の四風牌すべての刻子または槓子を揃える。雀頭は別の牌。" },
+  { name:"字一色", reading:"ツーイーソウ", han:"役満", closed:false,
+    desc:"字牌（東南西北白發中）のみで手牌を構成する。" },
+  { name:"緑一色", reading:"リューイーソウ", han:"役満", closed:false,
+    desc:"ソーの2・3・4・6・8と發のみで構成する。すべて緑色の牌のみ。" },
+  { name:"清老頭", reading:"チンロウトウ", han:"役満", closed:false,
+    desc:"1と9の数牌のみで構成する。すべて刻子か槓子になる。" },
+  { name:"四槓子", reading:"スーカンツ", han:"役満", closed:false,
+    desc:"4組すべてを槓子にする。" },
+  { name:"天和", reading:"テンホウ", han:"役満", closed:true,
+    desc:"親が配牌の時点で和了形になっている。ゲーム開始直後のみ成立。" },
+  { name:"地和", reading:"チーホウ", han:"役満", closed:true,
+    desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
+  { name:"人和", reading:"レンホウ", han:"役満", closed:true,
+    desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。採用しないルールも多い。" },
 ];
 
 function hanGroup(han) {
+  if (han.includes('役満')) return 'yakuman';
   if (han.includes('6') || han.includes('5') || han.includes('3')) return '3';
   if (han.includes('2')) return '2';
   return '1';
+}
+
+function badgeClass(han) {
+  if (han.includes('ダブル')) return 'dym';
+  if (han.includes('役満')) return 'ym';
+  return '';
 }
 
 function renderCards(filterType) {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   yaku.forEach(y => {
+    const group = hanGroup(y.han);
     const show = filterType === 'all'
       || (filterType === 'closed' && y.closed)
-      || (filterType === hanGroup(y.han));
+      || (filterType === group);
     if (!show) return;
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card' + (group === 'yakuman' ? ' is-yakuman' : '');
     card.innerHTML = `
       <div class="card-top">
         <div>
@@ -157,7 +223,7 @@ function renderCards(filterType) {
           <div class="yaku-reading">${y.reading}</div>
         </div>
         <div class="badges">
-          <div class="han-badge">${y.han}</div>
+          <div class="han-badge ${badgeClass(y.han)}">${y.han}</div>
           ${y.closed ? '<div class="closed-tag">門前限定</div>' : ''}
         </div>
       </div>
