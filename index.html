@@ -23,6 +23,7 @@
 
   /* ===== 役一覧 (green) ===== */
   .filter { display: flex; gap: 8px; justify-content: center; padding: 24px 20px 16px; flex-wrap: wrap; }
+  .filter-break { display: none; }
   .filter button { padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px; background: white; color: #388e3c; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; font-family: inherit; }
   .filter button.active, .filter button:hover { background: #388e3c; color: white; }
   .filter button.yakuman-btn { border-color: #b45309; color: #b45309; }
@@ -121,6 +122,7 @@
     .tab-nav-btn { font-size: 13px; padding: 12px 8px; }
     .filter { padding: 16px 12px 12px; gap: 6px; }
     .filter button { padding: 6px 13px; font-size: 13px; }
+    .filter-break { display: block; width: 100%; }
     .grid { grid-template-columns: 1fr; padding: 8px 12px 40px; gap: 12px; }
     .card { padding: 16px; }
     .yaku-name { font-size: 16px; }
@@ -153,9 +155,10 @@
     <button onclick="filter('1',this)">1翻</button>
     <button onclick="filter('2',this)">2翻</button>
     <button onclick="filter('3',this)">3翻以上</button>
-    <button class="yakuman-btn" onclick="filter('yakuman',this)">役満</button>
+    <span class="filter-break"></span>
     <button onclick="filter('closed',this)">門前限定</button>
-    <button class="local-filter-btn" onclick="filter('local',this)">ローカル/依存</button>
+    <button class="yakuman-btn" onclick="filter('yakuman',this)">役満</button>
+    <button class="local-filter-btn" onclick="filter('local',this)">ローカル</button>
   </div>
   <div class="grid" id="grid"></div>
 </div>
