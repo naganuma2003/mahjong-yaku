@@ -440,7 +440,7 @@ function renderCards(f){
     let cls='card';
     if(y.local) cls+=' is-local';
     else if(grp==='yakuman') cls+=' is-yakuman';
-    if(y.rulevar) cls+=' is-rulevar';
+    if(y.rulevar && grp==='yakuman') cls+=' is-rulevar';
     const tags=[
       y.local?'<div class="local-tag">ローカル</div>':'',
       y.rulevar?'<div class="rulevar-tag">ルール依存</div>':'',
