@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麻雀 役一覧</title>
+<meta name="description" content="麻雀の基本20役をまとめた一覧。翻数・鳴き可否・説明つき。">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: #f0f4f8; color: #333; min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1b5e20, #388e3c);
+    color: white; padding: 36px 20px; text-align: center;
+  }
+  header h1 { font-size: 28px; font-weight: 800; letter-spacing: 0.05em; }
+  header p { font-size: 14px; opacity: 0.8; margin-top: 8px; }
+
+  .filter {
+    display: flex; gap: 8px; justify-content: center;
+    padding: 24px 20px 16px; flex-wrap: wrap;
+  }
+  .filter button {
+    padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px;
+    background: white; color: #388e3c; cursor: pointer; font-size: 14px;
+    font-weight: 600; transition: all 0.15s; font-family: inherit;
+  }
+  .filter button.active, .filter button:hover {
+    background: #388e3c; color: white;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+    padding: 8px 20px 48px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: white; border-radius: 14px; padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.11); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+
+  .yaku-name { font-size: 18px; font-weight: 800; color: #1a1a1a; }
+  .yaku-reading { font-size: 12px; color: #999; margin-top: 3px; letter-spacing: 0.06em; }
+
+  .badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+  .han-badge {
+    background: #e8f5e9; color: #2e7d32;
+    font-weight: 700; font-size: 12px;
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .closed-tag {
+    background: #fff3e0; color: #e65100;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+  }
+
+  .desc { font-size: 14px; color: #555; line-height: 1.65; margin-top: 12px; }
+
+  footer { text-align: center; padding: 24px; font-size: 13px; color: #aaa; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🀄 麻雀 役一覧</h1>
+  <p>基本20役のルールと翻数をまとめました</p>
+</header>
+
+<div class="filter">
+  <button class="active" onclick="filter('all', this)">すべて</button>
+  <button onclick="filter('1', this)">1翻</button>
+  <button onclick="filter('2', this)">2翻</button>
+  <button onclick="filter('3', this)">3翻以上</button>
+  <button onclick="filter('closed', this)">門前限定</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>基本役20種。役満は含みません。</footer>
+
+<script>
+const yaku = [
+  { name:"立直", reading:"リーチ", han:"1翻", closed:true,
+    desc:"門前でテンパイしたときに宣言できる。宣言後は手牌を変えられない。" },
+  { name:"一発", reading:"イッパツ", han:"1翻", closed:true,
+    desc:"リーチ後、次の自分のツモ番が来る前に和了する。" },
+  { name:"門前清自摸和", reading:"メンゼンツモ", han:"1翻", closed:true,
+    desc:"鳴きなしの門前でツモ和了する。" },
+  { name:"断么九", reading:"タンヤオ", han:"1翻", closed:false,
+    desc:"手牌がすべて2〜8の数牌（中張牌）のみ。1・9・字牌を一切含まない。" },
+  { name:"平和", reading:"ピンフ", han:"1翻", closed:true,
+    desc:"すべて順子で構成し、雀頭が役牌でなく、待ちが両面待ち。鳴き不可。" },
+  { name:"一盃口", reading:"イーペーコー", han:"1翻", closed:true,
+    desc:"同じ牌の並びの順子が2組。門前限定。" },
+  { name:"役牌（白）", reading:"ハク", han:"1翻", closed:false,
+    desc:"三元牌「白」の刻子または槓子。" },
+  { name:"役牌（發）", reading:"ハツ", han:"1翻", closed:false,
+    desc:"三元牌「發」の刻子または槓子。" },
+  { name:"役牌（中）", reading:"チュン", han:"1翻", closed:false,
+    desc:"三元牌「中」の刻子または槓子。" },
+  { name:"役牌（自風・場風）", reading:"ヤクハイ", han:"1翻", closed:false,
+    desc:"自分の席風牌または場の風牌の刻子。" },
+  { name:"七対子", reading:"チートイツ", han:"2翻", closed:true,
+    desc:"7種類の対子で手牌を構成する。同じ牌を4枚使うのは不可。" },
+  { name:"対々和", reading:"トイトイ", han:"2翻", closed:false,
+    desc:"すべての面子が刻子または槓子。順子なし。" },
+  { name:"三色同順", reading:"サンショクドウジュン", han:"門前2翻／鳴き1翻", closed:false,
+    desc:"マン・ピン・ソーの3種で、同じ数字の順子を1組ずつ揃える。" },
+  { name:"一気通貫", reading:"イッキツウカン", han:"門前2翻／鳴き1翻", closed:false,
+    desc:"同じ種類の牌で123・456・789の順子をすべて揃える。" },
+  { name:"混全帯么九", reading:"チャンタ", han:"門前2翻／鳴き1翻", closed:false,
+    desc:"すべての面子と雀頭に1・9・字牌のいずれかを含む。" },
+  { name:"三暗刻", reading:"サンアンコウ", han:"2翻", closed:false,
+    desc:"ツモで揃えた暗刻（暗槓含む）を3組持つ。" },
+  { name:"三色同刻", reading:"サンショクドウコウ", han:"2翻", closed:false,
+    desc:"マン・ピン・ソーの3種で、同じ数字の刻子を1組ずつ揃える。" },
+  { name:"混一色", reading:"ホンイツ", han:"門前3翻／鳴き2翻", closed:false,
+    desc:"1種類の数牌と字牌のみで手牌を構成する。" },
+  { name:"純全帯么九", reading:"ジュンチャン", han:"門前3翻／鳴き2翻", closed:false,
+    desc:"すべての面子と雀頭に1・9牌を含む。字牌は使わない。" },
+  { name:"清一色", reading:"チンイツ", han:"門前6翻／鳴き5翻", closed:false,
+    desc:"1種類の数牌のみで手牌を構成する。字牌は一切含まない。" },
+];
+
+function hanGroup(han) {
+  if (han.includes('6') || han.includes('5') || han.includes('3')) return '3';
+  if (han.includes('2')) return '2';
+  return '1';
+}
+
+function renderCards(filterType) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  yaku.forEach(y => {
+    const show = filterType === 'all'
+      || (filterType === 'closed' && y.closed)
+      || (filterType === hanGroup(y.han));
+    if (!show) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="yaku-name">${y.name}</div>
+          <div class="yaku-reading">${y.reading}</div>
+        </div>
+        <div class="badges">
+          <div class="han-badge">${y.han}</div>
+          ${y.closed ? '<div class="closed-tag">門前限定</div>' : ''}
+        </div>
+      </div>
+      <div class="desc">${y.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filter(type, btn) {
+  document.querySelectorAll('.filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards(type);
+}
+
+renderCards('all');
+</script>
+</body>
+</html>
