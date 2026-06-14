@@ -16,7 +16,8 @@
 
   .tabs-nav { display: flex; background: white; border-bottom: 2px solid #dce3eb; }
   .tab-nav-btn { flex: 1; padding: 14px; border: none; background: none; cursor: pointer; font: 600 15px/1 inherit; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
-  .tab-nav-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
+  .tab-nav-btn.yaku-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
+  .tab-nav-btn.score-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
   .tab-section { display: none; }
   .tab-section.active { display: block; }
 
@@ -140,8 +141,8 @@
 </header>
 
 <div class="tabs-nav">
-  <button class="tab-nav-btn active" onclick="showTab('yaku',this)">役一覧</button>
-  <button class="tab-nav-btn" onclick="showTab('score',this)">点数計算</button>
+  <button class="tab-nav-btn yaku-btn active" onclick="showTab('yaku',this)">役一覧</button>
+  <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
 </div>
 
 <!-- 役一覧タブ -->
