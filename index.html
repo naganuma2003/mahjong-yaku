@@ -20,10 +20,29 @@
   .tab-nav-btn.yaku-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
   .tab-nav-btn.score-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
   .tab-nav-btn.play-btn.active { color: #c62828; border-bottom-color: #c62828; }
+  header.drill { background: linear-gradient(135deg,#bf360c,#e64a19); }
+  .tab-nav-btn.drill-btn.active { color: #e64a19; border-bottom-color: #e64a19; }
   .tab-section { display: none; }
   .tab-section.active { display: block; }
   #tab-play { height: calc(100vh - 176px); overflow: hidden; }
   #tab-play iframe { width: 100%; height: 100%; border: none; display: block; }
+
+  /* ===== 点数計算ドリル ===== */
+  .drill-wrap { max-width: 540px; margin: 0 auto; padding: 24px 16px 48px; }
+  .drill-q-card { background: white; border-radius: 14px; padding: 28px 24px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 16px; text-align: center; }
+  .drill-q-text { font-size: 30px; font-weight: 900; color: #1a1a1a; line-height: 1.2; }
+  .drill-q-sub { font-size: 17px; color: #555; margin-top: 10px; font-weight: 600; }
+  .drill-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .drill-btn { padding: 16px 10px; border: 2px solid #dce3eb; border-radius: 10px; background: white; font: 700 16px/1 inherit; color: #333; cursor: pointer; transition: all .12s; font-family: inherit; }
+  .drill-btn:hover:not(:disabled) { border-color: #e64a19; color: #e64a19; }
+  .drill-btn.correct { background: #e8f5e9 !important; border-color: #388e3c !important; color: #2e7d32 !important; }
+  .drill-btn.wrong { background: #ffebee !important; border-color: #c62828 !important; color: #c62828 !important; }
+  .drill-feedback { text-align: center; padding: 14px; border-radius: 10px; font: 700 14px/1.5 inherit; margin-bottom: 12px; min-height: 48px; }
+  .drill-feedback.ok { background: #e8f5e9; color: #2e7d32; }
+  .drill-feedback.ng { background: #ffebee; color: #c62828; }
+  .drill-score { text-align: center; font-size: 14px; color: #666; margin-bottom: 14px; }
+  .drill-next-btn { width: 100%; padding: 14px; background: #e64a19; border: none; border-radius: 10px; color: white; font: 700 15px/1 inherit; cursor: pointer; transition: background .12s; font-family: inherit; }
+  .drill-next-btn:hover { background: #bf360c; }
 
   /* ===== 役一覧 (green) ===== */
   .search-wrap { padding: 20px 20px 0; display: flex; justify-content: center; }
@@ -147,6 +166,8 @@
     .ref-grid { grid-template-columns: 1fr; }
     .meld-sub { padding-left: 0; }
     #tab-play { height: calc(100vh - 140px); }
+    .drill-q-text { font-size: 22px; }
+    .drill-btn { font-size: 14px; padding: 12px 8px; }
   }
 </style>
 </head>
@@ -160,6 +181,7 @@
 <div class="tabs-nav">
   <button class="tab-nav-btn yaku-btn active" onclick="showTab('yaku',this)">役一覧</button>
   <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
+  <button class="tab-nav-btn drill-btn" onclick="showTab('drill',this)">点数ドリル</button>
   <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">プレイする</button>
 </div>
 
@@ -406,6 +428,20 @@
   </div>
 </div>
 
+<!-- 点数計算ドリルタブ -->
+<div id="tab-drill" class="tab-section">
+  <div class="drill-wrap">
+    <div class="drill-q-card">
+      <div class="drill-q-text" id="d-q">…</div>
+      <div class="drill-q-sub" id="d-sub"></div>
+    </div>
+    <div class="drill-choices" id="d-choices"></div>
+    <div class="drill-feedback" id="d-fb"></div>
+    <div class="drill-score" id="d-score">正解 0 / 0 問</div>
+    <button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNext()">次の問題 →</button>
+  </div>
+</div>
+
 <!-- プレイするタブ -->
 <div id="tab-play" class="tab-section">
   <iframe src="game.html" title="麻雀ゲーム"></iframe>
@@ -557,7 +593,7 @@ function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEa
 function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
 function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
 function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
-function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');h.classList.toggle('drill',id==='drill');if(id==='drill'&&!dStarted)drillStart();}
 updateCalc();
 
 /* ===== 符計算 ===== */
@@ -607,6 +643,72 @@ function fuMeldHonor(i,v,btn){fuState.melds[i].honor=v;btn.closest('.meld-sub').
 (function initMelds(){
   document.getElementById('fu-melds').innerHTML=[0,1,2,3].map(i=>`<div class="meld-row"><div class="meld-top"><span class="meld-label">面子${i+1}</span><button class="obtn mtype-btn on" onclick="fuMeldType(${i},'none',this)">なし</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'shuntsu',this)">順子</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'koutsu',this)">刻子</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'kantsu',this)">槓子</button></div><div class="meld-sub hidden" id="msub${i}"><button class="obtn mopen-btn on" onclick="fuMeldOpen(${i},true,this)">明</button><button class="obtn mopen-btn" onclick="fuMeldOpen(${i},false,this)">暗</button><button class="obtn mhonor-btn on" onclick="fuMeldHonor(${i},false,this)">中張牌</button><button class="obtn mhonor-btn" onclick="fuMeldHonor(${i},true,this)">老頭・字牌</button></div></div>`).join('');
 })();
+
+/* ===== 点数計算ドリル ===== */
+let dScore=0,dTotal=0,dStarted=false,dActive=false,dQ=null;
+const D_HAN=[1,2,3,4],D_FU=[20,25,30,40,50,60,70,80,90,100,110];
+function dNewQ(){
+  let han,fu,deal=Math.random()<.5,tsumo=Math.random()<.5;
+  if(Math.random()<.25){
+    han=[5,6,8,11,13][Math.floor(Math.random()*5)];fu=30;
+  }else{
+    han=D_HAN[Math.floor(Math.random()*D_HAN.length)];
+    fu=D_FU[Math.floor(Math.random()*D_FU.length)];
+    if(fu===25&&tsumo)tsumo=false;
+  }
+  return{han,fu,deal,tsumo};
+}
+function dHanLabel(han){
+  if(han>=13)return'役満';if(han>=11)return'11〜12翻（三倍満）';
+  if(han>=8)return'8〜10翻（倍満）';if(han>=6)return'6〜7翻（跳満）';
+  if(han>=5)return'5翻（満貫）';return han+'翻';
+}
+function dChoices(correct){
+  const pool=new Set();
+  [1,2,3,4,5,6,8,11,13].forEach(h=>D_FU.forEach(f=>[false,true].forEach(d=>[false,true].forEach(t=>pool.add(calcScore(h,f,d,t).total)))));
+  const cands=[...pool].filter(v=>v!==correct).sort(()=>Math.random()-.5);
+  const close=cands.filter(v=>v>=correct*.3&&v<=correct*3.5);
+  const picks=(close.length>=3?close:cands).slice(0,3);
+  return[correct,...picks].sort(()=>Math.random()-.5);
+}
+function dRender(){
+  const{han,fu,deal,tsumo}=dQ;
+  const res=calcScore(han,fu,deal,tsumo);
+  const correct=res.total;
+  document.getElementById('d-q').textContent=dHanLabel(han)+(han<5?' '+fu+'符':'');
+  document.getElementById('d-sub').textContent=(deal?'親':'子')+' '+(tsumo?'ツモ':'ロン');
+  document.getElementById('d-fb').textContent='';
+  document.getElementById('d-fb').className='drill-feedback';
+  document.getElementById('d-next').style.display='none';
+  const el=document.getElementById('d-choices');
+  el.innerHTML='';
+  dChoices(correct).forEach(v=>{
+    const b=document.createElement('button');
+    b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
+    b.onclick=()=>dAnswer(v,correct,res);
+    el.appendChild(b);
+  });
+  dActive=true;
+}
+function dAnswer(chosen,correct,res){
+  if(!dActive)return;
+  dActive=false;dTotal++;
+  const ok=chosen===correct;
+  if(ok)dScore++;
+  document.querySelectorAll('.drill-btn').forEach(b=>{
+    b.disabled=true;
+    const v=parseInt(b.textContent.replace(/[^0-9]/g,''));
+    if(v===correct)b.classList.add('correct');
+    else if(v===chosen&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('d-fb');
+  if(ok){fb.textContent='⭕ 正解！'+(res.name?' '+res.name:'')+'（'+res.detail+'）';fb.className='drill-feedback ok';}
+  else{fb.textContent='❌ 不正解。正解は '+correct.toLocaleString()+'点'+(res.name?' '+res.name:'')+'（'+res.detail+'）';fb.className='drill-feedback ng';}
+  document.getElementById('d-score').textContent='正解 '+dScore+' / '+dTotal+' 問';
+  document.getElementById('d-next').style.display='block';
+}
+function drillStart(){dStarted=true;dQ=dNewQ();dRender();}
+function drillNext(){dQ=dNewQ();dRender();}
 </script>
 </body>
 </html>
