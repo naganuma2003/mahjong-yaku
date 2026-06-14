@@ -1356,16 +1356,18 @@ const MX_PIN_POS=[
   [[11,8],[19,8],[27,8],[11,22],[19,22],[27,22],[11,37],[19,37],[27,37]],
 ];
 const MX_PIN_R=[9,7.5,6.5,6.5,6,5.8,5.5,5.2,5];
+// 各竹のサイズ [幅, 高さ] — index=n-2 (n=2..9)
+const MX_SOU_SZ=[[12,22],[11,17],[11,14],[11,14],[9,12],[9,11],[8,10],[8,10]];
 // 各竹の [中心x, 上端y, 向き('up'=節が上/'dn'=節が下)]
 const MX_SOU_POS=[
   null,
-  [[13,19,'up'],[25,19,'dn']],
-  [[13,12,'up'],[25,12,'dn'],[19,32,'up']],
-  [[13,9,'up'],[25,9,'dn'],[13,29,'dn'],[25,29,'up']],
-  [[13,6,'up'],[25,6,'dn'],[13,23,'dn'],[25,23,'up'],[19,39,'up']],
-  [[13,7,'up'],[25,7,'dn'],[13,22,'dn'],[25,22,'up'],[13,37,'up'],[25,37,'dn']],
-  [[11,6,'up'],[19,6,'dn'],[27,6,'up'],[11,21,'dn'],[27,21,'up'],[11,37,'up'],[27,37,'dn']],
-  [[13,4,'up'],[25,4,'dn'],[13,16,'dn'],[25,16,'up'],[13,28,'up'],[25,28,'dn'],[13,40,'dn'],[25,40,'up']],
+  [[13,16,'up'],[25,16,'dn']],
+  [[13,7,'up'],[25,7,'dn'],[19,29,'up']],
+  [[13,10,'up'],[25,10,'dn'],[13,28,'dn'],[25,28,'up']],
+  [[13,4,'up'],[25,4,'dn'],[19,20,'up'],[13,36,'dn'],[25,36,'up']],
+  [[12,7,'up'],[26,7,'dn'],[12,22,'dn'],[26,22,'up'],[12,37,'up'],[26,37,'dn']],
+  [[10,6,'up'],[19,6,'dn'],[28,6,'up'],[10,20,'dn'],[28,20,'up'],[10,35,'up'],[28,35,'dn']],
+  [[12,5,'up'],[26,5,'dn'],[12,17,'dn'],[26,17,'up'],[12,29,'up'],[26,29,'dn'],[12,41,'dn'],[26,41,'up']],
   [[10,5,'up'],[19,5,'dn'],[28,5,'up'],[10,18,'dn'],[19,18,'up'],[28,18,'dn'],[10,31,'up'],[19,31,'dn'],[28,31,'up']],
 ];
 
@@ -1380,13 +1382,17 @@ function mxPinSvg(n){
   return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="35" height="51" rx="2" fill="none" stroke="#90caf9" stroke-width=".8"/>${circles}</svg>`;
 }
 function mxSouStick(cx,y,w,h,dir){
-  const x=cx-w/2, kh=Math.max(2,Math.round(h*.22));
+  const x=cx-w/2, kh=Math.max(2,Math.round(h*.25));
   const nodeY=dir==='dn'?y+h-kh:y;
   const bodyY=dir==='dn'?y:y+kh, bodyH=h-kh;
-  return`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.5" fill="#2e7d32"/>` +
-    `<rect x="${x}" y="${nodeY}" width="${w}" height="${kh}" rx="2.5" fill="#f57c00"/>` +
-    `<rect x="${x+1.5}" y="${bodyY}" width="${w-3}" height="${bodyH}" rx="1" fill="#43a047"/>` +
-    `<rect x="${x+2.5}" y="${bodyY+2}" width="${w-5}" height="${Math.round(bodyH*.45)}" rx="1" fill="#81c784"/>`;
+  const segs=Math.max(1,Math.round(bodyH/4));
+  let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.5" fill="#1b5e20"/>`;
+  s+=`<rect x="${x+1}" y="${bodyY}" width="${w-2}" height="${bodyH}" rx="1" fill="#388e3c"/>`;
+  s+=`<rect x="${x+2}" y="${bodyY+1}" width="${w-4}" height="${Math.round(bodyH*.42)}" rx="1" fill="#66bb6a"/>`;
+  for(let i=1;i<segs;i++){const ly=bodyY+Math.round(bodyH*i/segs);s+=`<rect x="${x+1}" y="${ly}" width="${w-2}" height="1" fill="#1b5e20" opacity=".5"/>`;}
+  s+=`<rect x="${x}" y="${nodeY}" width="${w}" height="${kh}" rx="2.5" fill="#c62828"/>`;
+  s+=`<rect x="${x+1.5}" y="${nodeY+1}" width="${w-3}" height="${kh-2}" rx="1.5" fill="#e53935"/>`;
+  return s;
 }
 function mxSouSvg(n){
   const bd=`<rect x="1.5" y="1.5" width="35" height="51" rx="2" fill="none" stroke="#a5d6a7" stroke-width=".8"/>`;
@@ -1403,7 +1409,7 @@ function mxSouSvg(n){
     `<path d="M17,41 Q17,50 17,52" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>` +
     `<path d="M25,40 Q30,48 24,51" fill="none" stroke="#1b5e20" stroke-width="2.5" stroke-linecap="round"/>` +
     `</svg>`;
-  const sw=n>=8?9:n>=6?10:11,sh=n>=8?12:13;
+  const [sw,sh]=MX_SOU_SZ[n-2];
   const sticks=MX_SOU_POS[n-1].map(([cx,y,dir])=>mxSouStick(cx,y,sw,sh,dir)).join('');
   return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg">${bd}${sticks}</svg>`;
 }
