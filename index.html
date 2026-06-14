@@ -22,7 +22,15 @@
   .tab-section.active { display: block; }
 
   /* ===== 役一覧 (green) ===== */
-  .filter { display: flex; gap: 8px; justify-content: center; padding: 24px 20px 16px; flex-wrap: wrap; }
+  .search-wrap { padding: 20px 20px 0; display: flex; justify-content: center; }
+  .search-box { width: 100%; max-width: 480px; position: relative; }
+  .search-box input { width: 100%; padding: 10px 40px 10px 16px; border: 2px solid #c8e6c9; border-radius: 24px; font-size: 15px; font-family: inherit; outline: none; background: #f1f8f1; color: #1a1a1a; box-sizing: border-box; transition: border-color .15s; }
+  .search-box input:focus { border-color: #388e3c; background: white; }
+  .search-box input::placeholder { color: #aaa; }
+  .search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aaa; font-size: 18px; line-height: 1; display: none; padding: 0; }
+  .search-clear.visible { display: block; }
+  .search-no-result { text-align: center; color: #999; padding: 60px 20px; font-size: 15px; }
+  .filter { display: flex; gap: 8px; justify-content: center; padding: 12px 20px 16px; flex-wrap: wrap; }
   .filter-break { display: none; }
   .filter button { padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px; background: white; color: #388e3c; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; font-family: inherit; }
   .filter button.active, .filter button:hover { background: #388e3c; color: white; }
@@ -151,6 +159,12 @@
 
 <!-- 役一覧タブ -->
 <div id="tab-yaku" class="tab-section active">
+  <div class="search-wrap">
+    <div class="search-box">
+      <input type="text" id="yaku-search" placeholder="役名・読み・説明で検索…" oninput="onSearch(this.value)">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
   <div class="filter">
     <button class="active" onclick="filter('all',this)">すべて</button>
     <button onclick="filter('1',this)">1翻</button>
@@ -461,7 +475,36 @@ function renderCards(f){
     g.appendChild(c);
   });
 }
-function filter(t,btn){document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCards(t);}
+let currentFilter='all';
+function onSearch(q){
+  const cl=document.getElementById('search-clear');
+  cl.classList.toggle('visible',q.length>0);
+  if(!q){renderCards(currentFilter);return;}
+  const kw=q.trim().toLowerCase();
+  const g=document.getElementById('grid');g.innerHTML='';
+  let count=0;
+  yaku.forEach(y=>{
+    if(!([y.name,y.reading,y.desc].some(s=>s.toLowerCase().includes(kw))))return;
+    count++;
+    const grp=hanGroup(y.han);
+    const c=document.createElement('div');
+    let cls='card';
+    if(y.local)cls+=' is-local';
+    else if(grp==='yakuman')cls+=' is-yakuman';
+    if(y.rulevar&&grp==='yakuman')cls+=' is-rulevar';
+    const tags=[y.local?'<div class="local-tag">ローカル</div>':'',y.rulevar?'<div class="rulevar-tag">ルール依存</div>':'',y.doubleyakuman?'<div class="dym-tag">W役満あり</div>':'',y.closed?'<div class="closed-tag">門前限定</div>':''].join('');
+    c.className=cls;
+    c.innerHTML=`<div class="card-top"><div><div class="yaku-name">${y.name}</div><div class="yaku-reading">${y.reading}</div></div><div class="badges"><div class="han-badge ${badgeClass(y.han)}">${y.han}</div>${tags}</div></div><div class="desc">${y.desc}</div>`;
+    g.appendChild(c);
+  });
+  if(!count)g.innerHTML='<div class="search-no-result">「'+q+'」に一致する役が見つかりません</div>';
+}
+function clearSearch(){
+  const inp=document.getElementById('yaku-search');
+  if(inp)inp.value='';
+  document.getElementById('search-clear')?.classList.remove('visible');
+}
+function filter(t,btn){document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentFilter=t;clearSearch();renderCards(t);}
 renderCards('all');
 
 /* ===== 点数計算 ===== */
