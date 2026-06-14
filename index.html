@@ -13,31 +13,19 @@
   header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
   header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
-  /* Tab nav */
   .tabs-nav { display: flex; background: white; border-bottom: 2px solid #dce3eb; }
-  .tab-nav-btn {
-    flex: 1; padding: 14px; border: none; background: none; cursor: pointer;
-    font: 600 15px/1 inherit; color: #888;
-    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s;
-  }
+  .tab-nav-btn { flex: 1; padding: 14px; border: none; background: none; cursor: pointer; font: 600 15px/1 inherit; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
   .tab-nav-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
-
   .tab-section { display: none; }
   .tab-section.active { display: block; }
 
   /* Yaku list */
   .filter { display: flex; gap: 8px; justify-content: center; padding: 24px 20px 16px; flex-wrap: wrap; }
-  .filter button {
-    padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px;
-    background: white; color: #388e3c; cursor: pointer; font-size: 14px;
-    font-weight: 600; transition: all .15s; font-family: inherit;
-  }
+  .filter button { padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px; background: white; color: #388e3c; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; font-family: inherit; }
   .filter button.active, .filter button:hover { background: #388e3c; color: white; }
   .filter button.yakuman-btn { border-color: #b45309; color: #b45309; }
   .filter button.yakuman-btn.active, .filter button.yakuman-btn:hover { background: #b45309; color: white; }
-
   .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(290px,1fr)); gap: 16px; padding: 8px 20px 48px; max-width: 1040px; margin: 0 auto; }
-
   .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.07); transition: transform .15s, box-shadow .15s; }
   .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.11); }
   .card.is-yakuman { border-left: 4px solid #d97706; }
@@ -53,27 +41,41 @@
 
   /* Calculator */
   .calc-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
-  .calc-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 20px; }
+  .calc-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 16px; }
   .clabel { font: 700 13px/1 inherit; color: #666; margin-bottom: 10px; display: block; }
   .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
-  .obtn {
-    padding: 8px 14px; border: 2px solid #dce3eb; border-radius: 8px;
-    background: white; color: #555; cursor: pointer; font: 600 13px/1 inherit; transition: all .12s;
-  }
+  .obtn { padding: 8px 14px; border: 2px solid #dce3eb; border-radius: 8px; background: white; color: #555; cursor: pointer; font: 600 13px/1 inherit; transition: all .12s; font-family: inherit; }
   .obtn.on { background: #388e3c; border-color: #388e3c; color: white; }
-  .obtn:hover:not(.on) { border-color: #388e3c; color: #388e3c; }
+  .obtn:hover:not(.on):not(:disabled) { border-color: #388e3c; color: #388e3c; }
   .obtn:disabled { opacity: .3; cursor: default; }
-
   .tgl-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .tgl { display: flex; border: 2px solid #dce3eb; border-radius: 8px; overflow: hidden; }
-  .tbtn { padding: 9px 20px; border: none; background: white; cursor: pointer; font: 600 14px/1 inherit; color: #666; transition: all .12s; }
+  .tbtn { padding: 9px 20px; border: none; background: white; cursor: pointer; font: 600 14px/1 inherit; color: #666; transition: all .12s; font-family: inherit; }
   .tbtn.on { background: #388e3c; color: white; }
-
   .result-box { background: #f0f9f1; border: 2px solid #a5d6a7; border-radius: 14px; padding: 24px; text-align: center; }
   .res-pts { font-size: 56px; font-weight: 900; color: #1b5e20; line-height: 1; }
   .res-unit { font-size: 22px; font-weight: 700; color: #2e7d32; }
   .res-name { font: 700 16px/1.4 inherit; color: #b45309; margin-top: 6px; min-height: 22px; }
   .res-detail { font-size: 14px; color: #666; margin-top: 6px; min-height: 20px; }
+
+  /* Fu calculator */
+  .fu-divider { border: none; border-top: 1px solid #eee; margin: 14px 0 12px; }
+  .fu-toggle-row { display: flex; align-items: center; cursor: pointer; gap: 6px; user-select: none; }
+  .fu-toggle-label { font: 600 13px/1 inherit; color: #388e3c; }
+  .fu-toggle-arrow { font-size: 11px; color: #888; }
+  .fu-body { margin-top: 16px; }
+  .fu-group { margin-bottom: 14px; }
+  .hidden { display: none !important; }
+  .meld-row { margin-bottom: 10px; }
+  .meld-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .meld-label { font: 700 12px/1 inherit; color: #388e3c; width: 36px; flex-shrink: 0; }
+  .meld-sub { margin-top: 5px; padding-left: 42px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .fu-bd { background: #f8fbf8; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  .fu-bd-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: #555; }
+  .fu-bd-row.total { font-weight: 900; color: #1b5e20; font-size: 15px; border-top: 1px solid #c8e6c9; margin-top: 4px; padding-top: 6px; }
+  .fu-bd-row.total span:last-child { color: #1b5e20; }
+  .fu-apply { width: 100%; padding: 11px; background: #388e3c; border: none; border-radius: 10px; color: white; font: 700 14px/1 inherit; cursor: pointer; transition: background .12s; font-family: inherit; }
+  .fu-apply:hover { background: #2e7d32; }
 
   /* Reference table */
   .ref-note { font-size: 13px; color: #666; margin-bottom: 12px; }
@@ -102,6 +104,7 @@
     .calc-card { padding: 16px; }
     .rtbl { font-size: 11px; }
     .rtbl th, .rtbl td { padding: 6px 6px; }
+    .meld-sub { padding-left: 0; }
   }
 </style>
 </head>
@@ -134,6 +137,7 @@
 <div id="tab-score" class="tab-section">
   <div class="calc-wrap">
 
+    <!-- 翻数 -->
     <div class="calc-card">
       <span class="clabel">翻数</span>
       <div class="btn-row" id="han-btns">
@@ -149,6 +153,7 @@
       </div>
     </div>
 
+    <!-- 符（直接選択 + 符計算） -->
     <div class="calc-card">
       <span class="clabel">符（5翻以上は不要）</span>
       <div class="btn-row" id="fu-btns">
@@ -164,8 +169,68 @@
         <button class="obtn fu-btn" onclick="setFu(100,this)">100符</button>
         <button class="obtn fu-btn" onclick="setFu(110,this)">110符</button>
       </div>
+
+      <!-- 符計算セクション -->
+      <hr class="fu-divider">
+      <div class="fu-toggle-row" onclick="toggleFuCalc()">
+        <span class="fu-toggle-label">符を計算する</span>
+        <span class="fu-toggle-arrow" id="fu-arrow">▼</span>
+      </div>
+
+      <div id="fu-body" class="fu-body hidden">
+
+        <!-- 和了方法 -->
+        <div class="fu-group">
+          <span class="clabel">和了方法</span>
+          <div class="btn-row" id="fu-win-btns">
+            <button class="obtn on" onclick="fuWin('ron_menzen',this)">門前ロン</button>
+            <button class="obtn" onclick="fuWin('ron_naki',this)">鳴きロン</button>
+            <button class="obtn" onclick="fuWin('tsumo',this)">ツモ</button>
+          </div>
+        </div>
+
+        <!-- 特殊形 -->
+        <div class="fu-group">
+          <span class="clabel">特殊形（通常は「普通」のまま）</span>
+          <div class="btn-row" id="fu-special-btns">
+            <button class="obtn on" onclick="fuSpecial('normal',this)">普通</button>
+            <button class="obtn" onclick="fuSpecial('chiitoi',this)">七対子（25符固定）</button>
+            <button class="obtn" id="pinfu-btn" onclick="fuSpecial('pinfu',this)">平和ツモ（20符固定）</button>
+          </div>
+        </div>
+
+        <!-- 面子 + 雀頭 + 待ち -->
+        <div id="fu-normal-section">
+          <div class="fu-group">
+            <span class="clabel">面子（刻子・槓子のみ符がつく。順子は0符）</span>
+            <div id="fu-melds"></div>
+          </div>
+
+          <div class="fu-group">
+            <span class="clabel">雀頭</span>
+            <div class="btn-row" id="fu-jantai-btns">
+              <button class="obtn on" onclick="fuJantai(0,this)">数牌・客風 +0符</button>
+              <button class="obtn" onclick="fuJantai(2,this)">役牌 +2符</button>
+              <button class="obtn" onclick="fuJantai(4,this)">連風牌 +4符</button>
+            </div>
+          </div>
+
+          <div class="fu-group">
+            <span class="clabel">待ち</span>
+            <div class="btn-row" id="fu-machi-btns">
+              <button class="obtn on" onclick="fuMachi(0,this)">両面・双碰 +0符</button>
+              <button class="obtn" onclick="fuMachi(2,this)">嵌張・辺張・単騎 +2符</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 結果 -->
+        <div id="fu-result"></div>
+
+      </div>
     </div>
 
+    <!-- 立場・和了方法 -->
     <div class="calc-card">
       <span class="clabel">立場・和了方法</span>
       <div class="tgl-row">
@@ -180,21 +245,20 @@
       </div>
     </div>
 
+    <!-- 結果 -->
     <div class="result-box">
       <div><span class="res-pts" id="res-pts">3,900</span><span class="res-unit">点</span></div>
       <div class="res-name" id="res-name"></div>
       <div class="res-detail" id="res-detail">子ロン</div>
     </div>
 
-    <!-- 子ロン早見表 -->
-    <div class="calc-card" style="margin-top:20px">
+    <!-- 早見表 -->
+    <div class="calc-card">
       <span class="clabel">子ロン 早見表</span>
       <p class="ref-note">20符はピンフツモのみ・25符は七対子専用。5翻以上は満貫（8,000点）。</p>
       <div class="tbl-wrap">
         <table class="rtbl">
-          <tr>
-            <th>符</th><th>1翻</th><th>2翻</th><th>3翻</th><th>4翻</th>
-          </tr>
+          <tr><th>符</th><th>1翻</th><th>2翻</th><th>3翻</th><th>4翻</th></tr>
           <tr><td class="fu-cell">20</td><td>700</td><td>1,300</td><td>2,600</td><td>5,200</td></tr>
           <tr><td class="fu-cell">25</td><td class="na">－</td><td>1,600</td><td>3,200</td><td>6,400</td></tr>
           <tr><td class="fu-cell">30</td><td>1,000</td><td>2,000</td><td>3,900</td><td>7,700</td></tr>
@@ -343,6 +407,168 @@ function setDealer(v){ cDeal=v; document.querySelectorAll('#dealer-tgl .tbtn').f
 function setTsumo(v){ cTsumo=v; document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0))); updateCalc(); }
 function showTab(id,btn){ document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
 updateCalc();
+
+/* ===== 符計算 ===== */
+const fuState = {
+  winType: 'ron_menzen',
+  special: 'normal',
+  melds: [
+    {type:'none',open:true,honor:false},
+    {type:'none',open:true,honor:false},
+    {type:'none',open:true,honor:false},
+    {type:'none',open:true,honor:false},
+  ],
+  jantai: 0,
+  machi: 0,
+};
+
+/* 面子符テーブル: [明/暗][中張/老頭字] */
+const MELD_PTS = {
+  koutsu: [[2,4],[4,8]],
+  kantsu: [[8,16],[16,32]],
+};
+
+function calcFu() {
+  const s = fuState;
+  if (s.special === 'chiitoi') return { total:25, raw:25, bd:[{label:'副底（七対子固定）',pts:25}] };
+  if (s.special === 'pinfu')   return { total:20, raw:20, bd:[{label:'副底（平和ツモ固定）',pts:20}] };
+
+  const bd = [];
+  let fu = 20;
+  bd.push({label:'副底',pts:20});
+
+  if (s.winType === 'ron_menzen') { fu+=10; bd.push({label:'門前加符',pts:10}); }
+  else if (s.winType === 'tsumo') { fu+=2;  bd.push({label:'ツモ加符',pts:2}); }
+
+  s.melds.forEach((m,i) => {
+    if (!MELD_PTS[m.type]) return;
+    const pts = MELD_PTS[m.type][m.open?0:1][m.honor?1:0];
+    if (!pts) return;
+    const tName = m.type==='koutsu'?'刻子':'槓子';
+    bd.push({label:`面子${i+1}（${tName}・${m.open?'明':'暗'}・${m.honor?'老頭/字牌':'中張牌'}）`,pts});
+    fu += pts;
+  });
+
+  if (s.jantai) { bd.push({label:`雀頭（${s.jantai===4?'連風牌':'役牌'}）`,pts:s.jantai}); fu+=s.jantai; }
+  if (s.machi)  { bd.push({label:'待ち符（嵌張/辺張/単騎）',pts:2}); fu+=2; }
+
+  const total = Math.ceil(fu/10)*10;
+  return {total, raw:fu, bd};
+}
+
+function renderFuResult() {
+  const r = calcFu();
+  const rows = r.bd.map(b=>`<div class="fu-bd-row"><span>${b.label}</span><span>+${b.pts}符</span></div>`).join('');
+  const totalLabel = r.raw!==r.total ? `合計 ${r.raw}符 → 切り上げ` : '合計';
+  document.getElementById('fu-result').innerHTML = `
+    <div class="fu-bd">
+      ${rows}
+      <div class="fu-bd-row total"><span>${totalLabel}</span><span>${r.total}符</span></div>
+    </div>
+    <button class="fu-apply" onclick="fuApply(${r.total})">この ${r.total}符 を点数計算に使う →</button>
+  `;
+}
+
+function fuApply(total) {
+  const allowed = [20,25,30,40,50,60,70,80,90,100,110];
+  const v = allowed.includes(total) ? total : allowed.reduce((a,b)=>Math.abs(b-total)<Math.abs(a-total)?b:a);
+  const btn = Array.from(document.querySelectorAll('.fu-btn')).find(b=>parseInt(b.textContent)===v);
+  if (btn) setFu(v, btn);
+  document.getElementById('res-pts').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+let fuOpen = false;
+function toggleFuCalc() {
+  fuOpen = !fuOpen;
+  document.getElementById('fu-body').classList.toggle('hidden', !fuOpen);
+  document.getElementById('fu-arrow').textContent = fuOpen ? '▲' : '▼';
+  if (fuOpen) renderFuResult();
+}
+
+function fuWin(v, btn) {
+  fuState.winType = v;
+  document.querySelectorAll('#fu-win-btns .obtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const pBtn = document.getElementById('pinfu-btn');
+  pBtn.disabled = (v !== 'tsumo');
+  if (v !== 'tsumo' && fuState.special === 'pinfu') fuSpecialInternal('normal');
+  renderFuResult();
+}
+
+function fuSpecialInternal(v) {
+  fuState.special = v;
+  document.querySelectorAll('#fu-special-btns .obtn').forEach(b=>b.classList.remove('on'));
+  const map = {normal:0,chiitoi:1,pinfu:2};
+  document.querySelectorAll('#fu-special-btns .obtn')[map[v]].classList.add('on');
+  document.getElementById('fu-normal-section').classList.toggle('hidden', v!=='normal');
+}
+
+function fuSpecial(v, btn) {
+  fuState.special = v;
+  document.querySelectorAll('#fu-special-btns .obtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('fu-normal-section').classList.toggle('hidden', v!=='normal');
+  renderFuResult();
+}
+
+function fuJantai(v, btn) {
+  fuState.jantai = v;
+  document.querySelectorAll('#fu-jantai-btns .obtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFuResult();
+}
+
+function fuMachi(v, btn) {
+  fuState.machi = v;
+  document.querySelectorAll('#fu-machi-btns .obtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFuResult();
+}
+
+function fuMeldType(i, v, btn) {
+  fuState.melds[i].type = v;
+  btn.closest('.meld-top').querySelectorAll('.mtype-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const sub = document.getElementById('msub'+i);
+  const showSub = v==='koutsu'||v==='kantsu';
+  sub.classList.toggle('hidden', !showSub);
+  renderFuResult();
+}
+
+function fuMeldOpen(i, v, btn) {
+  fuState.melds[i].open = v;
+  btn.closest('.meld-sub').querySelectorAll('.mopen-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFuResult();
+}
+
+function fuMeldHonor(i, v, btn) {
+  fuState.melds[i].honor = v;
+  btn.closest('.meld-sub').querySelectorAll('.mhonor-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFuResult();
+}
+
+/* 面子UI生成 */
+(function initMelds() {
+  document.getElementById('fu-melds').innerHTML = [0,1,2,3].map(i=>`
+    <div class="meld-row">
+      <div class="meld-top">
+        <span class="meld-label">面子${i+1}</span>
+        <button class="obtn mtype-btn on" onclick="fuMeldType(${i},'none',this)">なし</button>
+        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'shuntsu',this)">順子</button>
+        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'koutsu',this)">刻子</button>
+        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'kantsu',this)">槓子</button>
+      </div>
+      <div class="meld-sub hidden" id="msub${i}">
+        <button class="obtn mopen-btn on" onclick="fuMeldOpen(${i},true,this)">明</button>
+        <button class="obtn mopen-btn" onclick="fuMeldOpen(${i},false,this)">暗</button>
+        <button class="obtn mhonor-btn on" onclick="fuMeldHonor(${i},false,this)">中張牌</button>
+        <button class="obtn mhonor-btn" onclick="fuMeldHonor(${i},true,this)">老頭・字牌</button>
+      </div>
+    </div>
+  `).join('');
+})();
 </script>
 </body>
 </html>
