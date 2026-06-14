@@ -56,6 +56,15 @@
   .d-agari { display:flex; align-items:center; gap:7px; margin-bottom:10px; }
   .d-agari-lbl { font-size:12px; color:#666; font-weight:600; white-space:nowrap; }
   .d-agari-tile { border-color:#e64a19 !important; box-shadow:0 0 0 2px rgba(230,74,25,.35) !important; }
+  .dsr-wrap { text-align:center; padding:20px 8px; }
+  .dsr-title { font:700 18px/1.4 inherit; margin-bottom:6px; color:#333; }
+  .dsr-score { margin-bottom:14px; }
+  .dsr-num { font:700 36px/1 inherit; color:#e64a19; }
+  .dsr-den { font-size:14px; color:#666; }
+  .dsr-dots { display:flex; justify-content:center; gap:6px; margin-bottom:16px; }
+  .dsr-dot { width:12px; height:12px; border-radius:50%; background:#dce3eb; }
+  .dsr-dot.dsr-done { background:#e64a19; }
+  .dsr-final { background:#e8f5e9; color:#2e7d32; border-radius:10px; padding:10px 14px; font:700 14px/1.5 inherit; margin-bottom:10px; }
   .d-info { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
   .d-tag { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; }
   .d-q { font: 700 16px/1 inherit; text-align: center; margin-bottom: 12px; color: #333; }
@@ -655,7 +664,7 @@ function fuMeldHonor(i,v,btn){fuState.melds[i].honor=v;btn.closest('.meld-sub').
 })();
 
 /* ===== 点数計算ドリル ===== */
-let drillScore=0,drillTotal=0,drillStarted=false;
+let drillScore=0,drillTotal=0,drillStarted=false,drillSet=1,drillQNum=0,drillSetScore=0,drillSetTotal=0;
 const D_FU=[20,25,30,40,50,60,70,80,90,100,110];
 // 実際の麻雀の和了頻度に近い重み（30符が最頻、高符は稀）
 const D_FU_W=[[20,12],[25,4],[30,30],[40,22],[50,14],[60,8],[70,5],[80,3],[90,1],[100,1]];
@@ -778,8 +787,8 @@ function dRenderQ(hand){
   html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span><span class="d-tag">${hand.han}翻</span></div>`;
   html+=`<div class="drill-choices" id="d-choices"></div>`;
   html+=`<div class="drill-feedback" id="d-fb"></div>`;
-  html+=`<div class="drill-score" id="d-score">正解 ${drillScore} / ${drillTotal} 問</div>`;
-  html+=`<button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNextQ()">次の問題 →</button>`;
+  html+=`<div class="drill-score" id="d-score">第${drillSet}セット ${drillQNum}/10問 ｜ 正解 ${drillSetScore}/${drillSetTotal}</div>`;
+  html+=`<button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNextHand()">次の問題 →</button>`;
   area.innerHTML=html;
   if(hand.isChiitoi){
     // 七対子は符が固定なのでいきなり点数問題
@@ -804,9 +813,9 @@ function dRenderQ(hand){
   }
 }
 function dAnswerFu(chosen,hand){
-  drillTotal++;
+  drillTotal++;drillSetTotal++;
   const ok=chosen===hand.fu;
-  if(ok)drillScore++;
+  if(ok){drillScore++;drillSetScore++;}
   document.querySelectorAll('#d-choices .drill-btn').forEach(b=>{
     b.disabled=true;const v=parseInt(b.textContent);
     if(v===hand.fu)b.classList.add('correct');
@@ -815,7 +824,7 @@ function dAnswerFu(chosen,hand){
   const fb=document.getElementById('d-fb');
   fb.className='drill-feedback '+(ok?'ok':'ng');
   fb.textContent=ok?'⭕ 正解！'+hand.fu+'符。では'+hand.han+'翻'+hand.fu+'符の点数は？':'❌ 不正解。正解は'+hand.fu+'符。では'+hand.han+'翻'+hand.fu+'符の点数は？';
-  document.getElementById('d-score').textContent='正解 '+drillScore+' / '+drillTotal+' 問';
+  document.getElementById('d-score').textContent='第'+drillSet+'セット '+drillQNum+'/10問 ｜ 正解 '+drillSetScore+'/'+drillSetTotal;
   const res=calcScore(hand.han,hand.fu,hand.isDealer,hand.winType==='tsumo');
   const el=document.getElementById('d-choices');el.innerHTML='';
   dScoreChoices(res.total).forEach(v=>{
@@ -826,9 +835,9 @@ function dAnswerFu(chosen,hand){
   });
 }
 function dAnswerScore(chosen,res){
-  drillTotal++;
+  drillTotal++;drillSetTotal++;
   const ok=chosen===res.total;
-  if(ok)drillScore++;
+  if(ok){drillScore++;drillSetScore++;}
   document.querySelectorAll('#d-choices .drill-btn').forEach(b=>{
     b.disabled=true;const v=parseInt(b.textContent.replace(/[^0-9]/g,''));
     if(v===res.total)b.classList.add('correct');
@@ -838,11 +847,44 @@ function dAnswerScore(chosen,res){
   fb.className='drill-feedback '+(ok?'ok':'ng');
   if(ok)fb.textContent='⭕ 正解！'+(res.name?res.name+' ':'')+res.total.toLocaleString()+'点（'+res.detail+'）';
   else fb.textContent='❌ 不正解。正解は'+res.total.toLocaleString()+'点'+(res.name?' '+res.name:'')+'（'+res.detail+'）';
-  document.getElementById('d-score').textContent='正解 '+drillScore+' / '+drillTotal+' 問';
+  document.getElementById('d-score').textContent='第'+drillSet+'セット '+drillQNum+'/10問 ｜ 正解 '+drillSetScore+'/'+drillSetTotal;
   document.getElementById('d-next').style.display='block';
 }
-function drillNextQ(){dRenderQ(dGenHand());}
-function drillInit(){drillStarted=true;drillNextQ();}
+function drillNextHand(){
+  drillQNum++;
+  if(drillQNum>10){dShowSetResult();return;}
+  dRenderQ(dGenHand());
+}
+function dShowSetResult(){
+  const area=document.getElementById('d-area');
+  const isLast=drillSet>=10;
+  const pct=drillSetTotal>0?Math.round(drillSetScore/drillSetTotal*100):0;
+  let html=`<div class="dsr-wrap">`;
+  html+=`<div class="dsr-title">第${drillSet}セット完了！</div>`;
+  html+=`<div class="dsr-score"><span class="dsr-num">${drillSetScore}</span><span class="dsr-den">/${drillSetTotal}問正解（${pct}%）</span></div>`;
+  // セット進捗ドット
+  html+=`<div class="dsr-dots">`;
+  for(let i=1;i<=10;i++)html+=`<span class="dsr-dot${i<=drillSet?' dsr-done':''}"></span>`;
+  html+=`</div>`;
+  if(!isLast){
+    html+=`<button class="drill-next-btn" onclick="drillNextSet()">第${drillSet+1}セットへ →</button>`;
+  } else {
+    const totalPct=drillTotal>0?Math.round(drillScore/drillTotal*100):0;
+    html+=`<div class="dsr-final">全100問完了！通算 ${drillScore}/${drillTotal}問正解（${totalPct}%）</div>`;
+    html+=`<button class="drill-next-btn" style="margin-top:10px" onclick="drillInit()">もう一度挑戦</button>`;
+  }
+  html+='</div>';
+  area.innerHTML=html;
+}
+function drillNextSet(){
+  drillSet++;drillQNum=0;drillSetScore=0;drillSetTotal=0;
+  drillNextHand();
+}
+function drillInit(){
+  drillStarted=true;drillScore=0;drillTotal=0;
+  drillSet=1;drillQNum=0;drillSetScore=0;drillSetTotal=0;
+  drillNextHand();
+}
 </script>
 </body>
 </html>
