@@ -748,6 +748,67 @@ const D_LBL={
 const D_WAIT={ryanmen:'リャンメン待ち',kanchan:'カンチャン待ち',penchan:'ペンチャン待ち',tanki:'単騎待ち',shanpon:'シャンポン待ち'};
 const D_WIN={ron_menzen:'門前ロン',ron_naki:'鳴きロン',tsumo:'ツモ'};
 
+// ===== 役検出 =====
+function dYakuTanyao(melds,pair){return[...melds.flatMap(m=>m.tiles),pair,pair].every(t=>t.suit!=='z'&&t.n>=2&&t.n<=8);}
+function dYakuPinfu(melds,pair,winType,wait){return winType!=='ron_naki'&&wait==='ryanmen'&&melds.every(m=>m.type==='shuntsu'&&!m.open)&&pair.suit!=='z';}
+function dYakuIipeiko(melds,winType){
+  if(winType==='ron_naki'||melds.some(m=>m.open))return false;
+  const s=melds.filter(m=>m.type==='shuntsu');
+  for(let i=0;i<s.length;i++)for(let j=i+1;j<s.length;j++){const a=s[i].tiles[0],b=s[j].tiles[0];if(a.suit===b.suit&&a.n===b.n)return true;}
+  return false;
+}
+function dYakuSananko(melds){return melds.filter(m=>m.type==='koutsu'&&!m.open).length>=3;}
+function dYakuSuuanko(melds){return melds.filter(m=>m.type==='koutsu'&&!m.open).length===4;}
+function dYakuToitoi(melds){return melds.every(m=>m.type==='koutsu');}
+function dYakuIttsu(melds){
+  const s=melds.filter(m=>m.type==='shuntsu').map(m=>({s:m.tiles[0].suit,n:m.tiles[0].n}));
+  return['m','p','s'].some(suit=>[1,4,7].every(n=>s.some(t=>t.s===suit&&t.n===n)));
+}
+function dYakuSanshokuDoujun(melds){
+  const s=melds.filter(m=>m.type==='shuntsu').map(m=>({s:m.tiles[0].suit,n:m.tiles[0].n}));
+  for(let n=1;n<=7;n++)if(['m','p','s'].every(suit=>s.some(t=>t.s===suit&&t.n===n)))return true;
+  return false;
+}
+function dYakuSanshokuDoukou(melds){
+  const k=melds.filter(m=>m.type==='koutsu').map(m=>m.tiles[0]);
+  for(let n=1;n<=9;n++)if(['m','p','s'].every(s=>k.some(t=>t.suit===s&&t.n===n)))return true;
+  return false;
+}
+function dYakuHonitsu(melds,pair){
+  const all=[...melds.flatMap(m=>m.tiles),pair];
+  const suits=new Set(all.filter(t=>t.suit!=='z').map(t=>t.suit));
+  return suits.size===1&&all.some(t=>t.suit==='z');
+}
+function dYakuChinitsu(melds,pair){
+  const all=[...melds.flatMap(m=>m.tiles),pair];
+  const suits=new Set(all.map(t=>t.suit));
+  return suits.size===1&&!suits.has('z');
+}
+function dComputeYaku(hand){
+  if(hand.isChiitoi){
+    const y=[{name:'七対子',han:2}];
+    if(hand.chiitoi7.every(t=>t.suit!=='z'&&t.n>=2&&t.n<=8))y.push({name:'断ヤオ九',han:1});
+    return y;
+  }
+  const{melds,pair,winType,wait}=hand;
+  const isOpen=melds.some(m=>m.open);
+  const y=[];
+  if(!isOpen)y.push(winType==='tsumo'?{name:'門前清自摸和',han:1}:{name:'立直',han:1});
+  if(dYakuTanyao(melds,pair))y.push({name:'断ヤオ九',han:1});
+  if(dYakuPinfu(melds,pair,winType,wait))y.push({name:'平和',han:1});
+  if(dYakuIipeiko(melds,winType))y.push({name:'一盃口',han:1});
+  if(dYakuSuuanko(melds)){y.push({name:'四暗刻',han:13});return y;}
+  if(dYakuIttsu(melds))y.push({name:'一気通貫',han:isOpen?1:2});
+  else if(dYakuSanshokuDoujun(melds))y.push({name:'三色同順',han:isOpen?1:2});
+  if(dYakuToitoi(melds))y.push({name:'対々和',han:2});
+  if(dYakuSananko(melds))y.push({name:'三暗刻',han:2});
+  if(dYakuSanshokuDoukou(melds))y.push({name:'三色同刻',han:2});
+  if(dYakuHonitsu(melds,pair))y.push({name:'混一色',han:isOpen?2:3});
+  if(dYakuChinitsu(melds,pair))y.push({name:'清一色',han:isOpen?5:6});
+  if(isOpen&&y.length===0)y.push({name:'役牌',han:1});
+  return y;
+}
+
 function dPickW(arr){let r=Math.random()*arr.reduce((s,[,w])=>s+w,0);for(const[v,w]of arr){r-=w;if(r<=0)return v;}return arr[0][0];}
 function dRT(){if(Math.random()<.72){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*9)+1};}return{suit:'z',n:Math.floor(Math.random()*7)+1};}
 function dMid(){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*7)+2};}
@@ -763,18 +824,22 @@ function dCalcFu(melds,pair,winType,wait){
   if(wait==='kanchan'||wait==='penchan'||wait==='tanki')fu+=2;
   return Math.ceil(fu/10)*10;
 }
-// 20符: 鳴き手・全順子・リャンメン（20+0+0+0+0=20）
+// 20符: 鳴き手・全順子（断ヤオ）・リャンメン
 function dMake20(){
-  const s1=dShuntsu(),s2=dShuntsu(),s3=dShuntsu(),s4=dShuntsu();
+  function tyS(){const s=['m','p','s'][Math.floor(Math.random()*3)];const n=Math.floor(Math.random()*5)+2;return{type:'shuntsu',tiles:[{suit:s,n},{suit:s,n:n+1},{suit:s,n:n+2}]};}
+  function tyP(){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*7)+2};}
+  const s1=tyS(),s2=tyS(),s3=tyS(),s4=tyS();
   const melds=[{...s1,open:false},{...s2,open:false},{...s3,open:false},{...s4,open:true}];
   const lc=melds[2];
   const agariTile=Math.random()<.5?lc.tiles[0]:lc.tiles[2];
-  return{melds,pair:dMid(),winType:'ron_naki',wait:'ryanmen',agariTile,fu:20,han:dPickW([[1,50],[2,50]]),isDealer:Math.random()<.5};
+  const hand={melds,pair:tyP(),winType:'ron_naki',wait:'ryanmen',agariTile,fu:20,isDealer:Math.random()<.5};
+  hand.yaku=dComputeYaku(hand);hand.han=hand.yaku.reduce((s,y)=>s+y.han,0);return hand;
 }
 // 25符: 七対子
 function dMake25(){
   const tiles=Array.from({length:7},()=>dRT());
-  return{chiitoi7:tiles,melds:[],pair:tiles[0],winType:Math.random()<.5?'ron_menzen':'tsumo',wait:'tanki',agariTile:tiles[6],fu:25,han:dPickW([[2,60],[3,30],[4,10]]),isDealer:Math.random()<.5,isChiitoi:true};
+  const hand={chiitoi7:tiles,melds:[],pair:tiles[0],winType:Math.random()<.5?'ron_menzen':'tsumo',wait:'tanki',agariTile:tiles[6],fu:25,isDealer:Math.random()<.5,isChiitoi:true};
+  hand.yaku=dComputeYaku(hand);hand.han=hand.yaku.reduce((s,y)=>s+y.han,0);return hand;
 }
 // targetFuに応じてkoutsu率を調整して1回生成
 function dGenAttempt(targetFu){
@@ -812,13 +877,15 @@ function dGenHand(){
   const targetFu=dPickW(D_FU_W);
   if(targetFu===20)return dMake20();
   if(targetFu===25)return dMake25();
-  // 拒絶サンプリング: targetFuと一致する手が出るまで最大30回試みる
   for(let i=0;i<30;i++){
     const h=dGenAttempt(targetFu);
-    if(h.fu===targetFu)return{...h,han:dPickW([[1,35],[2,35],[3,20],[4,10]]),isDealer:Math.random()<.5};
+    if(h.fu!==targetFu)continue;
+    const hand={...h,isDealer:Math.random()<.5};
+    hand.yaku=dComputeYaku(hand);hand.han=Math.min(13,hand.yaku.reduce((s,y)=>s+y.han,0));return hand;
   }
   const h=dGenAttempt(targetFu);
-  return{...h,han:dPickW([[1,35],[2,35],[3,20],[4,10]]),isDealer:Math.random()<.5};
+  const hand={...h,isDealer:Math.random()<.5};
+  hand.yaku=dComputeYaku(hand);hand.han=Math.min(13,hand.yaku.reduce((s,y)=>s+y.han,0));return hand;
 }
 
 function dTileHTML(t,extra){return`<span class="d-tile d-${t.suit}${extra?' '+extra:''}">${D_LBL[t.suit][t.n]}</span>`;}
@@ -852,34 +919,64 @@ function dScoreChoices(correct){
   const close=cands.filter(v=>v>=correct*.3&&v<=correct*3.5);
   return[correct,...(close.length>=3?close:cands).slice(0,3)].sort(()=>Math.random()-.5);
 }
+function dHanChoices(correct){
+  const pool=[1,2,3,4,5,6,7,8].filter(v=>v!==correct);
+  if(correct===13)return[13,...pool.slice(0,3)].sort(()=>Math.random()-.5);
+  const close=pool.filter(v=>Math.abs(v-correct)<=2);
+  const far=pool.filter(v=>Math.abs(v-correct)>2);
+  return[correct,...[...close,...far].slice(0,3)].sort(()=>Math.random()-.5);
+}
 function dRenderQ(hand){
   const area=document.getElementById('d-area');
   let html=dHandHTML(hand);
-  html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span><span class="d-tag">${hand.han}翻</span></div>`;
+  html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span></div>`;
   html+=`<div class="drill-choices" id="d-choices"></div>`;
   html+=`<div class="drill-feedback" id="d-fb"></div>`;
   html+=`<div class="drill-score" id="d-score">セット ${drillSet}/20 │ 問 ${drillQNum}/5 │ 正解 ${drillSetScore}/${drillSetTotal}</div>`;
   html+=`<button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNextHand()">次の問題 →</button>`;
   area.innerHTML=html;
+  const qEl=document.createElement('div');qEl.className='d-q';qEl.textContent='この手は何翻？';
+  document.getElementById('d-choices').before(qEl);
+  dHanChoices(hand.han).forEach(v=>{
+    const b=document.createElement('button');
+    b.className='drill-btn';
+    b.textContent=v===13?'役満':v+'翻';
+    b.onclick=()=>dAnswerHan(v,hand);
+    document.getElementById('d-choices').appendChild(b);
+  });
+}
+function dAnswerHan(chosen,hand){
+  drillTotal++;drillSetTotal++;
+  const ok=chosen===hand.han;
+  if(ok){drillScore++;drillSetScore++;}
+  document.querySelectorAll('#d-choices .drill-btn').forEach(b=>{
+    b.disabled=true;
+    const v=b.textContent==='役満'?13:parseInt(b.textContent);
+    if(v===hand.han)b.classList.add('correct');
+    else if(v===chosen&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('d-fb');
+  fb.className='drill-feedback '+(ok?'ok':'ng');
+  const yakuStr=hand.yaku.map(y=>y.han<13?`${y.name}(${y.han}翻)`:y.name).join('・');
+  const hanLabel=hand.han===13?'役満':hand.han+'翻';
+  const next=hand.isChiitoi?'では点数は？':'では何符？';
+  fb.textContent=(ok?`⭕ 正解！`:`❌ 不正解。正解は`)+`${hanLabel}（${yakuStr}）。${next}`;
+  document.getElementById('d-score').textContent=`セット ${drillSet}/20 │ 問 ${drillQNum}/5 │ 正解 ${drillSetScore}/${drillSetTotal}`;
+  const el=document.getElementById('d-choices');el.innerHTML='';
   if(hand.isChiitoi){
-    // 七対子は符が固定なのでいきなり点数問題
-    html=area.innerHTML.replace(/<div class="drill-choices"/,`<div class="d-q">七対子（25符固定）。この手は何点？</div><div class="drill-choices"`);
-    area.innerHTML=html;
+    const q=document.createElement('div');q.className='d-q';q.textContent='七対子（25符固定）。この手は何点？';
+    el.before(q);
     const res=calcScore(hand.han,25,hand.isDealer,hand.winType==='tsumo');
     dScoreChoices(res.total).forEach(v=>{
-      const b=document.createElement('button');
-      b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
-      b.onclick=()=>dAnswerScore(v,res);
-      document.getElementById('d-choices').appendChild(b);
+      const b=document.createElement('button');b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
+      b.onclick=()=>dAnswerScore(v,res);el.appendChild(b);
     });
   } else {
-    const qEl=document.createElement('div');qEl.className='d-q';qEl.textContent='この手は何符？';
-    document.getElementById('d-choices').before(qEl);
+    const q=document.createElement('div');q.className='d-q';q.textContent='この手は何符？';
+    el.before(q);
     dFuChoices(hand.fu).forEach(v=>{
-      const b=document.createElement('button');
-      b.className='drill-btn';b.textContent=v+'符';
-      b.onclick=()=>dAnswerFu(v,hand);
-      document.getElementById('d-choices').appendChild(b);
+      const b=document.createElement('button');b.className='drill-btn';b.textContent=v+'符';
+      b.onclick=()=>dAnswerFu(v,hand);el.appendChild(b);
     });
   }
 }
