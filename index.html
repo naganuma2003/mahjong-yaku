@@ -4,102 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>こんにちおはたろう</title>
-<meta name="description" content="麻雀の全役をまとめた一覧。翻数・鳴き可否・説明つき。役満も収録。">
+<meta name="description" content="麻雀の全役・点数計算をまとめたサイト。役満も収録。">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
-    background: #f0f4f8; color: #333; min-height: 100vh;
-  }
+  body { font-family: 'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
-  header {
-    background: linear-gradient(135deg, #1b5e20, #388e3c);
-    color: white; padding: 36px 20px; text-align: center;
-  }
-  header h1 { font-size: 28px; font-weight: 800; letter-spacing: 0.05em; }
-  header p { font-size: 14px; opacity: 0.8; margin-top: 8px; }
+  header { background: linear-gradient(135deg,#1b5e20,#388e3c); color: white; padding: 36px 20px; text-align: center; }
+  header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
+  header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
-  .filter {
-    display: flex; gap: 8px; justify-content: center;
-    padding: 24px 20px 16px; flex-wrap: wrap;
+  /* Tab nav */
+  .tabs-nav { display: flex; background: white; border-bottom: 2px solid #dce3eb; }
+  .tab-nav-btn {
+    flex: 1; padding: 14px; border: none; background: none; cursor: pointer;
+    font: 600 15px/1 inherit; color: #888;
+    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s;
   }
+  .tab-nav-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
+
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
+
+  /* Yaku list */
+  .filter { display: flex; gap: 8px; justify-content: center; padding: 24px 20px 16px; flex-wrap: wrap; }
   .filter button {
     padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px;
     background: white; color: #388e3c; cursor: pointer; font-size: 14px;
-    font-weight: 600; transition: all 0.15s; font-family: inherit;
+    font-weight: 600; transition: all .15s; font-family: inherit;
   }
-  .filter button.active, .filter button:hover {
-    background: #388e3c; color: white;
-  }
+  .filter button.active, .filter button:hover { background: #388e3c; color: white; }
   .filter button.yakuman-btn { border-color: #b45309; color: #b45309; }
-  .filter button.yakuman-btn.active, .filter button.yakuman-btn:hover {
-    background: #b45309; color: white;
-  }
+  .filter button.yakuman-btn.active, .filter button.yakuman-btn:hover { background: #b45309; color: white; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 16px;
-    padding: 8px 20px 48px;
-    max-width: 1040px;
-    margin: 0 auto;
-  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(290px,1fr)); gap: 16px; padding: 8px 20px 48px; max-width: 1040px; margin: 0 auto; }
 
-  .card {
-    background: white; border-radius: 14px; padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.11); }
+  .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.07); transition: transform .15s, box-shadow .15s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.11); }
   .card.is-yakuman { border-left: 4px solid #d97706; }
-
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-
   .yaku-name { font-size: 18px; font-weight: 800; color: #1a1a1a; }
-  .yaku-reading { font-size: 12px; color: #999; margin-top: 3px; letter-spacing: 0.06em; }
-
+  .yaku-reading { font-size: 12px; color: #999; margin-top: 3px; letter-spacing: .06em; }
   .badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-
-  .han-badge {
-    background: #e8f5e9; color: #2e7d32;
-    font-weight: 700; font-size: 12px;
-    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
-  }
-  .han-badge.ym {
-    background: #fef3c7; color: #92400e;
-  }
-  .han-badge.dym {
-    background: #fee2e2; color: #991b1b;
-  }
-  .closed-tag {
-    background: #fff3e0; color: #e65100;
-    font-size: 11px; font-weight: 600;
-    padding: 2px 8px; border-radius: 10px; white-space: nowrap;
-  }
-
+  .han-badge { background: #e8f5e9; color: #2e7d32; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .han-badge.ym { background: #fef3c7; color: #92400e; }
+  .han-badge.dym { background: #fee2e2; color: #991b1b; }
+  .closed-tag { background: #fff3e0; color: #e65100; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
   .desc { font-size: 14px; color: #555; line-height: 1.65; margin-top: 12px; }
+
+  /* Calculator */
+  .calc-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
+  .calc-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 20px; }
+  .clabel { font: 700 13px/1 inherit; color: #666; margin-bottom: 10px; display: block; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .obtn {
+    padding: 8px 14px; border: 2px solid #dce3eb; border-radius: 8px;
+    background: white; color: #555; cursor: pointer; font: 600 13px/1 inherit; transition: all .12s;
+  }
+  .obtn.on { background: #388e3c; border-color: #388e3c; color: white; }
+  .obtn:hover:not(.on) { border-color: #388e3c; color: #388e3c; }
+  .obtn:disabled { opacity: .3; cursor: default; }
+
+  .tgl-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tgl { display: flex; border: 2px solid #dce3eb; border-radius: 8px; overflow: hidden; }
+  .tbtn { padding: 9px 20px; border: none; background: white; cursor: pointer; font: 600 14px/1 inherit; color: #666; transition: all .12s; }
+  .tbtn.on { background: #388e3c; color: white; }
+
+  .result-box { background: #f0f9f1; border: 2px solid #a5d6a7; border-radius: 14px; padding: 24px; text-align: center; }
+  .res-pts { font-size: 56px; font-weight: 900; color: #1b5e20; line-height: 1; }
+  .res-unit { font-size: 22px; font-weight: 700; color: #2e7d32; }
+  .res-name { font: 700 16px/1.4 inherit; color: #b45309; margin-top: 6px; min-height: 22px; }
+  .res-detail { font-size: 14px; color: #666; margin-top: 6px; min-height: 20px; }
+
+  /* Reference table */
+  .ref-note { font-size: 13px; color: #666; margin-bottom: 12px; }
+  .tbl-wrap { overflow-x: auto; }
+  .rtbl { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+  .rtbl th { background: #388e3c; color: white; padding: 8px 10px; text-align: center; font-weight: 700; }
+  .rtbl td { border: 1px solid #dce3eb; padding: 7px 10px; text-align: center; }
+  .rtbl tr:nth-child(even) td { background: #f8fbf8; }
+  .rtbl .fu-cell { font-weight: 700; background: #e8f5e9 !important; color: #2e7d32; }
+  .rtbl .mg { font-weight: 700; color: #b45309; background: #fef3c7 !important; }
+  .rtbl .na { color: #ccc; }
 
   footer { text-align: center; padding: 24px; font-size: 13px; color: #aaa; }
 
   @media (max-width: 600px) {
     header { padding: 24px 16px; }
     header h1 { font-size: 22px; }
-    header p { font-size: 13px; }
-
+    .tab-nav-btn { font-size: 13px; padding: 12px 8px; }
     .filter { padding: 16px 12px 12px; gap: 6px; }
     .filter button { padding: 6px 13px; font-size: 13px; }
-
-    .grid {
-      grid-template-columns: 1fr;
-      padding: 8px 12px 40px;
-      gap: 12px;
-    }
-
+    .grid { grid-template-columns: 1fr; padding: 8px 12px 40px; gap: 12px; }
     .card { padding: 16px; }
     .yaku-name { font-size: 16px; }
-    .han-badge { font-size: 11px; padding: 3px 8px; }
-    .closed-tag { font-size: 10px; }
-    .desc { font-size: 13px; }
+    .han-badge { font-size: 11px; }
+    .res-pts { font-size: 40px; }
+    .calc-card { padding: 16px; }
+    .rtbl { font-size: 11px; }
+    .rtbl th, .rtbl td { padding: 6px 6px; }
   }
 </style>
 </head>
@@ -107,160 +109,240 @@
 
 <header>
   <h1>こんにちおはたろう</h1>
-  <p>🀄 麻雀 役一覧 ― 基本役・役満を含む全役のルールと翻数をまとめました</p>
+  <p>🀄 麻雀 役一覧・点数計算</p>
 </header>
 
-<div class="filter">
-  <button class="active" onclick="filter('all', this)">すべて</button>
-  <button onclick="filter('1', this)">1翻</button>
-  <button onclick="filter('2', this)">2翻</button>
-  <button onclick="filter('3', this)">3翻以上</button>
-  <button class="yakuman-btn" onclick="filter('yakuman', this)">役満</button>
-  <button onclick="filter('closed', this)">門前限定</button>
+<div class="tabs-nav">
+  <button class="tab-nav-btn active" onclick="showTab('yaku',this)">役一覧</button>
+  <button class="tab-nav-btn" onclick="showTab('score',this)">点数計算</button>
 </div>
 
-<div class="grid" id="grid"></div>
+<!-- 役一覧タブ -->
+<div id="tab-yaku" class="tab-section active">
+  <div class="filter">
+    <button class="active" onclick="filter('all',this)">すべて</button>
+    <button onclick="filter('1',this)">1翻</button>
+    <button onclick="filter('2',this)">2翻</button>
+    <button onclick="filter('3',this)">3翻以上</button>
+    <button class="yakuman-btn" onclick="filter('yakuman',this)">役満</button>
+    <button onclick="filter('closed',this)">門前限定</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- 点数計算タブ -->
+<div id="tab-score" class="tab-section">
+  <div class="calc-wrap">
+
+    <div class="calc-card">
+      <span class="clabel">翻数</span>
+      <div class="btn-row" id="han-btns">
+        <button class="obtn" onclick="setHan(1,this)">1翻</button>
+        <button class="obtn" onclick="setHan(2,this)">2翻</button>
+        <button class="obtn on" onclick="setHan(3,this)">3翻</button>
+        <button class="obtn" onclick="setHan(4,this)">4翻</button>
+        <button class="obtn" onclick="setHan(5,this)">5翻（満貫）</button>
+        <button class="obtn" onclick="setHan(6,this)">6〜7翻（跳満）</button>
+        <button class="obtn" onclick="setHan(8,this)">8〜10翻（倍満）</button>
+        <button class="obtn" onclick="setHan(11,this)">11〜12翻（三倍満）</button>
+        <button class="obtn" onclick="setHan(13,this)">役満</button>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <span class="clabel">符（5翻以上は不要）</span>
+      <div class="btn-row" id="fu-btns">
+        <button class="obtn fu-btn" onclick="setFu(20,this)">20符</button>
+        <button class="obtn fu-btn" onclick="setFu(25,this)">25符</button>
+        <button class="obtn fu-btn on" onclick="setFu(30,this)">30符</button>
+        <button class="obtn fu-btn" onclick="setFu(40,this)">40符</button>
+        <button class="obtn fu-btn" onclick="setFu(50,this)">50符</button>
+        <button class="obtn fu-btn" onclick="setFu(60,this)">60符</button>
+        <button class="obtn fu-btn" onclick="setFu(70,this)">70符</button>
+        <button class="obtn fu-btn" onclick="setFu(80,this)">80符</button>
+        <button class="obtn fu-btn" onclick="setFu(90,this)">90符</button>
+        <button class="obtn fu-btn" onclick="setFu(100,this)">100符</button>
+        <button class="obtn fu-btn" onclick="setFu(110,this)">110符</button>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <span class="clabel">立場・和了方法</span>
+      <div class="tgl-row">
+        <div class="tgl" id="dealer-tgl">
+          <button class="tbtn on" onclick="setDealer(false)">子</button>
+          <button class="tbtn" onclick="setDealer(true)">親</button>
+        </div>
+        <div class="tgl" id="tsumo-tgl">
+          <button class="tbtn on" onclick="setTsumo(false)">ロン</button>
+          <button class="tbtn" onclick="setTsumo(true)">ツモ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div><span class="res-pts" id="res-pts">3,900</span><span class="res-unit">点</span></div>
+      <div class="res-name" id="res-name"></div>
+      <div class="res-detail" id="res-detail">子ロン</div>
+    </div>
+
+    <!-- 子ロン早見表 -->
+    <div class="calc-card" style="margin-top:20px">
+      <span class="clabel">子ロン 早見表</span>
+      <p class="ref-note">20符はピンフツモのみ・25符は七対子専用。5翻以上は満貫（8,000点）。</p>
+      <div class="tbl-wrap">
+        <table class="rtbl">
+          <tr>
+            <th>符</th><th>1翻</th><th>2翻</th><th>3翻</th><th>4翻</th>
+          </tr>
+          <tr><td class="fu-cell">20</td><td>700</td><td>1,300</td><td>2,600</td><td>5,200</td></tr>
+          <tr><td class="fu-cell">25</td><td class="na">－</td><td>1,600</td><td>3,200</td><td>6,400</td></tr>
+          <tr><td class="fu-cell">30</td><td>1,000</td><td>2,000</td><td>3,900</td><td>7,700</td></tr>
+          <tr><td class="fu-cell">40</td><td>1,300</td><td>2,600</td><td>5,200</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">50</td><td>1,600</td><td>3,200</td><td>6,400</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">60</td><td>2,000</td><td>3,900</td><td>7,700</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">70</td><td>2,300</td><td>4,500</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">80</td><td>2,600</td><td>5,200</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">90</td><td>2,900</td><td>5,800</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">100</td><td>3,200</td><td>6,400</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell">110</td><td>3,600</td><td>7,100</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
+          <tr><td class="fu-cell" colspan="2">5翻以上</td><td colspan="3" class="mg">満貫 8,000点</td></tr>
+          <tr><td class="fu-cell" colspan="2">6〜7翻</td><td colspan="3" class="mg">跳満 12,000点</td></tr>
+          <tr><td class="fu-cell" colspan="2">8〜10翻</td><td colspan="3" class="mg">倍満 16,000点</td></tr>
+          <tr><td class="fu-cell" colspan="2">11〜12翻</td><td colspan="3" class="mg">三倍満 24,000点</td></tr>
+          <tr><td class="fu-cell" colspan="2">役満</td><td colspan="3" class="mg">役満 32,000点</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <footer>役満のダブル役満扱い・人和の採否はルールによって異なります。</footer>
 
 <script>
+/* ===== 役一覧 ===== */
 const yaku = [
-  // 1翻
-  { name:"立直", reading:"リーチ", han:"1翻", closed:true,
-    desc:"門前でテンパイしたときに宣言できる。宣言後は手牌を変えられない。" },
-  { name:"ダブル立直", reading:"ダブルリーチ", han:"2翻", closed:true,
-    desc:"第一ツモ番（最初の自分の捨て牌）でリーチを宣言する。通常のリーチより1翻高い。" },
-  { name:"一発", reading:"イッパツ", han:"1翻", closed:true,
-    desc:"リーチ後、次の自分のツモ番が来る前に和了する。" },
-  { name:"門前清自摸和", reading:"メンゼンツモ", han:"1翻", closed:true,
-    desc:"鳴きなしの門前でツモ和了する。" },
-  { name:"断么九", reading:"タンヤオ", han:"1翻", closed:false,
-    desc:"手牌がすべて2〜8の数牌（中張牌）のみ。1・9・字牌を一切含まない。" },
-  { name:"平和", reading:"ピンフ", han:"1翻", closed:true,
-    desc:"すべて順子で構成し、雀頭が役牌でなく、待ちが両面待ち。鳴き不可。" },
-  { name:"一盃口", reading:"イーペーコー", han:"1翻", closed:true,
-    desc:"同じ牌の並びの順子が2組。門前限定。" },
-  { name:"二盃口", reading:"リャンペーコー", han:"3翻", closed:true,
-    desc:"一盃口が2組、つまり同じ順子の組が2ペア。門前限定。七対子と複合しない。" },
-  { name:"役牌（白）", reading:"ハク", han:"1翻", closed:false,
-    desc:"三元牌「白」の刻子または槓子。" },
-  { name:"役牌（發）", reading:"ハツ", han:"1翻", closed:false,
-    desc:"三元牌「發」の刻子または槓子。" },
-  { name:"役牌（中）", reading:"チュン", han:"1翻", closed:false,
-    desc:"三元牌「中」の刻子または槓子。" },
-  { name:"役牌（自風・場風）", reading:"ヤクハイ", han:"1翻", closed:false,
-    desc:"自分の席風牌または場の風牌の刻子。" },
-  { name:"嶺上開花", reading:"リンシャンカイホウ", han:"1翻", closed:false,
-    desc:"槓子を作った後、嶺上牌（補充牌）でツモ和了する。" },
-  { name:"槍槓", reading:"チャンカン", han:"1翻", closed:false,
-    desc:"他家が加槓した牌でロン和了する。" },
-  { name:"海底撈月", reading:"ハイテイ", han:"1翻", closed:false,
-    desc:"最後のツモ牌でツモ和了する。" },
-  { name:"河底撈魚", reading:"ホウテイ", han:"1翻", closed:false,
-    desc:"最後の捨て牌でロン和了する。" },
-  // 2翻
-  { name:"七対子", reading:"チートイツ", han:"2翻", closed:true,
-    desc:"7種類の対子で手牌を構成する。同じ牌を4枚使うのは不可。" },
-  { name:"対々和", reading:"トイトイ", han:"2翻", closed:false,
-    desc:"すべての面子が刻子または槓子。順子なし。" },
-  { name:"三色同順", reading:"サンショクドウジュン", han:"門前2翻／鳴き1翻", closed:false,
-    desc:"マン・ピン・ソーの3種で、同じ数字の順子を1組ずつ揃える。" },
-  { name:"一気通貫", reading:"イッキツウカン", han:"門前2翻／鳴き1翻", closed:false,
-    desc:"同じ種類の牌で123・456・789の順子をすべて揃える。" },
-  { name:"混全帯么九", reading:"チャンタ", han:"門前2翻／鳴き1翻", closed:false,
-    desc:"すべての面子と雀頭に1・9・字牌のいずれかを含む。" },
-  { name:"三暗刻", reading:"サンアンコウ", han:"2翻", closed:false,
-    desc:"ツモで揃えた暗刻（暗槓含む）を3組持つ。" },
-  { name:"三色同刻", reading:"サンショクドウコウ", han:"2翻", closed:false,
-    desc:"マン・ピン・ソーの3種で、同じ数字の刻子を1組ずつ揃える。" },
-  { name:"三槓子", reading:"サンカンツ", han:"2翻", closed:false,
-    desc:"3組の槓子を含む。" },
-  { name:"小三元", reading:"ショウサンゲン", han:"2翻", closed:false,
-    desc:"白・發・中のうち2種を刻子、1種を雀頭にする。役牌2翻と合計4翻になる。" },
-  // 3翻以上
-  { name:"混一色", reading:"ホンイツ", han:"門前3翻／鳴き2翻", closed:false,
-    desc:"1種類の数牌と字牌のみで手牌を構成する。" },
-  { name:"純全帯么九", reading:"ジュンチャン", han:"門前3翻／鳴き2翻", closed:false,
-    desc:"すべての面子と雀頭に1・9牌を含む。字牌は使わない。" },
-  { name:"清一色", reading:"チンイツ", han:"門前6翻／鳴き5翻", closed:false,
-    desc:"1種類の数牌のみで手牌を構成する。字牌は一切含まない。" },
-  // 役満
-  { name:"国士無双", reading:"コクシムソウ", han:"役満", closed:true,
-    desc:"マン・ピン・ソーの1と9、字牌（東南西北白發中）の13種を1枚ずつ揃え、そのうち1種を雀頭にする。" },
-  { name:"九蓮宝燈", reading:"チューレンポウトウ", han:"役満", closed:true,
-    desc:"同じ種類の数牌で1112345678999を構成し、さらに同じ種類の牌を1枚加えて和了する。" },
-  { name:"四暗刻", reading:"スーアンコウ", han:"役満", closed:true,
-    desc:"4組すべての面子をツモで揃えた暗刻にする。単騎待ちはダブル役満扱いのルールも。" },
-  { name:"大三元", reading:"ダイサンゲン", han:"役満", closed:false,
-    desc:"白・發・中の三元牌すべての刻子または槓子を揃える。" },
-  { name:"小四喜", reading:"ショウスーシー", han:"役満", closed:false,
-    desc:"東・南・西・北のうち3種を刻子、1種を雀頭にする。" },
-  { name:"大四喜", reading:"ダイスーシー", han:"ダブル役満", closed:false,
-    desc:"東・南・西・北の四風牌すべての刻子または槓子を揃える。雀頭は別の牌。" },
-  { name:"字一色", reading:"ツーイーソウ", han:"役満", closed:false,
-    desc:"字牌（東南西北白發中）のみで手牌を構成する。" },
-  { name:"緑一色", reading:"リューイーソウ", han:"役満", closed:false,
-    desc:"ソーの2・3・4・6・8と發のみで構成する。すべて緑色の牌のみ。" },
-  { name:"清老頭", reading:"チンロウトウ", han:"役満", closed:false,
-    desc:"1と9の数牌のみで構成する。すべて刻子か槓子になる。" },
-  { name:"四槓子", reading:"スーカンツ", han:"役満", closed:false,
-    desc:"4組すべてを槓子にする。" },
-  { name:"天和", reading:"テンホウ", han:"役満", closed:true,
-    desc:"親が配牌の時点で和了形になっている。ゲーム開始直後のみ成立。" },
-  { name:"地和", reading:"チーホウ", han:"役満", closed:true,
-    desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
-  { name:"人和", reading:"レンホウ", han:"役満", closed:true,
-    desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。採用しないルールも多い。" },
+  { name:"立直", reading:"リーチ", han:"1翻", closed:true, desc:"門前でテンパイしたときに宣言できる。宣言後は手牌を変えられない。" },
+  { name:"ダブル立直", reading:"ダブルリーチ", han:"2翻", closed:true, desc:"第一ツモ番（最初の自分の捨て牌）でリーチを宣言する。通常のリーチより1翻高い。" },
+  { name:"一発", reading:"イッパツ", han:"1翻", closed:true, desc:"リーチ後、次の自分のツモ番が来る前に和了する。" },
+  { name:"門前清自摸和", reading:"メンゼンツモ", han:"1翻", closed:true, desc:"鳴きなしの門前でツモ和了する。" },
+  { name:"断么九", reading:"タンヤオ", han:"1翻", closed:false, desc:"手牌がすべて2〜8の数牌（中張牌）のみ。1・9・字牌を一切含まない。" },
+  { name:"平和", reading:"ピンフ", han:"1翻", closed:true, desc:"すべて順子で構成し、雀頭が役牌でなく、待ちが両面待ち。鳴き不可。" },
+  { name:"一盃口", reading:"イーペーコー", han:"1翻", closed:true, desc:"同じ牌の並びの順子が2組。門前限定。" },
+  { name:"二盃口", reading:"リャンペーコー", han:"3翻", closed:true, desc:"一盃口が2組、つまり同じ順子の組が2ペア。門前限定。七対子と複合しない。" },
+  { name:"役牌（白）", reading:"ハク", han:"1翻", closed:false, desc:"三元牌「白」の刻子または槓子。" },
+  { name:"役牌（發）", reading:"ハツ", han:"1翻", closed:false, desc:"三元牌「發」の刻子または槓子。" },
+  { name:"役牌（中）", reading:"チュン", han:"1翻", closed:false, desc:"三元牌「中」の刻子または槓子。" },
+  { name:"役牌（自風・場風）", reading:"ヤクハイ", han:"1翻", closed:false, desc:"自分の席風牌または場の風牌の刻子。" },
+  { name:"嶺上開花", reading:"リンシャンカイホウ", han:"1翻", closed:false, desc:"槓子を作った後、嶺上牌（補充牌）でツモ和了する。" },
+  { name:"槍槓", reading:"チャンカン", han:"1翻", closed:false, desc:"他家が加槓した牌でロン和了する。" },
+  { name:"海底撈月", reading:"ハイテイ", han:"1翻", closed:false, desc:"最後のツモ牌でツモ和了する。" },
+  { name:"河底撈魚", reading:"ホウテイ", han:"1翻", closed:false, desc:"最後の捨て牌でロン和了する。" },
+  { name:"七対子", reading:"チートイツ", han:"2翻", closed:true, desc:"7種類の対子で手牌を構成する。同じ牌を4枚使うのは不可。" },
+  { name:"対々和", reading:"トイトイ", han:"2翻", closed:false, desc:"すべての面子が刻子または槓子。順子なし。" },
+  { name:"三色同順", reading:"サンショクドウジュン", han:"門前2翻／鳴き1翻", closed:false, desc:"マン・ピン・ソーの3種で、同じ数字の順子を1組ずつ揃える。" },
+  { name:"一気通貫", reading:"イッキツウカン", han:"門前2翻／鳴き1翻", closed:false, desc:"同じ種類の牌で123・456・789の順子をすべて揃える。" },
+  { name:"混全帯么九", reading:"チャンタ", han:"門前2翻／鳴き1翻", closed:false, desc:"すべての面子と雀頭に1・9・字牌のいずれかを含む。" },
+  { name:"三暗刻", reading:"サンアンコウ", han:"2翻", closed:false, desc:"ツモで揃えた暗刻（暗槓含む）を3組持つ。" },
+  { name:"三色同刻", reading:"サンショクドウコウ", han:"2翻", closed:false, desc:"マン・ピン・ソーの3種で、同じ数字の刻子を1組ずつ揃える。" },
+  { name:"三槓子", reading:"サンカンツ", han:"2翻", closed:false, desc:"3組の槓子を含む。" },
+  { name:"小三元", reading:"ショウサンゲン", han:"2翻", closed:false, desc:"白・發・中のうち2種を刻子、1種を雀頭にする。役牌2翻と合計4翻になる。" },
+  { name:"混一色", reading:"ホンイツ", han:"門前3翻／鳴き2翻", closed:false, desc:"1種類の数牌と字牌のみで手牌を構成する。" },
+  { name:"純全帯么九", reading:"ジュンチャン", han:"門前3翻／鳴き2翻", closed:false, desc:"すべての面子と雀頭に1・9牌を含む。字牌は使わない。" },
+  { name:"清一色", reading:"チンイツ", han:"門前6翻／鳴き5翻", closed:false, desc:"1種類の数牌のみで手牌を構成する。字牌は一切含まない。" },
+  { name:"国士無双", reading:"コクシムソウ", han:"役満", closed:true, desc:"マン・ピン・ソーの1と9、字牌の13種を1枚ずつ揃え、そのうち1種を雀頭にする。" },
+  { name:"九蓮宝燈", reading:"チューレンポウトウ", han:"役満", closed:true, desc:"同じ種類の数牌で1112345678999を構成し、さらに同じ種類の牌を1枚加えて和了する。" },
+  { name:"四暗刻", reading:"スーアンコウ", han:"役満", closed:true, desc:"4組すべての面子をツモで揃えた暗刻にする。単騎待ちはダブル役満扱いのルールも。" },
+  { name:"大三元", reading:"ダイサンゲン", han:"役満", closed:false, desc:"白・發・中の三元牌すべての刻子または槓子を揃える。" },
+  { name:"小四喜", reading:"ショウスーシー", han:"役満", closed:false, desc:"東・南・西・北のうち3種を刻子、1種を雀頭にする。" },
+  { name:"大四喜", reading:"ダイスーシー", han:"ダブル役満", closed:false, desc:"東・南・西・北の四風牌すべての刻子または槓子を揃える。" },
+  { name:"字一色", reading:"ツーイーソウ", han:"役満", closed:false, desc:"字牌（東南西北白發中）のみで手牌を構成する。" },
+  { name:"緑一色", reading:"リューイーソウ", han:"役満", closed:false, desc:"ソーの2・3・4・6・8と發のみで構成する。すべて緑色の牌のみ。" },
+  { name:"清老頭", reading:"チンロウトウ", han:"役満", closed:false, desc:"1と9の数牌のみで構成する。すべて刻子か槓子になる。" },
+  { name:"四槓子", reading:"スーカンツ", han:"役満", closed:false, desc:"4組すべてを槓子にする。" },
+  { name:"天和", reading:"テンホウ", han:"役満", closed:true, desc:"親が配牌の時点で和了形になっている。ゲーム開始直後のみ成立。" },
+  { name:"地和", reading:"チーホウ", han:"役満", closed:true, desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
+  { name:"人和", reading:"レンホウ", han:"役満", closed:true, desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。採用しないルールも多い。" },
 ];
 
 function hanGroup(han) {
   if (han.includes('役満')) return 'yakuman';
-  if (han.includes('6') || han.includes('5') || han.includes('3')) return '3';
+  if (han.includes('6')||han.includes('5')||han.includes('3')) return '3';
   if (han.includes('2')) return '2';
   return '1';
 }
-
 function badgeClass(han) {
   if (han.includes('ダブル')) return 'dym';
   if (han.includes('役満')) return 'ym';
   return '';
 }
-
-function renderCards(filterType) {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+function renderCards(f) {
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
   yaku.forEach(y => {
-    const group = hanGroup(y.han);
-    const show = filterType === 'all'
-      || (filterType === 'closed' && y.closed)
-      || (filterType === group);
+    const grp = hanGroup(y.han);
+    const show = f==='all'||(f==='closed'&&y.closed)||(f===grp);
     if (!show) return;
-    const card = document.createElement('div');
-    card.className = 'card' + (group === 'yakuman' ? ' is-yakuman' : '');
-    card.innerHTML = `
-      <div class="card-top">
-        <div>
-          <div class="yaku-name">${y.name}</div>
-          <div class="yaku-reading">${y.reading}</div>
-        </div>
-        <div class="badges">
-          <div class="han-badge ${badgeClass(y.han)}">${y.han}</div>
-          ${y.closed ? '<div class="closed-tag">門前限定</div>' : ''}
-        </div>
-      </div>
-      <div class="desc">${y.desc}</div>
-    `;
-    grid.appendChild(card);
+    const c = document.createElement('div');
+    c.className = 'card'+(grp==='yakuman'?' is-yakuman':'');
+    c.innerHTML = `<div class="card-top"><div><div class="yaku-name">${y.name}</div><div class="yaku-reading">${y.reading}</div></div><div class="badges"><div class="han-badge ${badgeClass(y.han)}">${y.han}</div>${y.closed?'<div class="closed-tag">門前限定</div>':''}</div></div><div class="desc">${y.desc}</div>`;
+    g.appendChild(c);
   });
 }
-
-function filter(type, btn) {
-  document.querySelectorAll('.filter button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderCards(type);
+function filter(t,btn) {
+  document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderCards(t);
 }
-
 renderCards('all');
+
+/* ===== 点数計算 ===== */
+const LIMITS = [
+  { min:13, name:'役満',   ko:32000, oya:48000, kToy:16000, kTok:8000,  oToe:16000 },
+  { min:11, name:'三倍満', ko:24000, oya:36000, kToy:12000, kTok:6000,  oToe:12000 },
+  { min:8,  name:'倍満',   ko:16000, oya:24000, kToy:8000,  kTok:4000,  oToe:8000  },
+  { min:6,  name:'跳満',   ko:12000, oya:18000, kToy:6000,  kTok:3000,  oToe:6000  },
+  { min:5,  name:'満貫',   ko:8000,  oya:12000, kToy:4000,  kTok:2000,  oToe:4000  },
+];
+
+let cHan=3, cFu=30, cDeal=false, cTsumo=false;
+
+function ru(n){ return Math.ceil(n/100)*100; }
+
+function calcScore(han,fu,deal,tsumo){
+  const lim = LIMITS.find(l=>han>=l.min);
+  if (lim) return fmt(lim,deal,tsumo);
+  const base = fu*(1<<(han+2));
+  if (ru(base*4)>=8000) return fmt(LIMITS[4],deal,tsumo);
+  if (deal){
+    if (tsumo){ const e=ru(base*2); return {total:e*3,name:'',detail:e.toLocaleString()+'オール'}; }
+    return {total:ru(base*6),name:'',detail:'親ロン'};
+  }
+  if (tsumo){ const oy=ru(base*2),ko=ru(base); return {total:oy+ko*2,name:'',detail:'親'+oy.toLocaleString()+' / 子'+ko.toLocaleString()}; }
+  return {total:ru(base*4),name:'',detail:'子ロン'};
+}
+function fmt(lim,deal,tsumo){
+  if (deal){
+    if (tsumo) return {total:lim.oToe*3,name:lim.name,detail:lim.oToe.toLocaleString()+'オール'};
+    return {total:lim.oya,name:lim.name,detail:'親ロン'};
+  }
+  if (tsumo) return {total:lim.kToy+lim.kTok*2,name:lim.name,detail:'親'+lim.kToy.toLocaleString()+' / 子'+lim.kTok.toLocaleString()};
+  return {total:lim.ko,name:lim.name,detail:'子ロン'};
+}
+function updateCalc(){
+  const r = calcScore(cHan,cFu,cDeal,cTsumo);
+  document.getElementById('res-pts').textContent = r.total.toLocaleString();
+  document.getElementById('res-name').textContent = r.name;
+  document.getElementById('res-detail').textContent = r.detail;
+  const noFu = cHan>=5;
+  document.querySelectorAll('.fu-btn').forEach(b=>{ b.disabled=noFu; if(noFu)b.classList.remove('on'); });
+}
+function setHan(v,btn){ cHan=v; document.querySelectorAll('#han-btns .obtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); updateCalc(); }
+function setFu(v,btn){ cFu=v; document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); updateCalc(); }
+function setDealer(v){ cDeal=v; document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0))); updateCalc(); }
+function setTsumo(v){ cTsumo=v; document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0))); updateCalc(); }
+function showTab(id,btn){ document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+updateCalc();
 </script>
 </body>
 </html>
