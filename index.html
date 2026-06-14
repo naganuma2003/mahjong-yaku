@@ -43,6 +43,7 @@
   .closed-tag { background: #fff3e0; color: #e65100; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
   .local-tag { background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; border: 1px solid #cbd5e1; }
   .rulevar-tag { background: #ede9fe; color: #7c3aed; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .dym-tag { background: #fee2e2; color: #991b1b; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; border: 1px solid #fca5a5; }
   .card.is-local { background: #f8f9fa; border: 1.5px dashed #adb5bd; }
   .card.is-rulevar { border-left: 4px solid #7c3aed; }
   .desc { font-size: 14px; color: #555; line-height: 1.65; margin-top: 12px; }
@@ -414,9 +415,9 @@ const yaku = [
   { name:"混一色", reading:"ホンイツ", han:"門前3翻／鳴き2翻", closed:false, desc:"1種類の数牌と字牌のみで手牌を構成する。" },
   { name:"純全帯么九", reading:"ジュンチャン", han:"門前3翻／鳴き2翻", closed:false, desc:"すべての面子と雀頭に1・9牌を含む。字牌は使わない。" },
   { name:"清一色", reading:"チンイツ", han:"門前6翻／鳴き5翻", closed:false, desc:"1種類の数牌のみで手牌を構成する。字牌は一切含まない。" },
-  { name:"国士無双", reading:"コクシムソウ", han:"役満", closed:true, desc:"マン・ピン・ソーの1と9、字牌の13種を1枚ずつ揃え、そのうち1種を雀頭にする。" },
-  { name:"九蓮宝燈", reading:"チューレンポウトウ", han:"役満", closed:true, desc:"同じ種類の数牌で1112345678999を構成し、さらに同じ種類の牌を1枚加えて和了する。" },
-  { name:"四暗刻", reading:"スーアンコウ", han:"役満", closed:true, desc:"4組すべての面子をツモで揃えた暗刻にする。単騎待ちはダブル役満扱いのルールも。" },
+  { name:"国士無双", reading:"コクシムソウ", han:"役満", closed:true, doubleyakuman:true, desc:"マン・ピン・ソーの1と9、字牌の13種を1枚ずつ揃え、そのうち1種を雀頭にする。13面待ち（国士十三面）はダブル役満扱いのルールも。" },
+  { name:"九蓮宝燈", reading:"チューレンポウトウ", han:"役満", closed:true, doubleyakuman:true, desc:"同じ種類の数牌で1112345678999を構成し、さらに同じ種類の牌を1枚加えて和了する。9面待ちで完成する純正九蓮宝燈はダブル役満扱いのルールも。" },
+  { name:"四暗刻", reading:"スーアンコウ", han:"役満", closed:true, doubleyakuman:true, desc:"4組すべての面子をツモで揃えた暗刻にする。単騎待ち（四暗刻単騎・スッタン）はダブル役満扱いのルールも。" },
   { name:"大三元", reading:"ダイサンゲン", han:"役満", closed:false, desc:"白・發・中の三元牌すべての刻子または槓子を揃える。" },
   { name:"小四喜", reading:"ショウスーシー", han:"役満", closed:false, desc:"東・南・西・北のうち3種を刻子、1種を雀頭にする。" },
   { name:"大四喜", reading:"ダイスーシー", han:"ダブル役満", closed:false, rulevar:true, desc:"東・南・西・北の四風牌すべての刻子または槓子を揃える。ダブル役満扱いかどうかはルール次第。" },
@@ -443,6 +444,7 @@ function renderCards(f){
     const tags=[
       y.local?'<div class="local-tag">ローカル</div>':'',
       y.rulevar?'<div class="rulevar-tag">ルール依存</div>':'',
+      y.doubleyakuman?'<div class="dym-tag">W役満あり</div>':'',
       y.closed?'<div class="closed-tag">門前限定</div>':'',
     ].join('');
     c.className=cls;
