@@ -11,6 +11,7 @@
 
   header { background: linear-gradient(135deg,#1b5e20,#388e3c); color: white; padding: 36px 20px; text-align: center; transition: background .35s; }
   header.score { background: linear-gradient(135deg,#0d47a1,#1565c0); }
+  header.play { background: linear-gradient(135deg,#7f0000,#b71c1c); }
   header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
   header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
@@ -18,8 +19,11 @@
   .tab-nav-btn { flex: 1; padding: 14px; border: none; background: none; cursor: pointer; font: 600 15px/1 inherit; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
   .tab-nav-btn.yaku-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
   .tab-nav-btn.score-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
+  .tab-nav-btn.play-btn.active { color: #c62828; border-bottom-color: #c62828; }
   .tab-section { display: none; }
   .tab-section.active { display: block; }
+  #tab-play { height: calc(100vh - 176px); overflow: hidden; }
+  #tab-play iframe { width: 100%; height: 100%; border: none; display: block; }
 
   /* ===== 役一覧 (green) ===== */
   .search-wrap { padding: 20px 20px 0; display: flex; justify-content: center; }
@@ -142,6 +146,7 @@
     .score-tbl th, .score-tbl td { padding: 4px 5px; }
     .ref-grid { grid-template-columns: 1fr; }
     .meld-sub { padding-left: 0; }
+    #tab-play { height: calc(100vh - 140px); }
   }
 </style>
 </head>
@@ -155,6 +160,7 @@
 <div class="tabs-nav">
   <button class="tab-nav-btn yaku-btn active" onclick="showTab('yaku',this)">役一覧</button>
   <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
+  <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">プレイする</button>
 </div>
 
 <!-- 役一覧タブ -->
@@ -400,6 +406,11 @@
   </div>
 </div>
 
+<!-- プレイするタブ -->
+<div id="tab-play" class="tab-section">
+  <iframe src="game.html" title="麻雀ゲーム"></iframe>
+</div>
+
 <footer>役満のダブル役満扱い・人和の採否はルールによって異なります。</footer>
 
 <script>
@@ -546,7 +557,7 @@ function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEa
 function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
 function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
 function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
-function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelector('header').classList.toggle('score',id==='score');}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');}
 updateCalc();
 
 /* ===== 符計算 ===== */
