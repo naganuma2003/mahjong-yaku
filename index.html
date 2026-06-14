@@ -41,6 +41,7 @@
   .han-badge { background: #e8f5e9; color: #2e7d32; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
   .han-badge.ym { background: #fef3c7; color: #92400e; }
   .han-badge.dym { background: #fee2e2; color: #991b1b; }
+  .han-badge.mg { background: #fef9c3; color: #854d0e; }
   .closed-tag { background: #fff3e0; color: #e65100; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
   .local-tag { background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; border: 1px solid #cbd5e1; }
   .rulevar-tag { background: #ede9fe; color: #7c3aed; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
@@ -406,6 +407,7 @@ const yaku = [
   { name:"槍槓", reading:"チャンカン", han:"1翻", closed:false, desc:"他家が加槓した牌でロン和了する。" },
   { name:"海底撈月", reading:"ハイテイ", han:"1翻", closed:false, desc:"最後のツモ牌でツモ和了する。" },
   { name:"河底撈魚", reading:"ホウテイ", han:"1翻", closed:false, desc:"最後の捨て牌でロン和了する。" },
+  { name:"流し満貫", reading:"ながしまんがん", han:"満貫", closed:false, rulevar:true, desc:"流局時、自分の捨て牌がすべて么九牌（1・9・字牌）で、かつ一度も鳴かれていない場合に満貫として和了と同様の点数を受け取る。採用しないルールも多い。" },
   { name:"七対子", reading:"チートイツ", han:"2翻", closed:true, desc:"7種類の対子で手牌を構成する。同じ牌を4枚使うのは不可。" },
   { name:"対々和", reading:"トイトイ", han:"2翻", closed:false, desc:"すべての面子が刻子または槓子。順子なし。" },
   { name:"三色同順", reading:"サンショクドウジュン", han:"門前2翻／鳴き1翻", closed:false, desc:"マン・ピン・ソーの3種で、同じ数字の順子を1組ずつ揃える。" },
@@ -432,8 +434,8 @@ const yaku = [
   { name:"地和", reading:"チーホウ", han:"役満", closed:true, desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
   { name:"人和", reading:"レンホウ", han:"役満", closed:true, local:true, desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。ローカル役で採用しないルールが多い。翻数も役満・8翻・満貫固定とルールによって大きく異なる。" },
 ];
-function hanGroup(h){if(h.includes('役満'))return'yakuman';if(h.includes('6')||h.includes('5')||h.includes('3'))return'3';if(h.includes('2'))return'2';return'1';}
-function badgeClass(h){if(h.includes('ダブル'))return'dym';if(h.includes('役満'))return'ym';return'';}
+function hanGroup(h){if(h.includes('役満'))return'yakuman';if(h==='満貫')return'3';if(h.includes('6')||h.includes('5')||h.includes('3'))return'3';if(h.includes('2'))return'2';return'1';}
+function badgeClass(h){if(h.includes('ダブル'))return'dym';if(h.includes('役満'))return'ym';if(h==='満貫')return'mg';return'';}
 function renderCards(f){
   const g=document.getElementById('grid');g.innerHTML='';
   yaku.forEach(y=>{
