@@ -12,6 +12,7 @@
   header { background: linear-gradient(135deg,#1b5e20,#388e3c); color: white; padding: 36px 20px; text-align: center; transition: background .35s; }
   header.score { background: linear-gradient(135deg,#0d47a1,#1565c0); }
   header.play { background: linear-gradient(135deg,#7f0000,#b71c1c); }
+  header.drill { background: linear-gradient(135deg,#e65100,#f57f17); }
   header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
   header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
@@ -20,6 +21,7 @@
   .tab-nav-btn.yaku-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
   .tab-nav-btn.score-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
   .tab-nav-btn.play-btn.active { color: #c62828; border-bottom-color: #c62828; }
+  .tab-nav-btn.drill-btn.active { color: #f57f17; border-bottom-color: #f57f17; }
 
   .tab-section { display: none; }
   .tab-section.active { display: block; }
@@ -253,6 +255,7 @@
   <button class="tab-nav-btn yaku-btn active" onclick="showTab('yaku',this)">役一覧</button>
   <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
   <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">プレイする</button>
+  <button class="tab-nav-btn drill-btn" onclick="showTab('drill',this)">ドリル</button>
 </div>
 
 <!-- 役一覧タブ -->
@@ -279,30 +282,6 @@
 <!-- 点数計算タブ -->
 <div id="tab-score" class="tab-section">
   <div class="calc-wrap">
-
-    <!-- 点数計算ドリル -->
-    <div class="calc-card drill-card">
-      <div class="drill-hd">📝 点数計算ドリル<span class="drill-hd-sub">牌を見て符→点数を計算しよう</span></div>
-      <div class="drill-body" id="d-area">
-        <button class="drill-next-btn" onclick="drillInit()">ドリルを始める</button>
-      </div>
-    </div>
-
-    <!-- 清一色ドリル -->
-    <div class="calc-card drill-card">
-      <div class="drill-hd cdr-hd">🀄 清一色ドリル<span class="drill-hd-sub">多面張の待ち牌をすべて選ぼう</span></div>
-      <div class="drill-body" id="cd-area">
-        <button class="drill-next-btn cdr-btn" onclick="cdrInit()">ドリルを始める</button>
-      </div>
-    </div>
-
-    <!-- 清一色ドリル２ -->
-    <div class="calc-card drill-card">
-      <div class="drill-hd cd2-hd">🀄 清一色ドリル２<span class="drill-hd-sub">リアル牌で多面張を見抜こう</span></div>
-      <div class="drill-body" id="cd2-area">
-        <button class="drill-next-btn cd2-btn" onclick="cd2Init()">ドリルを始める</button>
-      </div>
-    </div>
 
     <!-- 翻数 -->
     <div class="calc-card">
@@ -527,6 +506,37 @@
   <iframe src="game.html" title="麻雀ゲーム"></iframe>
 </div>
 
+<!-- ドリルタブ -->
+<div id="tab-drill" class="tab-section">
+  <div class="calc-wrap">
+
+    <!-- 点数計算ドリル -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd">📝 点数計算ドリル<span class="drill-hd-sub">牌を見て符→点数を計算しよう</span></div>
+      <div class="drill-body" id="d-area">
+        <button class="drill-next-btn" onclick="drillInit()">ドリルを始める</button>
+      </div>
+    </div>
+
+    <!-- 清一色ドリル -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd cdr-hd">🀄 清一色ドリル<span class="drill-hd-sub">多面張の待ち牌をすべて選ぼう</span></div>
+      <div class="drill-body" id="cd-area">
+        <button class="drill-next-btn cdr-btn" onclick="cdrInit()">ドリルを始める</button>
+      </div>
+    </div>
+
+    <!-- 清一色ドリル２ -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd cd2-hd">🀄 清一色ドリル２<span class="drill-hd-sub">リアル牌で多面張を見抜こう</span></div>
+      <div class="drill-body" id="cd2-area">
+        <button class="drill-next-btn cd2-btn" onclick="cd2Init()">ドリルを始める</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <footer>役満のダブル役満扱い・人和の採否はルールによって異なります。</footer>
 
 <script>
@@ -673,7 +683,7 @@ function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEa
 function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
 function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
 function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
-function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');h.classList.toggle('drill',id==='drill');}
 updateCalc();
 
 /* ===== 符計算 ===== */
