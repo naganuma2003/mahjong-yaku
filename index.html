@@ -61,10 +61,24 @@
   .dsr-score { margin-bottom:14px; }
   .dsr-num { font:700 36px/1 inherit; color:#e64a19; }
   .dsr-den { font-size:14px; color:#666; }
-  .dsr-dots { display:flex; justify-content:center; gap:6px; margin-bottom:16px; }
-  .dsr-dot { width:12px; height:12px; border-radius:50%; background:#dce3eb; }
+  .dsr-dots { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; margin-bottom:16px; }
+  .dsr-dot { width:10px; height:10px; border-radius:50%; background:#dce3eb; }
   .dsr-dot.dsr-done { background:#e64a19; }
   .dsr-final { background:#e8f5e9; color:#2e7d32; border-radius:10px; padding:10px 14px; font:700 14px/1.5 inherit; margin-bottom:10px; }
+  .cdr-hd { background:linear-gradient(135deg,#1565c0,#1976d2) !important; }
+  .cdr-btn { background:#1976d2 !important; }
+  .cdr-btn:hover { background:#1565c0 !important; }
+  .dsr-dot.cdr-done { background:#1976d2; }
+  .cdr-final { background:#e3f2fd !important; color:#0d47a1 !important; }
+  .cd-hand { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:12px; justify-content:center; }
+  .cd-tile { display:inline-flex; align-items:center; justify-content:center; width:32px; height:44px; border:1px solid #ddd; border-radius:4px; font:700 10px/1.3 inherit; background:white; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+  .cd-choices { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; justify-content:center; }
+  .cd-choice { width:46px; height:52px; border:2px solid #dce3eb; border-radius:9px; background:white; font:700 11px/1.3 inherit; cursor:pointer; transition:all .12s; display:flex; align-items:center; justify-content:center; font-family:inherit; }
+  .cd-choice:hover:not(:disabled) { border-color:#1976d2; color:#0d47a1; }
+  .cd-choice.selected { border-color:#1976d2 !important; border-width:3px; background:#e3f2fd !important; color:#0d47a1 !important; }
+  .cd-choice.correct { border-color:#388e3c !important; background:#e8f5e9 !important; color:#2e7d32 !important; }
+  .cd-choice.wrong { border-color:#c62828 !important; background:#ffebee !important; color:#c62828 !important; }
+  .cd-choice.missed { border-color:#e65100 !important; background:#fff3e0 !important; color:#e65100 !important; }
   .d-info { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
   .d-tag { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; }
   .d-q { font: 700 16px/1 inherit; text-align: center; margin-bottom: 12px; color: #333; }
@@ -458,6 +472,13 @@
       </div>
     </div>
 
+    <div class="calc-card drill-card" style="margin-top:16px">
+      <div class="drill-hd cdr-hd">🀄 清一色ドリル<span class="drill-hd-sub">多面張の待ち牌をすべて選ぼう</span></div>
+      <div class="drill-body" id="cd-area">
+        <button class="drill-next-btn cdr-btn" onclick="cdrInit()">ドリルを始める</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -787,7 +808,7 @@ function dRenderQ(hand){
   html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span><span class="d-tag">${hand.han}翻</span></div>`;
   html+=`<div class="drill-choices" id="d-choices"></div>`;
   html+=`<div class="drill-feedback" id="d-fb"></div>`;
-  html+=`<div class="drill-score" id="d-score">第${drillSet}セット ${drillQNum}/10問 ｜ 正解 ${drillSetScore}/${drillSetTotal}</div>`;
+  html+=`<div class="drill-score" id="d-score">セット ${drillSet}/20 │ 問 ${drillQNum}/5 │ 正解 ${drillSetScore}/${drillSetTotal}</div>`;
   html+=`<button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNextHand()">次の問題 →</button>`;
   area.innerHTML=html;
   if(hand.isChiitoi){
@@ -824,7 +845,7 @@ function dAnswerFu(chosen,hand){
   const fb=document.getElementById('d-fb');
   fb.className='drill-feedback '+(ok?'ok':'ng');
   fb.textContent=ok?'⭕ 正解！'+hand.fu+'符。では'+hand.han+'翻'+hand.fu+'符の点数は？':'❌ 不正解。正解は'+hand.fu+'符。では'+hand.han+'翻'+hand.fu+'符の点数は？';
-  document.getElementById('d-score').textContent='第'+drillSet+'セット '+drillQNum+'/10問 ｜ 正解 '+drillSetScore+'/'+drillSetTotal;
+  document.getElementById('d-score').textContent='セット '+drillSet+'/20 │ 問 '+drillQNum+'/5 │ 正解 '+drillSetScore+'/'+drillSetTotal;
   const res=calcScore(hand.han,hand.fu,hand.isDealer,hand.winType==='tsumo');
   const el=document.getElementById('d-choices');el.innerHTML='';
   dScoreChoices(res.total).forEach(v=>{
@@ -847,30 +868,29 @@ function dAnswerScore(chosen,res){
   fb.className='drill-feedback '+(ok?'ok':'ng');
   if(ok)fb.textContent='⭕ 正解！'+(res.name?res.name+' ':'')+res.total.toLocaleString()+'点（'+res.detail+'）';
   else fb.textContent='❌ 不正解。正解は'+res.total.toLocaleString()+'点'+(res.name?' '+res.name:'')+'（'+res.detail+'）';
-  document.getElementById('d-score').textContent='第'+drillSet+'セット '+drillQNum+'/10問 ｜ 正解 '+drillSetScore+'/'+drillSetTotal;
+  document.getElementById('d-score').textContent='セット '+drillSet+'/20 │ 問 '+drillQNum+'/5 │ 正解 '+drillSetScore+'/'+drillSetTotal;
   document.getElementById('d-next').style.display='block';
 }
 function drillNextHand(){
   drillQNum++;
-  if(drillQNum>10){dShowSetResult();return;}
+  if(drillQNum>5){dShowSetResult();return;}
   dRenderQ(dGenHand());
 }
 function dShowSetResult(){
   const area=document.getElementById('d-area');
-  const isLast=drillSet>=10;
+  const isLast=drillSet>=20;
   const pct=drillSetTotal>0?Math.round(drillSetScore/drillSetTotal*100):0;
   let html=`<div class="dsr-wrap">`;
-  html+=`<div class="dsr-title">第${drillSet}セット完了！</div>`;
+  html+=`<div class="dsr-title">セット ${drillSet}/20 完了！</div>`;
   html+=`<div class="dsr-score"><span class="dsr-num">${drillSetScore}</span><span class="dsr-den">/${drillSetTotal}問正解（${pct}%）</span></div>`;
-  // セット進捗ドット
   html+=`<div class="dsr-dots">`;
-  for(let i=1;i<=10;i++)html+=`<span class="dsr-dot${i<=drillSet?' dsr-done':''}"></span>`;
+  for(let i=1;i<=20;i++)html+=`<span class="dsr-dot${i<=drillSet?' dsr-done':''}"></span>`;
   html+=`</div>`;
   if(!isLast){
-    html+=`<button class="drill-next-btn" onclick="drillNextSet()">第${drillSet+1}セットへ →</button>`;
+    html+=`<button class="drill-next-btn" onclick="drillNextSet()">次のセットへ →</button>`;
   } else {
     const totalPct=drillTotal>0?Math.round(drillScore/drillTotal*100):0;
-    html+=`<div class="dsr-final">全100問完了！通算 ${drillScore}/${drillTotal}問正解（${totalPct}%）</div>`;
+    html+=`<div class="dsr-final">全20セット完了！通算 ${drillScore}/${drillTotal}問正解（${totalPct}%）</div>`;
     html+=`<button class="drill-next-btn" style="margin-top:10px" onclick="drillInit()">もう一度挑戦</button>`;
   }
   html+='</div>';
@@ -882,8 +902,114 @@ function drillNextSet(){
 }
 function drillInit(){
   drillStarted=true;drillScore=0;drillTotal=0;
-  drillSet=1;drillQNum=0;drillSetScore=0;drillSetTotal=0;
+  const ord=Array.from({length:20},(_,i)=>i+1).sort(()=>Math.random()-.5);
+  drillSet=ord[0];drillQNum=0;drillSetScore=0;drillSetTotal=0;
   drillNextHand();
+}
+
+/* ===== 清一色ドリル ===== */
+let cdrScore=0,cdrTotal=0,cdrSet=1,cdrQNum=0,cdrSetScore=0,cdrSetTotal=0;
+const CDR_LBL={m:'萬',p:'筒',s:'索'};
+const CDR_CLS={m:'d-m',p:'d-p',s:'d-s'};
+
+function cdMentsuRec(c){
+  let i=0;while(i<9&&c[i]===0)i++;if(i===9)return true;
+  if(c[i]>=3){c[i]-=3;if(cdMentsuRec(c)){c[i]+=3;return true;}c[i]+=3;}
+  if(i<=6&&c[i+1]>0&&c[i+2]>0){c[i]--;c[i+1]--;c[i+2]--;if(cdMentsuRec(c)){c[i]++;c[i+1]++;c[i+2]++;return true;}c[i]++;c[i+1]++;c[i+2]++;}
+  return false;
+}
+function cdIsWin(c9){
+  if(c9.filter(c=>c===2).length===7&&c9.every(c=>c===0||c===2))return true;
+  for(let i=0;i<9;i++){if(c9[i]>=2){const c=[...c9];c[i]-=2;if(cdMentsuRec(c))return true;}}
+  return false;
+}
+function cdGenHand(){
+  const suits=['m','p','s'];
+  const suit=suits[Math.floor(Math.random()*3)];
+  for(let att=0;att<1000;att++){
+    const c=new Array(9).fill(0);let tot=0;
+    while(tot<13){const t=Math.floor(Math.random()*9);if(c[t]<4){c[t]++;tot++;}}
+    const waits=[];
+    for(let t=0;t<9;t++){if(c[t]<4){const c2=[...c];c2[t]++;if(cdIsWin(c2))waits.push(t+1);}}
+    if(waits.length>=2){
+      const tiles=[];c.forEach((n,i)=>{for(let j=0;j<n;j++)tiles.push(i+1);});
+      return{suit,tiles,waits};
+    }
+  }
+  return{suit:'m',tiles:[1,2,3,4,5,6,7,8,9,1,2,3,4],waits:[2,5]};
+}
+function cdTileHTML(n,suit){return`<span class="cd-tile ${CDR_CLS[suit]}">${n}${CDR_LBL[suit]}</span>`;}
+function cdrRenderQ(hand){
+  const area=document.getElementById('cd-area');
+  let html=`<div class="cd-hand">`;
+  hand.tiles.forEach(n=>html+=cdTileHTML(n,hand.suit));
+  html+=`</div><div class="d-q">何が待ち牌？（複数選択可）</div>`;
+  html+=`<div class="cd-choices" id="cd-choices">`;
+  for(let n=1;n<=9;n++)html+=`<button class="cd-choice ${CDR_CLS[hand.suit]}" id="cdc-${n}" onclick="cdToggle(${n})">${n}${CDR_LBL[hand.suit]}</button>`;
+  html+=`</div>`;
+  html+=`<div class="drill-feedback" id="cd-fb"></div>`;
+  html+=`<div class="drill-score" id="cd-score">セット ${cdrSet}/20 │ 問 ${cdrQNum}/5 │ 正解 ${cdrSetScore}/${cdrSetTotal}</div>`;
+  html+=`<button class="drill-next-btn cdr-btn" id="cd-submit" onclick="cdSubmit(${JSON.stringify(hand.waits)},'${hand.suit}')">確認する</button>`;
+  html+=`<button class="drill-next-btn cdr-btn" id="cd-next" style="display:none" onclick="cdrNextHand()">次の問題 →</button>`;
+  area.innerHTML=html;
+}
+function cdToggle(n){const b=document.getElementById('cdc-'+n);if(b)b.classList.toggle('selected');}
+function cdSubmit(waits,suit){
+  const sel=[];
+  for(let n=1;n<=9;n++){const b=document.getElementById('cdc-'+n);if(b&&b.classList.contains('selected'))sel.push(n);}
+  if(sel.length===0){
+    const fb=document.getElementById('cd-fb');
+    fb.className='drill-feedback ng';fb.textContent='待ち牌を選んでください';return;
+  }
+  cdrTotal++;cdrSetTotal++;
+  for(let n=1;n<=9;n++){
+    const b=document.getElementById('cdc-'+n);if(!b)continue;b.disabled=true;
+    const isW=waits.includes(n),isSel=sel.includes(n);
+    if(isW&&isSel)b.classList.add('correct');
+    else if(!isW&&isSel)b.classList.add('wrong');
+    else if(isW&&!isSel)b.classList.add('missed');
+  }
+  const allOk=waits.every(w=>sel.includes(w))&&sel.every(s=>waits.includes(s));
+  if(allOk){cdrScore++;cdrSetScore++;}
+  const fb=document.getElementById('cd-fb');
+  fb.className='drill-feedback '+(allOk?'ok':'ng');
+  const lbl=CDR_LBL[suit];
+  const waitStr=waits.map(w=>w+lbl).join('・');
+  if(allOk)fb.textContent='⭕ 正解！待ち牌：'+waitStr;
+  else fb.textContent='❌ 不正解。待ち牌：'+waitStr+'（橙=見落とし、赤=誤選択）';
+  document.getElementById('cd-score').textContent='セット '+cdrSet+'/20 │ 問 '+cdrQNum+'/5 │ 正解 '+cdrSetScore+'/'+cdrSetTotal;
+  document.getElementById('cd-submit').style.display='none';
+  document.getElementById('cd-next').style.display='block';
+}
+function cdrNextHand(){
+  cdrQNum++;
+  if(cdrQNum>5){cdShowSetResult();return;}
+  cdrRenderQ(cdGenHand());
+}
+function cdShowSetResult(){
+  const area=document.getElementById('cd-area');
+  const isLast=cdrSet>=20;
+  const pct=cdrSetTotal>0?Math.round(cdrSetScore/cdrSetTotal*100):0;
+  let html=`<div class="dsr-wrap">`;
+  html+=`<div class="dsr-title">セット ${cdrSet}/20 完了！</div>`;
+  html+=`<div class="dsr-score"><span class="dsr-num">${cdrSetScore}</span><span class="dsr-den">/${cdrSetTotal}問正解（${pct}%）</span></div>`;
+  html+=`<div class="dsr-dots">`;
+  for(let i=1;i<=20;i++)html+=`<span class="dsr-dot${i<=cdrSet?' dsr-done cdr-done':''}"></span>`;
+  html+=`</div>`;
+  if(!isLast){
+    html+=`<button class="drill-next-btn cdr-btn" onclick="cdrNextSet()">次のセットへ →</button>`;
+  } else {
+    const totalPct=cdrTotal>0?Math.round(cdrScore/cdrTotal*100):0;
+    html+=`<div class="dsr-final cdr-final">全20セット完了！通算 ${cdrScore}/${cdrTotal}問正解（${totalPct}%）</div>`;
+    html+=`<button class="drill-next-btn cdr-btn" style="margin-top:10px" onclick="cdrInit()">もう一度挑戦</button>`;
+  }
+  html+='</div>';
+  area.innerHTML=html;
+}
+function cdrNextSet(){cdrSet++;cdrQNum=0;cdrSetScore=0;cdrSetTotal=0;cdrNextHand();}
+function cdrInit(){
+  cdrScore=0;cdrTotal=0;cdrSet=1;cdrQNum=0;cdrSetScore=0;cdrSetTotal=0;
+  cdrNextHand();
 }
 </script>
 </body>
