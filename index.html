@@ -88,6 +88,18 @@
   .cd2-btn:hover { background:#00695c !important; }
   .dsr-dot.cd2-done { background:#00897b; }
   .cd2-final { background:#e0f2f1 !important; color:#004d40 !important; }
+  /* 点数計算ドリル２ */
+  .d2-hd { background:linear-gradient(135deg,#4a148c,#7b1fa2) !important; }
+  .d2-btn { background:#7b1fa2 !important; }
+  .d2-btn:hover { background:#4a148c !important; }
+  .dsr-dot.d2-done { background:#7b1fa2; }
+  .d2-final { background:#f3e5f5 !important; color:#4a148c !important; }
+  .d2-yaku-choices { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
+  .d2-yaku-btn { padding:9px 13px; border:2px solid #dce3eb; border-radius:8px; background:white; font:600 13px/1 inherit; color:#555; cursor:pointer; transition:all .12s; font-family:inherit; }
+  .d2-yaku-btn.selected { border-color:#7b1fa2; background:#f3e5f5; color:#4a148c; }
+  .d2-yaku-btn.d2-correct { border-color:#388e3c !important; background:#e8f5e9 !important; color:#2e7d32 !important; }
+  .d2-yaku-btn.d2-wrong { border-color:#c62828 !important; background:#ffebee !important; color:#c62828 !important; }
+  .d2-yaku-btn.d2-missed { border-color:#e65100 !important; background:#fff3e0 !important; color:#e65100 !important; }
   /* リアル牌 (SVG) */
   .mx-tile {
     display:inline-block; width:38px; height:54px; border-radius:5px; position:relative;
@@ -516,6 +528,14 @@
       <div class="drill-hd">📝 点数計算ドリル<span class="drill-hd-sub">牌を見て符→点数を計算しよう</span></div>
       <div class="drill-body" id="d-area">
         <button class="drill-next-btn" onclick="drillInit()">ドリルを始める</button>
+      </div>
+    </div>
+
+    <!-- 点数計算ドリル２ -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd d2-hd">📝 点数計算ドリル２<span class="drill-hd-sub">役を見抜いて点数まで計算しよう</span></div>
+      <div class="drill-body" id="d2-area">
+        <button class="drill-next-btn d2-btn" onclick="d2Init()">ドリルを始める</button>
       </div>
     </div>
 
@@ -1053,6 +1073,166 @@ function drillInit(){
   const ord=Array.from({length:20},(_,i)=>i+1).sort(()=>Math.random()-.5);
   drillSet=ord[0];drillQNum=0;drillSetScore=0;drillSetTotal=0;
   drillNextHand();
+}
+
+/* ===== 点数計算ドリル２ ===== */
+let d2Score=0,d2Total=0,d2Set=1,d2QNum=0,d2SetScore=0,d2SetTotal=0;
+let _d2H=null;
+const D2_YAKU_POOL=['門前清自摸和','立直','断ヤオ九','平和','一盃口','四暗刻','一気通貫','三色同順','対々和','三暗刻','三色同刻','混一色','清一色','七対子','役牌'];
+
+function d2Init(){
+  d2Score=0;d2Total=0;d2Set=1;d2QNum=0;d2SetScore=0;d2SetTotal=0;
+  d2StartNext();
+}
+function d2StartNext(){
+  d2QNum++;
+  if(d2QNum>5){d2ShowSetResult();return;}
+  _d2H=dGenHand();
+  d2RenderYakuQ(_d2H);
+}
+function d2RenderYakuQ(hand){
+  const area=document.getElementById('d2-area');
+  let html=dHandHTML(hand);
+  html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span></div>`;
+  html+=`<div class="d-q" id="d2-q">この手の役はどれ？（複数選択可）</div>`;
+  html+=`<div class="d2-yaku-choices" id="d2-choices"></div>`;
+  html+=`<div class="drill-feedback" id="d2-fb"></div>`;
+  html+=`<div class="drill-score" id="d2-score">セット ${d2Set}/20 │ 問 ${d2QNum}/5 │ 正解 ${d2SetScore}/${d2SetTotal}</div>`;
+  html+=`<button class="drill-next-btn d2-btn" id="d2-check" onclick="d2CheckYaku()">確認</button>`;
+  html+=`<button class="drill-next-btn d2-btn" id="d2-next" style="display:none" onclick="d2StartNext()">次の問題 →</button>`;
+  area.innerHTML=html;
+  const correctNames=hand.yaku.map(y=>y.name);
+  const pool=D2_YAKU_POOL.filter(n=>!correctNames.includes(n)).sort(()=>Math.random()-.5);
+  const choices=[...correctNames,...pool.slice(0,3)].sort(()=>Math.random()-.5);
+  const container=document.getElementById('d2-choices');
+  choices.forEach(name=>{
+    const b=document.createElement('button');
+    b.className='d2-yaku-btn';b.dataset.yaku=name;b.textContent=name;
+    b.onclick=()=>b.classList.toggle('selected');
+    container.appendChild(b);
+  });
+}
+function d2CheckYaku(){
+  const hand=_d2H;
+  const correctSet=new Set(hand.yaku.map(y=>y.name));
+  const btns=[...document.querySelectorAll('#d2-choices .d2-yaku-btn')];
+  const selectedSet=new Set(btns.filter(b=>b.classList.contains('selected')).map(b=>b.dataset.yaku));
+  btns.forEach(b=>b.disabled=true);
+  let allOk=true;
+  btns.forEach(b=>{
+    const isCor=correctSet.has(b.dataset.yaku),isSel=selectedSet.has(b.dataset.yaku);
+    if(isCor&&isSel)b.classList.add('d2-correct');
+    else if(isCor&&!isSel){b.classList.add('d2-missed');allOk=false;}
+    else if(!isCor&&isSel){b.classList.add('d2-wrong');allOk=false;}
+  });
+  d2Total++;d2SetTotal++;
+  if(allOk){d2Score++;d2SetScore++;}
+  const yakuStr=hand.yaku.map(y=>y.han<13?`${y.name}(${y.han}翻)`:y.name).join('・');
+  const fb=document.getElementById('d2-fb');
+  fb.className='drill-feedback '+(allOk?'ok':'ng');
+  fb.textContent=(allOk?'⭕ 正解！ ':'❌ 不正解。役：')+yakuStr;
+  document.getElementById('d2-score').textContent=`セット ${d2Set}/20 │ 問 ${d2QNum}/5 │ 正解 ${d2SetScore}/${d2SetTotal}`;
+  document.getElementById('d2-check').style.display='none';
+  const el=document.getElementById('d2-choices');
+  el.className='drill-choices';el.innerHTML='';
+  document.getElementById('d2-q').textContent='この手は何翻？';
+  dHanChoices(hand.han).forEach(v=>{
+    const b=document.createElement('button');
+    b.className='drill-btn';b.textContent=v===13?'役満':v+'翻';
+    b.onclick=()=>d2AnswerHan(v,hand);
+    el.appendChild(b);
+  });
+}
+function d2AnswerHan(chosen,hand){
+  d2Total++;d2SetTotal++;
+  const ok=chosen===hand.han;
+  if(ok){d2Score++;d2SetScore++;}
+  document.querySelectorAll('#d2-choices .drill-btn').forEach(b=>{
+    b.disabled=true;const v=b.textContent==='役満'?13:parseInt(b.textContent);
+    if(v===hand.han)b.classList.add('correct');
+    else if(v===chosen&&!ok)b.classList.add('wrong');
+  });
+  const hanLabel=hand.han===13?'役満':hand.han+'翻';
+  const fb=document.getElementById('d2-fb');
+  fb.className='drill-feedback '+(ok?'ok':'ng');
+  fb.textContent=(ok?'⭕ 正解！':'❌ 不正解。')+hanLabel+'。';
+  document.getElementById('d2-score').textContent=`セット ${d2Set}/20 │ 問 ${d2QNum}/5 │ 正解 ${d2SetScore}/${d2SetTotal}`;
+  const el=document.getElementById('d2-choices');el.innerHTML='';
+  if(hand.isChiitoi){
+    document.getElementById('d2-q').textContent='七対子（25符固定）。この手は何点？';
+    const res=calcScore(hand.han,25,hand.isDealer,hand.winType==='tsumo');
+    dScoreChoices(res.total).forEach(v=>{
+      const b=document.createElement('button');b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
+      b.onclick=()=>d2AnswerScore(v,res);el.appendChild(b);
+    });
+  } else {
+    document.getElementById('d2-q').textContent='この手は何符？';
+    dFuChoices(hand.fu).forEach(v=>{
+      const b=document.createElement('button');b.className='drill-btn';b.textContent=v+'符';
+      b.onclick=()=>d2AnswerFu(v,hand);el.appendChild(b);
+    });
+  }
+}
+function d2AnswerFu(chosen,hand){
+  d2Total++;d2SetTotal++;
+  const ok=chosen===hand.fu;
+  if(ok){d2Score++;d2SetScore++;}
+  document.querySelectorAll('#d2-choices .drill-btn').forEach(b=>{
+    b.disabled=true;const v=parseInt(b.textContent);
+    if(v===hand.fu)b.classList.add('correct');
+    else if(v===chosen&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('d2-fb');
+  fb.className='drill-feedback '+(ok?'ok':'ng');
+  fb.textContent=(ok?'⭕ 正解！':'❌ 不正解。')+hand.fu+'符。では'+hand.han+'翻'+hand.fu+'符の点数は？';
+  document.getElementById('d2-score').textContent=`セット ${d2Set}/20 │ 問 ${d2QNum}/5 │ 正解 ${d2SetScore}/${d2SetTotal}`;
+  const res=calcScore(hand.han,hand.fu,hand.isDealer,hand.winType==='tsumo');
+  const el=document.getElementById('d2-choices');el.innerHTML='';
+  document.getElementById('d2-q').textContent=hand.han+'翻'+hand.fu+'符。この手は何点？';
+  dScoreChoices(res.total).forEach(v=>{
+    const b=document.createElement('button');b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
+    b.onclick=()=>d2AnswerScore(v,res);el.appendChild(b);
+  });
+}
+function d2AnswerScore(chosen,res){
+  d2Total++;d2SetTotal++;
+  const ok=chosen===res.total;
+  if(ok){d2Score++;d2SetScore++;}
+  document.querySelectorAll('#d2-choices .drill-btn').forEach(b=>{
+    b.disabled=true;const v=parseInt(b.textContent.replace(/[^0-9]/g,''));
+    if(v===res.total)b.classList.add('correct');
+    else if(v===chosen&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('d2-fb');
+  fb.className='drill-feedback '+(ok?'ok':'ng');
+  if(ok)fb.textContent='⭕ 正解！'+(res.name?res.name+' ':'')+res.total.toLocaleString()+'点（'+res.detail+'）';
+  else fb.textContent='❌ 不正解。正解は'+res.total.toLocaleString()+'点'+(res.name?' '+res.name:'')+'（'+res.detail+'）';
+  document.getElementById('d2-score').textContent=`セット ${d2Set}/20 │ 問 ${d2QNum}/5 │ 正解 ${d2SetScore}/${d2SetTotal}`;
+  document.getElementById('d2-next').style.display='block';
+}
+function d2ShowSetResult(){
+  const area=document.getElementById('d2-area');
+  const isLast=d2Set>=20;
+  const pct=d2SetTotal>0?Math.round(d2SetScore/d2SetTotal*100):0;
+  let html='<div class="dsr-wrap">';
+  html+=`<div class="dsr-title">セット ${d2Set}/20 完了！</div>`;
+  html+=`<div class="dsr-score"><span class="dsr-num">${d2SetScore}</span><span class="dsr-den">/${d2SetTotal}問正解（${pct}%）</span></div>`;
+  html+='<div class="dsr-dots">';
+  for(let i=1;i<=20;i++)html+=`<span class="dsr-dot${i<=d2Set?' dsr-done d2-done':''}"></span>`;
+  html+='</div>';
+  if(!isLast){
+    html+=`<button class="drill-next-btn d2-btn" onclick="d2NextSet()">次のセットへ →</button>`;
+  } else {
+    const totalPct=d2Total>0?Math.round(d2Score/d2Total*100):0;
+    html+=`<div class="dsr-final d2-final">全20セット完了！通算 ${d2Score}/${d2Total}問正解（${totalPct}%）</div>`;
+    html+=`<button class="drill-next-btn d2-btn" style="margin-top:10px" onclick="d2Init()">もう一度挑戦</button>`;
+  }
+  html+='</div>';
+  area.innerHTML=html;
+}
+function d2NextSet(){
+  d2Set++;d2QNum=0;d2SetScore=0;d2SetTotal=0;
+  d2StartNext();
 }
 
 /* ===== 清一色ドリル ===== */
