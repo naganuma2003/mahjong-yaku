@@ -85,39 +85,29 @@
   .cd2-btn:hover { background:#00695c !important; }
   .dsr-dot.cd2-done { background:#00897b; }
   .cd2-final { background:#e0f2f1 !important; color:#004d40 !important; }
-  /* リアル牌 */
+  /* リアル牌 (SVG) */
   .mx-tile {
-    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
-    width:38px; height:54px; border-radius:5px; padding:2px 0; gap:0; position:relative;
+    display:inline-block; width:38px; height:54px; border-radius:5px; position:relative;
     background:linear-gradient(160deg,#fffff8 0%,#f5f0e2 100%);
     border:1.5px solid #c8aa78;
     box-shadow:0 4px 8px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.25) inset;
-    cursor:default; user-select:none;
+    cursor:default; user-select:none; overflow:hidden; vertical-align:middle;
   }
-  .mx-num { font:900 20px/1 Georgia,serif; letter-spacing:-1px; }
-  .mx-suit { font:700 10px/1 inherit; opacity:.9; }
-  .mx-m .mx-num,.mx-m .mx-suit { color:#c0392b; }
-  .mx-p .mx-num,.mx-p .mx-suit { color:#1565c0; }
-  .mx-s .mx-num,.mx-s .mx-suit { color:#1b5e20; }
-  /* 選択ボタン用の牌 */
+  .mx-tile svg { display:block; width:100%; height:100%; }
+  /* 選択ボタン用の牌 (SVG) */
   .mx-choice {
-    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
-    width:44px; height:62px; border-radius:6px; padding:3px 0; gap:0; position:relative;
+    display:inline-block; width:44px; height:62px; border-radius:6px; padding:0; position:relative;
     background:linear-gradient(160deg,#fffff8 0%,#f5f0e2 100%);
     border:2px solid #c8aa78;
     box-shadow:0 4px 8px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.2) inset;
-    cursor:pointer; user-select:none; transition:transform .1s,box-shadow .1s;
+    cursor:pointer; user-select:none; transition:transform .12s,box-shadow .12s; overflow:hidden;
   }
+  .mx-choice svg { display:block; width:100%; height:100%; }
   .mx-choice:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 7px 12px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.2) inset; }
-  .mx-choice .mx-num { font:900 22px/1 Georgia,serif; }
-  .mx-choice .mx-suit { font:700 11px/1 inherit; }
   .mx-choice.selected { border-color:#00897b !important; border-width:3px; box-shadow:0 0 0 2px rgba(0,137,123,.4),0 4px 8px rgba(0,0,0,.2) !important; transform:translateY(-2px); }
   .mx-choice.correct { background:linear-gradient(160deg,#f1fff4,#d4f5da) !important; border-color:#2e7d32 !important; border-width:3px; }
-  .mx-choice.correct .mx-num,.mx-choice.correct .mx-suit { color:#1b5e20; }
   .mx-choice.wrong { background:linear-gradient(160deg,#fff5f5,#fdd) !important; border-color:#c62828 !important; border-width:3px; }
-  .mx-choice.wrong .mx-num,.mx-choice.wrong .mx-suit { color:#c62828; }
   .mx-choice.missed { background:linear-gradient(160deg,#fff9f0,#ffe0b2) !important; border-color:#e65100 !important; border-width:3px; }
-  .mx-choice.missed .mx-num,.mx-choice.missed .mx-suit { color:#e65100; }
   .cd2-choices { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; justify-content:center; }
   .cd2-hand { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; justify-content:center; }
   .d-info { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
@@ -1064,26 +1054,63 @@ function cdrInit(){
 
 /* ===== 清一色ドリル２ ===== */
 let cd2Score=0,cd2Total=0,cd2Set=1,cd2QNum=0,cd2SetScore=0,cd2SetTotal=0;
-const CD2_LBL={m:'萬',p:'筒',s:'索'};
-const CD2_KANJI=['一','二','三','四','五','六','七','八','九'];
 
-function cd2MxTile(n,suit,cls='mx-tile'){
-  return`<span class="${cls} mx-${suit}"><span class="mx-num">${n}</span><span class="mx-suit">${CD2_LBL[suit]}</span></span>`;
+const MX_MAN_K=['一','二','三','四','五','六','七','八','九'];
+const MX_PIN_POS=[
+  [[19,27]],
+  [[19,15],[19,39]],
+  [[11,14],[27,14],[19,39]],
+  [[11,13],[27,13],[11,39],[27,39]],
+  [[11,10],[27,10],[19,27],[11,44],[27,44]],
+  [[11,10],[27,10],[11,27],[27,27],[11,44],[27,44]],
+  [[11,10],[27,10],[11,25],[19,25],[27,25],[11,42],[27,42]],
+  [[11,7],[27,7],[11,21],[27,21],[11,35],[27,35],[11,47],[27,47]],
+  [[11,8],[19,8],[27,8],[11,22],[19,22],[27,22],[11,37],[19,37],[27,37]],
+];
+const MX_PIN_R=[9,7.5,6.5,6.5,6,5.8,5.5,5.2,5];
+const MX_SOU_POS=[
+  null,
+  [[13,19],[25,19]],
+  [[13,12],[25,12],[19,32]],
+  [[13,9],[25,9],[13,29],[25,29]],
+  [[13,6],[25,6],[13,23],[25,23],[19,39]],
+  [[13,7],[25,7],[13,22],[25,22],[13,37],[25,37]],
+  [[11,6],[19,6],[27,6],[11,21],[27,21],[11,37],[27,37]],
+  [[13,4],[25,4],[13,16],[25,16],[13,28],[25,28],[13,40],[25,40]],
+  [[10,5],[19,5],[28,5],[10,18],[19,18],[28,18],[10,31],[19,31],[28,31]],
+];
+
+function mxPinSvg(n){
+  const r=MX_PIN_R[n-1];
+  const circles=MX_PIN_POS[n-1].map(([cx,cy])=>
+    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#1565c0"/><circle cx="${cx}" cy="${cy}" r="${r*.55}" fill="white"/><circle cx="${cx}" cy="${cy}" r="${r*.27}" fill="#e53935"/>`
+  ).join('');
+  return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="35" height="51" rx="2" fill="none" stroke="#90caf9" stroke-width=".8"/>${circles}</svg>`;
 }
-function cd2RenderHand(tiles,suit){
-  return'<div class="cd2-hand">'+tiles.map(n=>cd2MxTile(n,suit)).join('')+'</div>';
+function mxSouStick(cx,y,w,h){
+  const x=cx-w/2;
+  return`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.5" fill="#43a047"/><rect x="${x+1.5}" y="${y}" width="${w-3}" height="${h*.38}" rx="2" fill="#81c784"/><line x1="${x+2}" y1="${y+h*.62}" x2="${x+w-2}" y2="${y+h*.62}" stroke="#1b5e20" stroke-width=".8"/>`;
 }
+function mxSouSvg(n){
+  const bd=`<rect x="1.5" y="1.5" width="35" height="51" rx="2" fill="none" stroke="#a5d6a7" stroke-width=".8"/>`;
+  if(n===1)return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg">${bd}<ellipse cx="19" cy="31" rx="9" ry="12" fill="#388e3c"/><ellipse cx="19" cy="31" rx="6" ry="8" fill="#66bb6a"/><circle cx="19" cy="15" r="6" fill="#388e3c"/><circle cx="19" cy="15" r="3.5" fill="white"/><circle cx="19" cy="15" r="1.8" fill="#e53935"/><path d="M13,41 Q9,50 15,51 Q19,49 23,51 Q29,50 25,41" fill="#2e7d32"/></svg>`;
+  const sw=n>=8?9:n>=6?10:11,sh=n>=8?12:13;
+  const sticks=MX_SOU_POS[n-1].map(([cx,y])=>mxSouStick(cx,y,sw,sh)).join('');
+  return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg">${bd}${sticks}</svg>`;
+}
+function mxManSvg(n){
+  const k=MX_MAN_K[n-1];
+  return`<svg viewBox="0 0 38 54" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="35" height="51" rx="2" fill="none" stroke="#ef9a9a" stroke-width=".8"/><text x="19" y="30" text-anchor="middle" dominant-baseline="middle" font-size="23" fill="#c62828" font-weight="bold" font-family="serif">${k}</text><text x="19" y="47" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#b71c1c" font-family="sans-serif">萬</text></svg>`;
+}
+function mxSvg(n,suit){return suit==='m'?mxManSvg(n):suit==='p'?mxPinSvg(n):mxSouSvg(n);}
+
 function cd2RenderQ(hand){
   const area=document.getElementById('cd2-area');
-  let html=cd2RenderHand(hand.tiles,hand.suit);
+  let html='<div class="cd2-hand">'+hand.tiles.map(n=>`<span class="mx-tile">${mxSvg(n,hand.suit)}</span>`).join('')+'</div>';
   html+=`<div class="d-q" style="margin-top:4px">何が待ち牌？（複数選択可）</div>`;
-  html+=`<div class="cd2-choices" id="cd2-choices">`;
-  for(let n=1;n<=9;n++){
-    html+=`<button class="mx-choice mx-${hand.suit}" id="cd2c-${n}" onclick="cd2Toggle(${n})">`;
-    html+=`<span class="mx-num">${n}</span><span class="mx-suit">${CD2_LBL[hand.suit]}</span>`;
-    html+=`</button>`;
-  }
-  html+=`</div>`;
+  html+='<div class="cd2-choices" id="cd2-choices">';
+  for(let n=1;n<=9;n++)html+=`<button class="mx-choice" id="cd2c-${n}" onclick="cd2Toggle(${n})">${mxSvg(n,hand.suit)}</button>`;
+  html+='</div>';
   html+=`<div class="drill-feedback" id="cd2-fb"></div>`;
   html+=`<div class="drill-score" id="cd2-score">セット ${cd2Set}/20 │ 問 ${cd2QNum}/5 │ 正解 ${cd2SetScore}/${cd2SetTotal}</div>`;
   html+=`<button class="drill-next-btn cd2-btn" id="cd2-submit" onclick="cd2Submit(${JSON.stringify(hand.waits)},'${hand.suit}')">確認する</button>`;
@@ -1110,7 +1137,7 @@ function cd2Submit(waits,suit){
   if(allOk){cd2Score++;cd2SetScore++;}
   const fb=document.getElementById('cd2-fb');
   fb.className='drill-feedback '+(allOk?'ok':'ng');
-  const lbl=CD2_LBL[suit];
+  const lbl={m:'萬',p:'筒',s:'索'}[suit];
   const waitStr=waits.map(w=>w+lbl).join('・');
   if(allOk)fb.textContent='⭕ 正解！待ち牌：'+waitStr;
   else fb.textContent='❌ 不正解。待ち牌：'+waitStr+'（橙=見落とし、赤=誤選択）';
