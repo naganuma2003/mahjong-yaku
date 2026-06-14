@@ -79,6 +79,47 @@
   .cd-choice.correct { border-color:#388e3c !important; background:#e8f5e9 !important; color:#2e7d32 !important; }
   .cd-choice.wrong { border-color:#c62828 !important; background:#ffebee !important; color:#c62828 !important; }
   .cd-choice.missed { border-color:#e65100 !important; background:#fff3e0 !important; color:#e65100 !important; }
+  /* 清一色ドリル２ */
+  .cd2-hd { background:linear-gradient(135deg,#00695c,#00897b) !important; }
+  .cd2-btn { background:#00897b !important; }
+  .cd2-btn:hover { background:#00695c !important; }
+  .dsr-dot.cd2-done { background:#00897b; }
+  .cd2-final { background:#e0f2f1 !important; color:#004d40 !important; }
+  /* リアル牌 */
+  .mx-tile {
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+    width:38px; height:54px; border-radius:5px; padding:2px 0; gap:0; position:relative;
+    background:linear-gradient(160deg,#fffff8 0%,#f5f0e2 100%);
+    border:1.5px solid #c8aa78;
+    box-shadow:0 4px 8px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.25) inset;
+    cursor:default; user-select:none;
+  }
+  .mx-num { font:900 20px/1 Georgia,serif; letter-spacing:-1px; }
+  .mx-suit { font:700 10px/1 inherit; opacity:.9; }
+  .mx-m .mx-num,.mx-m .mx-suit { color:#c0392b; }
+  .mx-p .mx-num,.mx-p .mx-suit { color:#1565c0; }
+  .mx-s .mx-num,.mx-s .mx-suit { color:#1b5e20; }
+  /* 選択ボタン用の牌 */
+  .mx-choice {
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+    width:44px; height:62px; border-radius:6px; padding:3px 0; gap:0; position:relative;
+    background:linear-gradient(160deg,#fffff8 0%,#f5f0e2 100%);
+    border:2px solid #c8aa78;
+    box-shadow:0 4px 8px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.2) inset;
+    cursor:pointer; user-select:none; transition:transform .1s,box-shadow .1s;
+  }
+  .mx-choice:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 7px 12px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.9) inset,-1px -2px 0 rgba(100,70,20,.2) inset; }
+  .mx-choice .mx-num { font:900 22px/1 Georgia,serif; }
+  .mx-choice .mx-suit { font:700 11px/1 inherit; }
+  .mx-choice.selected { border-color:#00897b !important; border-width:3px; box-shadow:0 0 0 2px rgba(0,137,123,.4),0 4px 8px rgba(0,0,0,.2) !important; transform:translateY(-2px); }
+  .mx-choice.correct { background:linear-gradient(160deg,#f1fff4,#d4f5da) !important; border-color:#2e7d32 !important; border-width:3px; }
+  .mx-choice.correct .mx-num,.mx-choice.correct .mx-suit { color:#1b5e20; }
+  .mx-choice.wrong { background:linear-gradient(160deg,#fff5f5,#fdd) !important; border-color:#c62828 !important; border-width:3px; }
+  .mx-choice.wrong .mx-num,.mx-choice.wrong .mx-suit { color:#c62828; }
+  .mx-choice.missed { background:linear-gradient(160deg,#fff9f0,#ffe0b2) !important; border-color:#e65100 !important; border-width:3px; }
+  .mx-choice.missed .mx-num,.mx-choice.missed .mx-suit { color:#e65100; }
+  .cd2-choices { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; justify-content:center; }
+  .cd2-hand { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; justify-content:center; }
   .d-info { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
   .d-tag { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; }
   .d-q { font: 700 16px/1 inherit; text-align: center; margin-bottom: 12px; color: #333; }
@@ -248,6 +289,30 @@
 <!-- 点数計算タブ -->
 <div id="tab-score" class="tab-section">
   <div class="calc-wrap">
+
+    <!-- 点数計算ドリル -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd">📝 点数計算ドリル<span class="drill-hd-sub">牌を見て符→点数を計算しよう</span></div>
+      <div class="drill-body" id="d-area">
+        <button class="drill-next-btn" onclick="drillInit()">ドリルを始める</button>
+      </div>
+    </div>
+
+    <!-- 清一色ドリル -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd cdr-hd">🀄 清一色ドリル<span class="drill-hd-sub">多面張の待ち牌をすべて選ぼう</span></div>
+      <div class="drill-body" id="cd-area">
+        <button class="drill-next-btn cdr-btn" onclick="cdrInit()">ドリルを始める</button>
+      </div>
+    </div>
+
+    <!-- 清一色ドリル２ -->
+    <div class="calc-card drill-card">
+      <div class="drill-hd cd2-hd">🀄 清一色ドリル２<span class="drill-hd-sub">リアル牌で多面張を見抜こう</span></div>
+      <div class="drill-body" id="cd2-area">
+        <button class="drill-next-btn cd2-btn" onclick="cd2Init()">ドリルを始める</button>
+      </div>
+    </div>
 
     <!-- 翻数 -->
     <div class="calc-card">
@@ -463,21 +528,6 @@
       </div>
 
     </div><!-- /ref-grid -->
-
-    <!-- 点数計算ドリル -->
-    <div class="calc-card drill-card">
-      <div class="drill-hd">📝 点数計算ドリル<span class="drill-hd-sub">牌を見て符→点数を計算しよう</span></div>
-      <div class="drill-body" id="d-area">
-        <button class="drill-next-btn" onclick="drillInit()">ドリルを始める</button>
-      </div>
-    </div>
-
-    <div class="calc-card drill-card" style="margin-top:16px">
-      <div class="drill-hd cdr-hd">🀄 清一色ドリル<span class="drill-hd-sub">多面張の待ち牌をすべて選ぼう</span></div>
-      <div class="drill-body" id="cd-area">
-        <button class="drill-next-btn cdr-btn" onclick="cdrInit()">ドリルを始める</button>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -1010,6 +1060,93 @@ function cdrNextSet(){cdrSet++;cdrQNum=0;cdrSetScore=0;cdrSetTotal=0;cdrNextHand
 function cdrInit(){
   cdrScore=0;cdrTotal=0;cdrSet=1;cdrQNum=0;cdrSetScore=0;cdrSetTotal=0;
   cdrNextHand();
+}
+
+/* ===== 清一色ドリル２ ===== */
+let cd2Score=0,cd2Total=0,cd2Set=1,cd2QNum=0,cd2SetScore=0,cd2SetTotal=0;
+const CD2_LBL={m:'萬',p:'筒',s:'索'};
+const CD2_KANJI=['一','二','三','四','五','六','七','八','九'];
+
+function cd2MxTile(n,suit,cls='mx-tile'){
+  return`<span class="${cls} mx-${suit}"><span class="mx-num">${n}</span><span class="mx-suit">${CD2_LBL[suit]}</span></span>`;
+}
+function cd2RenderHand(tiles,suit){
+  return'<div class="cd2-hand">'+tiles.map(n=>cd2MxTile(n,suit)).join('')+'</div>';
+}
+function cd2RenderQ(hand){
+  const area=document.getElementById('cd2-area');
+  let html=cd2RenderHand(hand.tiles,hand.suit);
+  html+=`<div class="d-q" style="margin-top:4px">何が待ち牌？（複数選択可）</div>`;
+  html+=`<div class="cd2-choices" id="cd2-choices">`;
+  for(let n=1;n<=9;n++){
+    html+=`<button class="mx-choice mx-${hand.suit}" id="cd2c-${n}" onclick="cd2Toggle(${n})">`;
+    html+=`<span class="mx-num">${n}</span><span class="mx-suit">${CD2_LBL[hand.suit]}</span>`;
+    html+=`</button>`;
+  }
+  html+=`</div>`;
+  html+=`<div class="drill-feedback" id="cd2-fb"></div>`;
+  html+=`<div class="drill-score" id="cd2-score">セット ${cd2Set}/20 │ 問 ${cd2QNum}/5 │ 正解 ${cd2SetScore}/${cd2SetTotal}</div>`;
+  html+=`<button class="drill-next-btn cd2-btn" id="cd2-submit" onclick="cd2Submit(${JSON.stringify(hand.waits)},'${hand.suit}')">確認する</button>`;
+  html+=`<button class="drill-next-btn cd2-btn" id="cd2-next" style="display:none" onclick="cd2NextHand()">次の問題 →</button>`;
+  area.innerHTML=html;
+}
+function cd2Toggle(n){const b=document.getElementById('cd2c-'+n);if(b)b.classList.toggle('selected');}
+function cd2Submit(waits,suit){
+  const sel=[];
+  for(let n=1;n<=9;n++){const b=document.getElementById('cd2c-'+n);if(b&&b.classList.contains('selected'))sel.push(n);}
+  if(sel.length===0){
+    const fb=document.getElementById('cd2-fb');
+    fb.className='drill-feedback ng';fb.textContent='待ち牌を選んでください';return;
+  }
+  cd2Total++;cd2SetTotal++;
+  for(let n=1;n<=9;n++){
+    const b=document.getElementById('cd2c-'+n);if(!b)continue;b.disabled=true;
+    const isW=waits.includes(n),isSel=sel.includes(n);
+    if(isW&&isSel)b.classList.add('correct');
+    else if(!isW&&isSel)b.classList.add('wrong');
+    else if(isW&&!isSel)b.classList.add('missed');
+  }
+  const allOk=waits.every(w=>sel.includes(w))&&sel.every(s=>waits.includes(s));
+  if(allOk){cd2Score++;cd2SetScore++;}
+  const fb=document.getElementById('cd2-fb');
+  fb.className='drill-feedback '+(allOk?'ok':'ng');
+  const lbl=CD2_LBL[suit];
+  const waitStr=waits.map(w=>w+lbl).join('・');
+  if(allOk)fb.textContent='⭕ 正解！待ち牌：'+waitStr;
+  else fb.textContent='❌ 不正解。待ち牌：'+waitStr+'（橙=見落とし、赤=誤選択）';
+  document.getElementById('cd2-score').textContent='セット '+cd2Set+'/20 │ 問 '+cd2QNum+'/5 │ 正解 '+cd2SetScore+'/'+cd2SetTotal;
+  document.getElementById('cd2-submit').style.display='none';
+  document.getElementById('cd2-next').style.display='block';
+}
+function cd2NextHand(){
+  cd2QNum++;
+  if(cd2QNum>5){cd2ShowSetResult();return;}
+  cd2RenderQ(cdGenHand());
+}
+function cd2ShowSetResult(){
+  const area=document.getElementById('cd2-area');
+  const isLast=cd2Set>=20;
+  const pct=cd2SetTotal>0?Math.round(cd2SetScore/cd2SetTotal*100):0;
+  let html=`<div class="dsr-wrap">`;
+  html+=`<div class="dsr-title">セット ${cd2Set}/20 完了！</div>`;
+  html+=`<div class="dsr-score"><span class="dsr-num" style="color:#00897b">${cd2SetScore}</span><span class="dsr-den">/${cd2SetTotal}問正解（${pct}%）</span></div>`;
+  html+=`<div class="dsr-dots">`;
+  for(let i=1;i<=20;i++)html+=`<span class="dsr-dot${i<=cd2Set?' dsr-done cd2-done':''}"></span>`;
+  html+=`</div>`;
+  if(!isLast){
+    html+=`<button class="drill-next-btn cd2-btn" onclick="cd2NextSet()">次のセットへ →</button>`;
+  } else {
+    const totalPct=cd2Total>0?Math.round(cd2Score/cd2Total*100):0;
+    html+=`<div class="dsr-final cd2-final">全20セット完了！通算 ${cd2Score}/${cd2Total}問正解（${totalPct}%）</div>`;
+    html+=`<button class="drill-next-btn cd2-btn" style="margin-top:10px" onclick="cd2Init()">もう一度挑戦</button>`;
+  }
+  html+='</div>';
+  area.innerHTML=html;
+}
+function cd2NextSet(){cd2Set++;cd2QNum=0;cd2SetScore=0;cd2SetTotal=0;cd2NextHand();}
+function cd2Init(){
+  cd2Score=0;cd2Total=0;cd2Set=1;cd2QNum=0;cd2SetScore=0;cd2SetTotal=0;
+  cd2NextHand();
 }
 </script>
 </body>
