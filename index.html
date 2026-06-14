@@ -53,6 +53,9 @@
   .d-p { background: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
   .d-s { background: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
   .d-z { background: #f3e5f5; color: #6a1b9a; border-color: #ce93d8; }
+  .d-agari { display:flex; align-items:center; gap:7px; margin-bottom:10px; }
+  .d-agari-lbl { font-size:12px; color:#666; font-weight:600; white-space:nowrap; }
+  .d-agari-tile { border-color:#e64a19 !important; box-shadow:0 0 0 2px rgba(230,74,25,.35) !important; }
   .d-info { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
   .d-tag { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; }
   .d-q { font: 700 16px/1 inherit; text-align: center; margin-bottom: 12px; color: #333; }
@@ -654,8 +657,10 @@ function fuMeldHonor(i,v,btn){fuState.melds[i].honor=v;btn.closest('.meld-sub').
 /* ===== 点数計算ドリル ===== */
 let drillScore=0,drillTotal=0,drillStarted=false;
 const D_FU=[20,25,30,40,50,60,70,80,90,100,110];
+// 実際の麻雀の和了頻度に近い重み（30符が最頻、高符は稀）
+const D_FU_W=[[20,12],[25,4],[30,30],[40,22],[50,14],[60,8],[70,5],[80,3],[90,1],[100,1]];
 const D_LBL={
-  m:['','1万','2万','3万','4万','5万','6万','7万','8万','9万'],
+  m:['','1萬','2萬','3萬','4萬','5萬','6萬','7萬','8萬','9萬'],
   p:['','1筒','2筒','3筒','4筒','5筒','6筒','7筒','8筒','9筒'],
   s:['','1索','2索','3索','4索','5索','6索','7索','8索','9索'],
   z:['','東','南','西','北','白','發','中'],
@@ -663,57 +668,98 @@ const D_LBL={
 const D_WAIT={ryanmen:'リャンメン待ち',kanchan:'カンチャン待ち',penchan:'ペンチャン待ち',tanki:'単騎待ち',shanpon:'シャンポン待ち'};
 const D_WIN={ron_menzen:'門前ロン',ron_naki:'鳴きロン',tsumo:'ツモ'};
 
-function dRT(){
-  if(Math.random()<.72){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*9)+1};}
-  return{suit:'z',n:Math.floor(Math.random()*7)+1};
-}
+function dPickW(arr){let r=Math.random()*arr.reduce((s,[,w])=>s+w,0);for(const[v,w]of arr){r-=w;if(r<=0)return v;}return arr[0][0];}
+function dRT(){if(Math.random()<.72){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*9)+1};}return{suit:'z',n:Math.floor(Math.random()*7)+1};}
+function dMid(){const s=['m','p','s'][Math.floor(Math.random()*3)];return{suit:s,n:Math.floor(Math.random()*7)+2};}
 function dHT(t){return t.suit==='z'||t.n===1||t.n===9;}
 function dShuntsu(){const s=['m','p','s'][Math.floor(Math.random()*3)];const n=Math.floor(Math.random()*7)+1;return{type:'shuntsu',tiles:[{suit:s,n},{suit:s,n:n+1},{suit:s,n:n+2}]};}
 function dKoutsu(){const t=dRT();return{type:'koutsu',tiles:[t,t,t]};}
-
-function dGenHand(){
-  const openCnt=Math.random()<.45?0:Math.floor(Math.random()*3)+1;
+function dCalcFu(melds,pair,winType,wait){
+  let fu=20;
+  if(winType==='ron_menzen')fu+=10;
+  else if(winType==='tsumo')fu+=2;
+  melds.forEach(m=>{if(m.type!=='koutsu')return;const h=dHT(m.tiles[0]);fu+=m.open?(h?4:2):(h?8:4);});
+  if(pair.suit==='z'&&pair.n>=5)fu+=2;
+  if(wait==='kanchan'||wait==='penchan'||wait==='tanki')fu+=2;
+  return Math.ceil(fu/10)*10;
+}
+// 20符: 鳴き手・全順子・リャンメン（20+0+0+0+0=20）
+function dMake20(){
+  const s1=dShuntsu(),s2=dShuntsu(),s3=dShuntsu(),s4=dShuntsu();
+  const melds=[{...s1,open:false},{...s2,open:false},{...s3,open:false},{...s4,open:true}];
+  const lc=melds[2];
+  const agariTile=Math.random()<.5?lc.tiles[0]:lc.tiles[2];
+  return{melds,pair:dMid(),winType:'ron_naki',wait:'ryanmen',agariTile,fu:20,han:dPickW([[1,50],[2,50]]),isDealer:Math.random()<.5};
+}
+// 25符: 七対子
+function dMake25(){
+  const tiles=Array.from({length:7},()=>dRT());
+  return{chiitoi7:tiles,melds:[],pair:tiles[0],winType:Math.random()<.5?'ron_menzen':'tsumo',wait:'tanki',agariTile:tiles[6],fu:25,han:dPickW([[2,60],[3,30],[4,10]]),isDealer:Math.random()<.5,isChiitoi:true};
+}
+// targetFuに応じてkoutsu率を調整して1回生成
+function dGenAttempt(targetFu){
+  const openCnt=Math.random()<.55?0:(Math.random()<.5?1:Math.floor(Math.random()*2)+2);
   const isMenzen=openCnt===0;
   const melds=[];
   for(let i=0;i<4;i++){
     const isOpen=i>=(4-openCnt);
-    const m=(Math.random()<(isOpen?.55:.38))?dKoutsu():dShuntsu();
+    const kRate=isOpen?(targetFu>=60?.65:.35):(targetFu>=60?.45:.2);
+    const m=(Math.random()<kRate)?dKoutsu():dShuntsu();
     m.open=isOpen;melds.push(m);
   }
-  const pair=dRT();
+  const pair=Math.random()<.15?{suit:'z',n:Math.floor(Math.random()*3)+5}:dMid();
   const winType=isMenzen?(Math.random()<.5?'ron_menzen':'tsumo'):(Math.random()<.6?'ron_naki':'tsumo');
   const closed=melds.filter(m=>!m.open);
   const lc=closed[closed.length-1]||melds[0];
-  let wait;
-  if(lc.type==='koutsu'){wait=Math.random()<.5?'shanpon':'tanki';}
-  else{const r=Math.random();wait=r<.5?'ryanmen':r<.75?'kanchan':'penchan';}
-  let fu=20;
-  if(winType==='ron_menzen')fu+=10;
-  else if(winType==='tsumo')fu+=2;
-  melds.forEach(m=>{
-    if(m.type!=='koutsu')return;
-    const h=dHT(m.tiles[0]);
-    fu+=m.open?(h?4:2):(h?8:4);
-  });
-  if(pair.suit==='z'&&pair.n>=5)fu+=2;
-  if(wait==='kanchan'||wait==='penchan'||wait==='tanki')fu+=2;
-  const fuTotal=Math.ceil(fu/10)*10;
-  let han=Math.floor(Math.random()*3)+1;
-  if(!isMenzen)han=Math.max(1,han-1);
-  if(isMenzen&&winType==='tsumo')han=Math.min(han+1,4);
-  return{melds,pair,winType,wait,fu:fuTotal,han,isDealer:Math.random()<.5};
+  let wait,agariTile;
+  if(lc.type==='koutsu'){
+    if(Math.random()<.5){wait='shanpon';agariTile=Math.random()<.5?lc.tiles[0]:pair;}
+    else{wait='tanki';agariTile=pair;}
+  } else {
+    const r=Math.random(),t=lc.tiles;
+    const canPenchan=t[0].n===1||t[0].n===7;
+    if(r<.55||(r>=.78&&!canPenchan)){
+      wait='ryanmen';agariTile=Math.random()<.5?t[0]:t[2];
+    } else if(r<.78){
+      wait='kanchan';agariTile=t[1];
+    } else {
+      wait='penchan';agariTile=t[0].n===1?t[2]:t[0];
+    }
+  }
+  return{melds,pair,winType,wait,agariTile,fu:dCalcFu(melds,pair,winType,wait)};
+}
+function dGenHand(){
+  const targetFu=dPickW(D_FU_W);
+  if(targetFu===20)return dMake20();
+  if(targetFu===25)return dMake25();
+  // 拒絶サンプリング: targetFuと一致する手が出るまで最大30回試みる
+  for(let i=0;i<30;i++){
+    const h=dGenAttempt(targetFu);
+    if(h.fu===targetFu)return{...h,han:dPickW([[1,35],[2,35],[3,20],[4,10]]),isDealer:Math.random()<.5};
+  }
+  const h=dGenAttempt(targetFu);
+  return{...h,han:dPickW([[1,35],[2,35],[3,20],[4,10]]),isDealer:Math.random()<.5};
 }
 
-function dTileHTML(t){return`<span class="d-tile d-${t.suit}">${D_LBL[t.suit][t.n]}</span>`;}
+function dTileHTML(t,extra){return`<span class="d-tile d-${t.suit}${extra?' '+extra:''}">${D_LBL[t.suit][t.n]}</span>`;}
 function dHandHTML(hand){
   let h='<div class="d-hand">';
-  hand.melds.forEach(m=>{
-    h+=`<div class="d-meld${m.open?' d-open':''}">`;
-    m.tiles.forEach(t=>h+=dTileHTML(t));
-    h+=`<div class="d-meld-lbl">${m.open?(m.type==='koutsu'?'明刻':'明順'):(m.type==='koutsu'?'暗刻':'暗順')}</div></div>`;
-  });
-  h+='<div class="d-meld d-pair">'+dTileHTML(hand.pair)+dTileHTML(hand.pair)+'<div class="d-meld-lbl">雀頭</div></div>';
-  return h+'</div>';
+  if(hand.isChiitoi){
+    hand.chiitoi7.forEach(t=>{h+=`<div class="d-meld"><span class="d-tile d-${t.suit}">${D_LBL[t.suit][t.n]}</span><span class="d-tile d-${t.suit}">${D_LBL[t.suit][t.n]}</span><div class="d-meld-lbl">対子</div></div>`;});
+  } else {
+    hand.melds.forEach(m=>{
+      h+=`<div class="d-meld${m.open?' d-open':''}">`;
+      m.tiles.forEach(t=>h+=dTileHTML(t));
+      h+=`<div class="d-meld-lbl">${m.open?(m.type==='koutsu'?'明刻':'明順'):(m.type==='koutsu'?'暗刻':'暗順')}</div></div>`;
+    });
+    h+='<div class="d-meld d-pair">'+dTileHTML(hand.pair)+dTileHTML(hand.pair)+'<div class="d-meld-lbl">雀頭</div></div>';
+  }
+  h+='</div>';
+  if(hand.agariTile){
+    const winLbl=hand.winType==='tsumo'?'ツモ':'ロン';
+    h+=`<div class="d-agari"><span class="d-agari-lbl">上がり牌：</span>${dTileHTML(hand.agariTile,'d-agari-tile')}<span class="d-tag">${winLbl}</span></div>`;
+  }
+  return h;
 }
 function dFuChoices(correct){
   const c=D_FU.filter(v=>v!==correct).sort(()=>Math.random()-.5).slice(0,3);
@@ -730,18 +776,32 @@ function dRenderQ(hand){
   const area=document.getElementById('d-area');
   let html=dHandHTML(hand);
   html+=`<div class="d-info"><span class="d-tag">${D_WIN[hand.winType]}</span><span class="d-tag">${D_WAIT[hand.wait]}</span><span class="d-tag">${hand.isDealer?'親':'子'}</span><span class="d-tag">${hand.han}翻</span></div>`;
-  html+=`<div class="d-q">この手は何符？</div>`;
   html+=`<div class="drill-choices" id="d-choices"></div>`;
   html+=`<div class="drill-feedback" id="d-fb"></div>`;
   html+=`<div class="drill-score" id="d-score">正解 ${drillScore} / ${drillTotal} 問</div>`;
   html+=`<button class="drill-next-btn" id="d-next" style="display:none" onclick="drillNextQ()">次の問題 →</button>`;
   area.innerHTML=html;
-  dFuChoices(hand.fu).forEach(v=>{
-    const b=document.createElement('button');
-    b.className='drill-btn';b.textContent=v+'符';
-    b.onclick=()=>dAnswerFu(v,hand);
-    document.getElementById('d-choices').appendChild(b);
-  });
+  if(hand.isChiitoi){
+    // 七対子は符が固定なのでいきなり点数問題
+    html=area.innerHTML.replace(/<div class="drill-choices"/,`<div class="d-q">七対子（25符固定）。この手は何点？</div><div class="drill-choices"`);
+    area.innerHTML=html;
+    const res=calcScore(hand.han,25,hand.isDealer,hand.winType==='tsumo');
+    dScoreChoices(res.total).forEach(v=>{
+      const b=document.createElement('button');
+      b.className='drill-btn';b.textContent=v.toLocaleString()+'点';
+      b.onclick=()=>dAnswerScore(v,res);
+      document.getElementById('d-choices').appendChild(b);
+    });
+  } else {
+    const qEl=document.createElement('div');qEl.className='d-q';qEl.textContent='この手は何符？';
+    document.getElementById('d-choices').before(qEl);
+    dFuChoices(hand.fu).forEach(v=>{
+      const b=document.createElement('button');
+      b.className='drill-btn';b.textContent=v+'符';
+      b.onclick=()=>dAnswerFu(v,hand);
+      document.getElementById('d-choices').appendChild(b);
+    });
+  }
 }
 function dAnswerFu(chosen,hand){
   drillTotal++;
