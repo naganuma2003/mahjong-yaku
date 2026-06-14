@@ -9,17 +9,17 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
-  header { background: linear-gradient(135deg,#1b5e20,#388e3c); color: white; padding: 36px 20px; text-align: center; }
+  header { background: linear-gradient(135deg,#0d47a1,#1565c0); color: white; padding: 36px 20px; text-align: center; }
   header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
   header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
   .tabs-nav { display: flex; background: white; border-bottom: 2px solid #dce3eb; }
   .tab-nav-btn { flex: 1; padding: 14px; border: none; background: none; cursor: pointer; font: 600 15px/1 inherit; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
-  .tab-nav-btn.active { color: #388e3c; border-bottom-color: #388e3c; }
+  .tab-nav-btn.active { color: #1565c0; border-bottom-color: #1565c0; }
   .tab-section { display: none; }
   .tab-section.active { display: block; }
 
-  /* Yaku list */
+  /* ===== 役一覧 (green) ===== */
   .filter { display: flex; gap: 8px; justify-content: center; padding: 24px 20px 16px; flex-wrap: wrap; }
   .filter button { padding: 7px 18px; border: 2px solid #388e3c; border-radius: 20px; background: white; color: #388e3c; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; font-family: inherit; }
   .filter button.active, .filter button:hover { background: #388e3c; color: white; }
@@ -39,54 +39,70 @@
   .closed-tag { background: #fff3e0; color: #e65100; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
   .desc { font-size: 14px; color: #555; line-height: 1.65; margin-top: 12px; }
 
-  /* Calculator */
-  .calc-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
-  .calc-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 16px; }
-  .clabel { font: 700 13px/1 inherit; color: #666; margin-bottom: 10px; display: block; }
+  /* ===== 点数計算 (BLUE) ===== */
+  .calc-wrap { max-width: 740px; margin: 0 auto; padding: 20px 16px 48px; }
+  .calc-card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 14px; }
+  .clabel { font: 700 13px/1 inherit; color: #555; margin-bottom: 10px; display: block; }
   .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .obtn { padding: 8px 14px; border: 2px solid #dce3eb; border-radius: 8px; background: white; color: #555; cursor: pointer; font: 600 13px/1 inherit; transition: all .12s; font-family: inherit; }
-  .obtn.on { background: #388e3c; border-color: #388e3c; color: white; }
-  .obtn:hover:not(.on):not(:disabled) { border-color: #388e3c; color: #388e3c; }
+  .obtn.on { background: #1565c0; border-color: #1565c0; color: white; }
+  .obtn:hover:not(.on):not(:disabled) { border-color: #1565c0; color: #1565c0; }
   .obtn:disabled { opacity: .3; cursor: default; }
   .tgl-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .tgl { display: flex; border: 2px solid #dce3eb; border-radius: 8px; overflow: hidden; }
   .tbtn { padding: 9px 20px; border: none; background: white; cursor: pointer; font: 600 14px/1 inherit; color: #666; transition: all .12s; font-family: inherit; }
-  .tbtn.on { background: #388e3c; color: white; }
-  .result-box { background: #f0f9f1; border: 2px solid #a5d6a7; border-radius: 14px; padding: 24px; text-align: center; }
-  .res-pts { font-size: 56px; font-weight: 900; color: #1b5e20; line-height: 1; }
-  .res-unit { font-size: 22px; font-weight: 700; color: #2e7d32; }
+  .tbtn.on { background: #1565c0; color: white; }
+  .result-box { background: #f0f7ff; border: 2px solid #90caf9; border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 14px; }
+  .res-pts { font-size: 56px; font-weight: 900; color: #0d47a1; line-height: 1; }
+  .res-unit { font-size: 22px; font-weight: 700; color: #1565c0; }
   .res-name { font: 700 16px/1.4 inherit; color: #b45309; margin-top: 6px; min-height: 22px; }
   .res-detail { font-size: 14px; color: #666; margin-top: 6px; min-height: 20px; }
 
   /* Fu calculator */
   .fu-divider { border: none; border-top: 1px solid #eee; margin: 14px 0 12px; }
   .fu-toggle-row { display: flex; align-items: center; cursor: pointer; gap: 6px; user-select: none; }
-  .fu-toggle-label { font: 600 13px/1 inherit; color: #388e3c; }
+  .fu-toggle-label { font: 600 13px/1 inherit; color: #1565c0; }
   .fu-toggle-arrow { font-size: 11px; color: #888; }
   .fu-body { margin-top: 16px; }
   .fu-group { margin-bottom: 14px; }
   .hidden { display: none !important; }
   .meld-row { margin-bottom: 10px; }
   .meld-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .meld-label { font: 700 12px/1 inherit; color: #388e3c; width: 36px; flex-shrink: 0; }
+  .meld-label { font: 700 12px/1 inherit; color: #1565c0; width: 36px; flex-shrink: 0; }
   .meld-sub { margin-top: 5px; padding-left: 42px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .fu-bd { background: #f8fbf8; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  .fu-bd { background: #f0f7ff; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
   .fu-bd-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: #555; }
-  .fu-bd-row.total { font-weight: 900; color: #1b5e20; font-size: 15px; border-top: 1px solid #c8e6c9; margin-top: 4px; padding-top: 6px; }
-  .fu-bd-row.total span:last-child { color: #1b5e20; }
-  .fu-apply { width: 100%; padding: 11px; background: #388e3c; border: none; border-radius: 10px; color: white; font: 700 14px/1 inherit; cursor: pointer; transition: background .12s; font-family: inherit; }
-  .fu-apply:hover { background: #2e7d32; }
+  .fu-bd-row.total { font-weight: 900; color: #0d47a1; font-size: 15px; border-top: 1px solid #90caf9; margin-top: 4px; padding-top: 6px; }
+  .fu-apply { width: 100%; padding: 11px; background: #1565c0; border: none; border-radius: 10px; color: white; font: 700 14px/1 inherit; cursor: pointer; transition: background .12s; font-family: inherit; }
+  .fu-apply:hover { background: #0d47a1; }
 
-  /* Reference table */
-  .ref-note { font-size: 13px; color: #666; margin-bottom: 12px; }
-  .tbl-wrap { overflow-x: auto; }
-  .rtbl { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
-  .rtbl th { background: #388e3c; color: white; padding: 8px 10px; text-align: center; font-weight: 700; }
-  .rtbl td { border: 1px solid #dce3eb; padding: 7px 10px; text-align: center; }
-  .rtbl tr:nth-child(even) td { background: #f8fbf8; }
-  .rtbl .fu-cell { font-weight: 700; background: #e8f5e9 !important; color: #2e7d32; }
-  .rtbl .mg { font-weight: 700; color: #b45309; background: #fef3c7 !important; }
-  .rtbl .na { color: #ccc; }
+  /* ===== 点数早見表（butterfly table） ===== */
+  .score-tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .score-tbl { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+  .score-tbl th { padding: 6px 8px; text-align: center; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,.3); }
+  .score-tbl td { border: 1px solid #dce3eb; padding: 6px 8px; text-align: center; }
+  .th-oya { background: #1976d2; }
+  .th-fu  { background: #0d47a1; }
+  .th-ko  { background: #1565c0; }
+  .td-oya { background: #e8f4fd; }
+  .td-fu  { background: #ddeeff; font-weight: 700; color: #0d47a1; border-left: 2px solid #1565c0 !important; border-right: 2px solid #1565c0 !important; }
+  .td-na  { color: #bbb; }
+  .td-mg  { background: #fef3c7 !important; font-weight: 700; color: #b45309; }
+  .score-tbl .lim-row td { background: #e3f2fd; }
+  .score-tbl .lim-name { background: #bbdefb !important; font-weight: 700; color: #0d47a1; font-size: 11px; }
+  .score-tbl .lim-val  { color: #1565c0; font-weight: 700; }
+
+  /* ===== 3-column fu reference ===== */
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .ref-card { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .ref-card-title { font: 700 12px/1 inherit; color: #0d47a1; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid #e3f2fd; }
+  .ref-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .ref-tbl td { padding: 3px 2px; border-bottom: 1px solid #f0f4f8; vertical-align: middle; }
+  .ref-tbl td:last-child { text-align: right; font-weight: 700; color: #1565c0; white-space: nowrap; padding-left: 4px; }
+  .ref-tbl .sec { font-size: 10px; color: #999; font-weight: 600; padding-top: 6px; }
+  .ref-tbl .sec td { border-bottom: none; }
+  .ref-tbl .sp { color: #b45309; }
+  .ref-tbl th { background: #e3f2fd; color: #0d47a1; font-size: 10px; padding: 3px 4px; text-align: center; }
 
   footer { text-align: center; padding: 24px; font-size: 13px; color: #aaa; }
 
@@ -101,9 +117,10 @@
     .yaku-name { font-size: 16px; }
     .han-badge { font-size: 11px; }
     .res-pts { font-size: 40px; }
-    .calc-card { padding: 16px; }
-    .rtbl { font-size: 11px; }
-    .rtbl th, .rtbl td { padding: 6px 6px; }
+    .calc-card { padding: 14px; }
+    .score-tbl { font-size: 10px; }
+    .score-tbl th, .score-tbl td { padding: 4px 5px; }
+    .ref-grid { grid-template-columns: 1fr; }
     .meld-sub { padding-left: 0; }
   }
 </style>
@@ -153,7 +170,7 @@
       </div>
     </div>
 
-    <!-- 符（直接選択 + 符計算） -->
+    <!-- 符 + 符計算 -->
     <div class="calc-card">
       <span class="clabel">符（5翻以上は不要）</span>
       <div class="btn-row" id="fu-btns">
@@ -169,17 +186,12 @@
         <button class="obtn fu-btn" onclick="setFu(100,this)">100符</button>
         <button class="obtn fu-btn" onclick="setFu(110,this)">110符</button>
       </div>
-
-      <!-- 符計算セクション -->
       <hr class="fu-divider">
       <div class="fu-toggle-row" onclick="toggleFuCalc()">
         <span class="fu-toggle-label">符を計算する</span>
         <span class="fu-toggle-arrow" id="fu-arrow">▼</span>
       </div>
-
       <div id="fu-body" class="fu-body hidden">
-
-        <!-- 和了方法 -->
         <div class="fu-group">
           <span class="clabel">和了方法</span>
           <div class="btn-row" id="fu-win-btns">
@@ -188,24 +200,19 @@
             <button class="obtn" onclick="fuWin('tsumo',this)">ツモ</button>
           </div>
         </div>
-
-        <!-- 特殊形 -->
         <div class="fu-group">
-          <span class="clabel">特殊形（通常は「普通」のまま）</span>
+          <span class="clabel">特殊形</span>
           <div class="btn-row" id="fu-special-btns">
             <button class="obtn on" onclick="fuSpecial('normal',this)">普通</button>
             <button class="obtn" onclick="fuSpecial('chiitoi',this)">七対子（25符固定）</button>
             <button class="obtn" id="pinfu-btn" onclick="fuSpecial('pinfu',this)">平和ツモ（20符固定）</button>
           </div>
         </div>
-
-        <!-- 面子 + 雀頭 + 待ち -->
         <div id="fu-normal-section">
           <div class="fu-group">
-            <span class="clabel">面子（刻子・槓子のみ符がつく。順子は0符）</span>
+            <span class="clabel">面子</span>
             <div id="fu-melds"></div>
           </div>
-
           <div class="fu-group">
             <span class="clabel">雀頭</span>
             <div class="btn-row" id="fu-jantai-btns">
@@ -214,7 +221,6 @@
               <button class="obtn" onclick="fuJantai(4,this)">連風牌 +4符</button>
             </div>
           </div>
-
           <div class="fu-group">
             <span class="clabel">待ち</span>
             <div class="btn-row" id="fu-machi-btns">
@@ -226,10 +232,7 @@
             </div>
           </div>
         </div>
-
-        <!-- 結果 -->
         <div id="fu-result"></div>
-
       </div>
     </div>
 
@@ -255,32 +258,116 @@
       <div class="res-detail" id="res-detail">子ロン</div>
     </div>
 
-    <!-- 早見表 -->
+    <!-- ===== 点数早見表 (butterfly) ===== -->
     <div class="calc-card">
-      <span class="clabel">子ロン 早見表</span>
-      <p class="ref-note">20符はピンフツモのみ・25符は七対子専用。5翻以上は満貫（8,000点）。</p>
-      <div class="tbl-wrap">
-        <table class="rtbl">
-          <tr><th>符</th><th>1翻</th><th>2翻</th><th>3翻</th><th>4翻</th></tr>
-          <tr><td class="fu-cell">20</td><td>700</td><td>1,300</td><td>2,600</td><td>5,200</td></tr>
-          <tr><td class="fu-cell">25</td><td class="na">－</td><td>1,600</td><td>3,200</td><td>6,400</td></tr>
-          <tr><td class="fu-cell">30</td><td>1,000</td><td>2,000</td><td>3,900</td><td>7,700</td></tr>
-          <tr><td class="fu-cell">40</td><td>1,300</td><td>2,600</td><td>5,200</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">50</td><td>1,600</td><td>3,200</td><td>6,400</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">60</td><td>2,000</td><td>3,900</td><td>7,700</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">70</td><td>2,300</td><td>4,500</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">80</td><td>2,600</td><td>5,200</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">90</td><td>2,900</td><td>5,800</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">100</td><td>3,200</td><td>6,400</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell">110</td><td>3,600</td><td>7,100</td><td class="mg">満貫</td><td class="mg">満貫</td></tr>
-          <tr><td class="fu-cell" colspan="2">5翻以上</td><td colspan="3" class="mg">満貫 8,000点</td></tr>
-          <tr><td class="fu-cell" colspan="2">6〜7翻</td><td colspan="3" class="mg">跳満 12,000点</td></tr>
-          <tr><td class="fu-cell" colspan="2">8〜10翻</td><td colspan="3" class="mg">倍満 16,000点</td></tr>
-          <tr><td class="fu-cell" colspan="2">11〜12翻</td><td colspan="3" class="mg">三倍満 24,000点</td></tr>
-          <tr><td class="fu-cell" colspan="2">役満</td><td colspan="3" class="mg">役満 32,000点</td></tr>
+      <span class="clabel">点数早見表（ロン）　※25符は七対子専用・20符はピンフツモのみ</span>
+      <div class="score-tbl-wrap">
+        <table class="score-tbl">
+          <thead>
+            <tr>
+              <th class="th-oya" colspan="3">親 ロン</th>
+              <th class="th-fu" rowspan="2">符</th>
+              <th class="th-ko" colspan="4">子 ロン</th>
+            </tr>
+            <tr>
+              <th class="th-oya">3翻</th>
+              <th class="th-oya">2翻</th>
+              <th class="th-oya">1翻</th>
+              <th class="th-ko">1翻</th>
+              <th class="th-ko">2翻</th>
+              <th class="th-ko">3翻</th>
+              <th class="th-ko">4翻</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="td-oya">3,900</td><td class="td-oya">2,000</td><td class="td-oya">1,000</td><td class="td-fu">20符</td><td>700</td><td>1,300</td><td>2,600</td><td>5,200</td></tr>
+            <tr><td class="td-oya td-na">－</td><td class="td-oya">2,400</td><td class="td-oya td-na">－</td><td class="td-fu">25符</td><td class="td-na">－</td><td>1,600</td><td>3,200</td><td>6,400</td></tr>
+            <tr><td class="td-oya">5,800</td><td class="td-oya">2,900</td><td class="td-oya">1,500</td><td class="td-fu">30符</td><td>1,000</td><td>2,000</td><td>3,900</td><td>7,700</td></tr>
+            <tr><td class="td-oya">7,700</td><td class="td-oya">3,900</td><td class="td-oya">2,000</td><td class="td-fu">40符</td><td>1,300</td><td>2,600</td><td>5,200</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya">4,800</td><td class="td-oya">2,400</td><td class="td-fu">50符</td><td>1,600</td><td>3,200</td><td>6,400</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya">5,800</td><td class="td-oya">2,900</td><td class="td-fu">60符</td><td>2,000</td><td>3,900</td><td>7,700</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya">6,800</td><td class="td-oya">3,400</td><td class="td-fu">70符</td><td>2,300</td><td>4,500</td><td class="td-mg">満貫</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya">7,700</td><td class="td-oya">3,900</td><td class="td-fu">80符</td><td>2,600</td><td>5,200</td><td class="td-mg">満貫</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya td-mg">満貫</td><td class="td-oya">4,400</td><td class="td-fu">90符</td><td>2,900</td><td>5,800</td><td class="td-mg">満貫</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya td-mg">満貫</td><td class="td-oya">4,800</td><td class="td-fu">100符</td><td>3,200</td><td>6,400</td><td class="td-mg">満貫</td><td class="td-mg">満貫</td></tr>
+            <tr><td class="td-oya td-mg">満貫</td><td class="td-oya td-mg">満貫</td><td class="td-oya">5,300</td><td class="td-fu">110符</td><td>3,600</td><td>7,100</td><td class="td-mg">満貫</td><td class="td-mg">満貫</td></tr>
+            <tr class="lim-row"><td class="lim-name" colspan="3">満貫（5翻・30符4翻等）</td><td class="td-fu">―</td><td class="lim-val" colspan="4">子 8,000　／　親 12,000</td></tr>
+            <tr class="lim-row"><td class="lim-name" colspan="3">跳満（6〜7翻）</td><td class="td-fu">―</td><td class="lim-val" colspan="4">子 12,000　／　親 18,000</td></tr>
+            <tr class="lim-row"><td class="lim-name" colspan="3">倍満（8〜10翻）</td><td class="td-fu">―</td><td class="lim-val" colspan="4">子 16,000　／　親 24,000</td></tr>
+            <tr class="lim-row"><td class="lim-name" colspan="3">三倍満（11〜12翻）</td><td class="td-fu">―</td><td class="lim-val" colspan="4">子 24,000　／　親 36,000</td></tr>
+            <tr class="lim-row"><td class="lim-name" colspan="3">役満（13翻〜）</td><td class="td-fu">―</td><td class="lim-val" colspan="4">子 32,000　／　親 48,000</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
+
+    <!-- ===== 符・ツモ早見 3列 ===== -->
+    <div class="ref-grid">
+
+      <!-- 基本符 -->
+      <div class="ref-card">
+        <div class="ref-card-title">基本符の計算</div>
+        <table class="ref-tbl">
+          <tr><td>副底（常に）</td><td>20符</td></tr>
+          <tr><td>門前ロン加符</td><td>+10符</td></tr>
+          <tr><td>ツモ加符</td><td>+2符</td></tr>
+          <tr><td>鳴きロン加符</td><td>+0符</td></tr>
+          <tr class="sec"><td colspan="2">アタマ（雀頭）</td></tr>
+          <tr><td>数牌・客風牌</td><td>0符</td></tr>
+          <tr><td>役牌</td><td>+2符</td></tr>
+          <tr><td>連風牌（両風）</td><td>+4符</td></tr>
+          <tr class="sec"><td colspan="2">待ち</td></tr>
+          <tr><td>リャンメン・シャンポン</td><td>0符</td></tr>
+          <tr><td>カンチャン・ペンチャン</td><td>+2符</td></tr>
+          <tr><td>タンキ（単騎）</td><td>+2符</td></tr>
+          <tr class="sec"><td colspan="2">特殊（切り上げなし）</td></tr>
+          <tr><td>七対子</td><td class="sp">25符固定</td></tr>
+          <tr><td>平和ツモ</td><td class="sp">20符固定</td></tr>
+        </table>
+      </div>
+
+      <!-- メンツ符 -->
+      <div class="ref-card">
+        <div class="ref-card-title">メンツ符</div>
+        <table class="ref-tbl">
+          <tr class="sec"><td colspan="2">順子（常に）</td></tr>
+          <tr><td>明・暗 共通</td><td>0符</td></tr>
+          <tr class="sec"><td colspan="2">刻子</td></tr>
+          <tr><td>明・中張牌</td><td>2符</td></tr>
+          <tr><td>暗・中張牌</td><td>4符</td></tr>
+          <tr><td>明・老頭/字牌</td><td>4符</td></tr>
+          <tr><td>暗・老頭/字牌</td><td>8符</td></tr>
+          <tr class="sec"><td colspan="2">槓子（刻子の4倍）</td></tr>
+          <tr><td>明・中張牌</td><td>8符</td></tr>
+          <tr><td>暗・中張牌</td><td>16符</td></tr>
+          <tr><td>明・老頭/字牌</td><td>16符</td></tr>
+          <tr><td>暗・老頭/字牌</td><td class="sp">32符</td></tr>
+          <tr class="sec"><td colspan="2">合計は10符単位に切り上げ</td></tr>
+        </table>
+      </div>
+
+      <!-- ツモ払い -->
+      <div class="ref-card">
+        <div class="ref-card-title">ツモ払い</div>
+        <table class="ref-tbl">
+          <thead>
+            <tr><th>役名</th><th>子ツモ（親/子）</th></tr>
+          </thead>
+          <tr><td>満貫</td><td>2,000 / 1,000</td></tr>
+          <tr><td>跳満</td><td>3,000 / 2,000</td></tr>
+          <tr><td>倍満</td><td>4,000 / 2,000</td></tr>
+          <tr><td>三倍満</td><td>6,000 / 3,000</td></tr>
+          <tr><td>役満</td><td>8,000 / 4,000</td></tr>
+          <tr class="sec"><td colspan="2">親ツモ（子各払い）</td></tr>
+          <tr><td>満貫</td><td>2,000オール</td></tr>
+          <tr><td>跳満</td><td>3,000オール</td></tr>
+          <tr><td>倍満</td><td>4,000オール</td></tr>
+          <tr><td>三倍満</td><td>6,000オール</td></tr>
+          <tr><td>役満</td><td>8,000オール</td></tr>
+        </table>
+      </div>
+
+    </div><!-- /ref-grid -->
 
   </div>
 </div>
@@ -332,245 +419,110 @@ const yaku = [
   { name:"地和", reading:"チーホウ", han:"役満", closed:true, desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
   { name:"人和", reading:"レンホウ", han:"役満", closed:true, desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。採用しないルールも多い。" },
 ];
-
-function hanGroup(han) {
-  if (han.includes('役満')) return 'yakuman';
-  if (han.includes('6')||han.includes('5')||han.includes('3')) return '3';
-  if (han.includes('2')) return '2';
-  return '1';
-}
-function badgeClass(han) {
-  if (han.includes('ダブル')) return 'dym';
-  if (han.includes('役満')) return 'ym';
-  return '';
-}
-function renderCards(f) {
-  const g = document.getElementById('grid');
-  g.innerHTML = '';
-  yaku.forEach(y => {
-    const grp = hanGroup(y.han);
-    const show = f==='all'||(f==='closed'&&y.closed)||(f===grp);
-    if (!show) return;
-    const c = document.createElement('div');
-    c.className = 'card'+(grp==='yakuman'?' is-yakuman':'');
-    c.innerHTML = `<div class="card-top"><div><div class="yaku-name">${y.name}</div><div class="yaku-reading">${y.reading}</div></div><div class="badges"><div class="han-badge ${badgeClass(y.han)}">${y.han}</div>${y.closed?'<div class="closed-tag">門前限定</div>':''}</div></div><div class="desc">${y.desc}</div>`;
+function hanGroup(h){if(h.includes('役満'))return'yakuman';if(h.includes('6')||h.includes('5')||h.includes('3'))return'3';if(h.includes('2'))return'2';return'1';}
+function badgeClass(h){if(h.includes('ダブル'))return'dym';if(h.includes('役満'))return'ym';return'';}
+function renderCards(f){
+  const g=document.getElementById('grid');g.innerHTML='';
+  yaku.forEach(y=>{
+    const grp=hanGroup(y.han);
+    if(!(f==='all'||(f==='closed'&&y.closed)||(f===grp)))return;
+    const c=document.createElement('div');
+    c.className='card'+(grp==='yakuman'?' is-yakuman':'');
+    c.innerHTML=`<div class="card-top"><div><div class="yaku-name">${y.name}</div><div class="yaku-reading">${y.reading}</div></div><div class="badges"><div class="han-badge ${badgeClass(y.han)}">${y.han}</div>${y.closed?'<div class="closed-tag">門前限定</div>':''}</div></div><div class="desc">${y.desc}</div>`;
     g.appendChild(c);
   });
 }
-function filter(t,btn) {
-  document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); renderCards(t);
-}
+function filter(t,btn){document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCards(t);}
 renderCards('all');
 
 /* ===== 点数計算 ===== */
-const LIMITS = [
-  { min:13, name:'役満',   ko:32000, oya:48000, kToy:16000, kTok:8000,  oToe:16000 },
-  { min:11, name:'三倍満', ko:24000, oya:36000, kToy:12000, kTok:6000,  oToe:12000 },
-  { min:8,  name:'倍満',   ko:16000, oya:24000, kToy:8000,  kTok:4000,  oToe:8000  },
-  { min:6,  name:'跳満',   ko:12000, oya:18000, kToy:6000,  kTok:3000,  oToe:6000  },
-  { min:5,  name:'満貫',   ko:8000,  oya:12000, kToy:4000,  kTok:2000,  oToe:4000  },
+const LIMITS=[
+  {min:13,name:'役満',  ko:32000,oya:48000,kToy:16000,kTok:8000,oToe:16000},
+  {min:11,name:'三倍満',ko:24000,oya:36000,kToy:12000,kTok:6000,oToe:12000},
+  {min:8, name:'倍満',  ko:16000,oya:24000,kToy:8000, kTok:4000,oToe:8000 },
+  {min:6, name:'跳満',  ko:12000,oya:18000,kToy:6000, kTok:3000,oToe:6000 },
+  {min:5, name:'満貫',  ko:8000, oya:12000,kToy:4000, kTok:2000,oToe:4000 },
 ];
-
-let cHan=3, cFu=30, cDeal=false, cTsumo=false;
-
-function ru(n){ return Math.ceil(n/100)*100; }
-
+let cHan=3,cFu=30,cDeal=false,cTsumo=false;
+function ru(n){return Math.ceil(n/100)*100;}
 function calcScore(han,fu,deal,tsumo){
-  const lim = LIMITS.find(l=>han>=l.min);
-  if (lim) return fmt(lim,deal,tsumo);
-  const base = fu*(1<<(han+2));
-  if (ru(base*4)>=8000) return fmt(LIMITS[4],deal,tsumo);
-  if (deal){
-    if (tsumo){ const e=ru(base*2); return {total:e*3,name:'',detail:e.toLocaleString()+'オール'}; }
-    return {total:ru(base*6),name:'',detail:'親ロン'};
+  const lim=LIMITS.find(l=>han>=l.min);
+  if(lim)return fmt(lim,deal,tsumo);
+  const base=fu*(1<<(han+2));
+  if(ru(base*4)>=8000)return fmt(LIMITS[4],deal,tsumo);
+  if(deal){
+    if(tsumo){const e=ru(base*2);return{total:e*3,name:'',detail:e.toLocaleString()+'オール'};}
+    return{total:ru(base*6),name:'',detail:'親ロン'};
   }
-  if (tsumo){ const oy=ru(base*2),ko=ru(base); return {total:oy+ko*2,name:'',detail:'親'+oy.toLocaleString()+' / 子'+ko.toLocaleString()}; }
-  return {total:ru(base*4),name:'',detail:'子ロン'};
+  if(tsumo){const oy=ru(base*2),ko=ru(base);return{total:oy+ko*2,name:'',detail:'親'+oy.toLocaleString()+' / 子'+ko.toLocaleString()};}
+  return{total:ru(base*4),name:'',detail:'子ロン'};
 }
 function fmt(lim,deal,tsumo){
-  if (deal){
-    if (tsumo) return {total:lim.oToe*3,name:lim.name,detail:lim.oToe.toLocaleString()+'オール'};
-    return {total:lim.oya,name:lim.name,detail:'親ロン'};
-  }
-  if (tsumo) return {total:lim.kToy+lim.kTok*2,name:lim.name,detail:'親'+lim.kToy.toLocaleString()+' / 子'+lim.kTok.toLocaleString()};
-  return {total:lim.ko,name:lim.name,detail:'子ロン'};
+  if(deal){if(tsumo)return{total:lim.oToe*3,name:lim.name,detail:lim.oToe.toLocaleString()+'オール'};return{total:lim.oya,name:lim.name,detail:'親ロン'};}
+  if(tsumo)return{total:lim.kToy+lim.kTok*2,name:lim.name,detail:'親'+lim.kToy.toLocaleString()+' / 子'+lim.kTok.toLocaleString()};
+  return{total:lim.ko,name:lim.name,detail:'子ロン'};
 }
 function updateCalc(){
-  const r = calcScore(cHan,cFu,cDeal,cTsumo);
-  document.getElementById('res-pts').textContent = r.total.toLocaleString();
-  document.getElementById('res-name').textContent = r.name;
-  document.getElementById('res-detail').textContent = r.detail;
-  const noFu = cHan>=5;
-  document.querySelectorAll('.fu-btn').forEach(b=>{ b.disabled=noFu; if(noFu)b.classList.remove('on'); });
+  const r=calcScore(cHan,cFu,cDeal,cTsumo);
+  document.getElementById('res-pts').textContent=r.total.toLocaleString();
+  document.getElementById('res-name').textContent=r.name;
+  document.getElementById('res-detail').textContent=r.detail;
+  const noFu=cHan>=5;
+  document.querySelectorAll('.fu-btn').forEach(b=>{b.disabled=noFu;if(noFu)b.classList.remove('on');});
 }
-function setHan(v,btn){ cHan=v; document.querySelectorAll('#han-btns .obtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); updateCalc(); }
-function setFu(v,btn){ cFu=v; document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); updateCalc(); }
-function setDealer(v){ cDeal=v; document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0))); updateCalc(); }
-function setTsumo(v){ cTsumo=v; document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0))); updateCalc(); }
-function showTab(id,btn){ document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
+function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
+function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
+function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 updateCalc();
 
 /* ===== 符計算 ===== */
-const fuState = {
-  winType: 'ron_menzen',
-  special: 'normal',
-  melds: [
-    {type:'none',open:true,honor:false},
-    {type:'none',open:true,honor:false},
-    {type:'none',open:true,honor:false},
-    {type:'none',open:true,honor:false},
-  ],
-  jantai: 0,
-  machi: 0,
-};
-
-/* 面子符テーブル: [明/暗][中張/老頭字] */
-const MELD_PTS = {
-  koutsu: [[2,4],[4,8]],
-  kantsu: [[8,16],[16,32]],
-};
-
-function calcFu() {
-  const s = fuState;
-  if (s.special === 'chiitoi') return { total:25, raw:25, bd:[{label:'副底（七対子固定）',pts:25}] };
-  if (s.special === 'pinfu')   return { total:20, raw:20, bd:[{label:'副底（平和ツモ固定）',pts:20}] };
-
-  const bd = [];
-  let fu = 20;
-  bd.push({label:'副底',pts:20});
-
-  if (s.winType === 'ron_menzen') { fu+=10; bd.push({label:'門前加符',pts:10}); }
-  else if (s.winType === 'tsumo') { fu+=2;  bd.push({label:'ツモ加符',pts:2}); }
-
-  s.melds.forEach((m,i) => {
-    if (!MELD_PTS[m.type]) return;
-    const pts = MELD_PTS[m.type][m.open?0:1][m.honor?1:0];
-    if (!pts) return;
-    const tName = m.type==='koutsu'?'刻子':'槓子';
-    bd.push({label:`面子${i+1}（${tName}・${m.open?'明':'暗'}・${m.honor?'老頭/字牌':'中張牌'}）`,pts});
-    fu += pts;
+const fuState={winType:'ron_menzen',special:'normal',melds:[{type:'none',open:true,honor:false},{type:'none',open:true,honor:false},{type:'none',open:true,honor:false},{type:'none',open:true,honor:false}],jantai:0,machi:0};
+const MELD_PTS={koutsu:[[2,4],[4,8]],kantsu:[[8,16],[16,32]]};
+function calcFu(){
+  const s=fuState;
+  if(s.special==='chiitoi')return{total:25,raw:25,bd:[{label:'副底（七対子固定）',pts:25}]};
+  if(s.special==='pinfu')return{total:20,raw:20,bd:[{label:'副底（平和ツモ固定）',pts:20}]};
+  const bd=[];let fu=20;bd.push({label:'副底',pts:20});
+  if(s.winType==='ron_menzen'){fu+=10;bd.push({label:'門前加符',pts:10});}
+  else if(s.winType==='tsumo'){fu+=2;bd.push({label:'ツモ加符',pts:2});}
+  s.melds.forEach((m,i)=>{
+    if(!MELD_PTS[m.type])return;
+    const pts=MELD_PTS[m.type][m.open?0:1][m.honor?1:0];
+    if(!pts)return;
+    bd.push({label:`面子${i+1}（${m.type==='koutsu'?'刻子':'槓子'}・${m.open?'明':'暗'}・${m.honor?'老頭/字牌':'中張牌'}）`,pts});
+    fu+=pts;
   });
-
-  if (s.jantai) { bd.push({label:`雀頭（${s.jantai===4?'連風牌':'役牌'}）`,pts:s.jantai}); fu+=s.jantai; }
-  if (s.machi)  { bd.push({label:'待ち符（嵌張/辺張/単騎）',pts:2}); fu+=2; }
-
-  const total = Math.ceil(fu/10)*10;
-  return {total, raw:fu, bd};
+  if(s.jantai){bd.push({label:`雀頭（${s.jantai===4?'連風牌':'役牌'}）`,pts:s.jantai});fu+=s.jantai;}
+  if(s.machi){bd.push({label:'待ち符（カンチャン/ペンチャン/タンキ）',pts:2});fu+=2;}
+  const total=Math.ceil(fu/10)*10;
+  return{total,raw:fu,bd};
 }
-
-function renderFuResult() {
-  const r = calcFu();
-  const rows = r.bd.map(b=>`<div class="fu-bd-row"><span>${b.label}</span><span>+${b.pts}符</span></div>`).join('');
-  const totalLabel = r.raw!==r.total ? `合計 ${r.raw}符 → 切り上げ` : '合計';
-  document.getElementById('fu-result').innerHTML = `
-    <div class="fu-bd">
-      ${rows}
-      <div class="fu-bd-row total"><span>${totalLabel}</span><span>${r.total}符</span></div>
-    </div>
-    <button class="fu-apply" onclick="fuApply(${r.total})">この ${r.total}符 を点数計算に使う →</button>
-  `;
+function renderFuResult(){
+  const r=calcFu();
+  const rows=r.bd.map(b=>`<div class="fu-bd-row"><span>${b.label}</span><span>+${b.pts}符</span></div>`).join('');
+  const tl=r.raw!==r.total?`合計 ${r.raw}符 → 切り上げ`:'合計';
+  document.getElementById('fu-result').innerHTML=`<div class="fu-bd">${rows}<div class="fu-bd-row total"><span>${tl}</span><span>${r.total}符</span></div></div><button class="fu-apply" onclick="fuApply(${r.total})">この ${r.total}符 を点数計算に使う →</button>`;
 }
-
-function fuApply(total) {
-  const allowed = [20,25,30,40,50,60,70,80,90,100,110];
-  const v = allowed.includes(total) ? total : allowed.reduce((a,b)=>Math.abs(b-total)<Math.abs(a-total)?b:a);
-  const btn = Array.from(document.querySelectorAll('.fu-btn')).find(b=>parseInt(b.textContent)===v);
-  if (btn) setFu(v, btn);
+function fuApply(total){
+  const allowed=[20,25,30,40,50,60,70,80,90,100,110];
+  const v=allowed.includes(total)?total:allowed.reduce((a,b)=>Math.abs(b-total)<Math.abs(a-total)?b:a);
+  const btn=Array.from(document.querySelectorAll('.fu-btn')).find(b=>parseInt(b.textContent)===v);
+  if(btn)setFu(v,btn);
   document.getElementById('res-pts').scrollIntoView({behavior:'smooth',block:'center'});
 }
-
-let fuOpen = false;
-function toggleFuCalc() {
-  fuOpen = !fuOpen;
-  document.getElementById('fu-body').classList.toggle('hidden', !fuOpen);
-  document.getElementById('fu-arrow').textContent = fuOpen ? '▲' : '▼';
-  if (fuOpen) renderFuResult();
-}
-
-function fuWin(v, btn) {
-  fuState.winType = v;
-  document.querySelectorAll('#fu-win-btns .obtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  const pBtn = document.getElementById('pinfu-btn');
-  pBtn.disabled = (v !== 'tsumo');
-  if (v !== 'tsumo' && fuState.special === 'pinfu') fuSpecialInternal('normal');
-  renderFuResult();
-}
-
-function fuSpecialInternal(v) {
-  fuState.special = v;
-  document.querySelectorAll('#fu-special-btns .obtn').forEach(b=>b.classList.remove('on'));
-  const map = {normal:0,chiitoi:1,pinfu:2};
-  document.querySelectorAll('#fu-special-btns .obtn')[map[v]].classList.add('on');
-  document.getElementById('fu-normal-section').classList.toggle('hidden', v!=='normal');
-}
-
-function fuSpecial(v, btn) {
-  fuState.special = v;
-  document.querySelectorAll('#fu-special-btns .obtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('fu-normal-section').classList.toggle('hidden', v!=='normal');
-  renderFuResult();
-}
-
-function fuJantai(v, btn) {
-  fuState.jantai = v;
-  document.querySelectorAll('#fu-jantai-btns .obtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderFuResult();
-}
-
-function fuMachi(v, btn) {
-  fuState.machi = v;
-  document.querySelectorAll('#fu-machi-btns .obtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderFuResult();
-}
-
-function fuMeldType(i, v, btn) {
-  fuState.melds[i].type = v;
-  btn.closest('.meld-top').querySelectorAll('.mtype-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  const sub = document.getElementById('msub'+i);
-  const showSub = v==='koutsu'||v==='kantsu';
-  sub.classList.toggle('hidden', !showSub);
-  renderFuResult();
-}
-
-function fuMeldOpen(i, v, btn) {
-  fuState.melds[i].open = v;
-  btn.closest('.meld-sub').querySelectorAll('.mopen-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderFuResult();
-}
-
-function fuMeldHonor(i, v, btn) {
-  fuState.melds[i].honor = v;
-  btn.closest('.meld-sub').querySelectorAll('.mhonor-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderFuResult();
-}
-
-/* 面子UI生成 */
-(function initMelds() {
-  document.getElementById('fu-melds').innerHTML = [0,1,2,3].map(i=>`
-    <div class="meld-row">
-      <div class="meld-top">
-        <span class="meld-label">面子${i+1}</span>
-        <button class="obtn mtype-btn on" onclick="fuMeldType(${i},'none',this)">なし</button>
-        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'shuntsu',this)">順子</button>
-        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'koutsu',this)">刻子</button>
-        <button class="obtn mtype-btn" onclick="fuMeldType(${i},'kantsu',this)">槓子</button>
-      </div>
-      <div class="meld-sub hidden" id="msub${i}">
-        <button class="obtn mopen-btn on" onclick="fuMeldOpen(${i},true,this)">明</button>
-        <button class="obtn mopen-btn" onclick="fuMeldOpen(${i},false,this)">暗</button>
-        <button class="obtn mhonor-btn on" onclick="fuMeldHonor(${i},false,this)">中張牌</button>
-        <button class="obtn mhonor-btn" onclick="fuMeldHonor(${i},true,this)">老頭・字牌</button>
-      </div>
-    </div>
-  `).join('');
+let fuOpen=false;
+function toggleFuCalc(){fuOpen=!fuOpen;document.getElementById('fu-body').classList.toggle('hidden',!fuOpen);document.getElementById('fu-arrow').textContent=fuOpen?'▲':'▼';if(fuOpen)renderFuResult();}
+function fuWin(v,btn){fuState.winType=v;document.querySelectorAll('#fu-win-btns .obtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const p=document.getElementById('pinfu-btn');p.disabled=(v!=='tsumo');if(v!=='tsumo'&&fuState.special==='pinfu'){fuState.special='normal';document.querySelectorAll('#fu-special-btns .obtn').forEach((b,i)=>b.classList.toggle('on',i===0));document.getElementById('fu-normal-section').classList.remove('hidden');}renderFuResult();}
+function fuSpecial(v,btn){fuState.special=v;document.querySelectorAll('#fu-special-btns .obtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('fu-normal-section').classList.toggle('hidden',v!=='normal');renderFuResult();}
+function fuJantai(v,btn){fuState.jantai=v;document.querySelectorAll('#fu-jantai-btns .obtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFuResult();}
+function fuMachi(v,btn){fuState.machi=v;document.querySelectorAll('#fu-machi-btns .obtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFuResult();}
+function fuMeldType(i,v,btn){fuState.melds[i].type=v;btn.closest('.meld-top').querySelectorAll('.mtype-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('msub'+i).classList.toggle('hidden',!(v==='koutsu'||v==='kantsu'));renderFuResult();}
+function fuMeldOpen(i,v,btn){fuState.melds[i].open=v;btn.closest('.meld-sub').querySelectorAll('.mopen-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFuResult();}
+function fuMeldHonor(i,v,btn){fuState.melds[i].honor=v;btn.closest('.meld-sub').querySelectorAll('.mhonor-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFuResult();}
+(function initMelds(){
+  document.getElementById('fu-melds').innerHTML=[0,1,2,3].map(i=>`<div class="meld-row"><div class="meld-top"><span class="meld-label">面子${i+1}</span><button class="obtn mtype-btn on" onclick="fuMeldType(${i},'none',this)">なし</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'shuntsu',this)">順子</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'koutsu',this)">刻子</button><button class="obtn mtype-btn" onclick="fuMeldType(${i},'kantsu',this)">槓子</button></div><div class="meld-sub hidden" id="msub${i}"><button class="obtn mopen-btn on" onclick="fuMeldOpen(${i},true,this)">明</button><button class="obtn mopen-btn" onclick="fuMeldOpen(${i},false,this)">暗</button><button class="obtn mhonor-btn on" onclick="fuMeldHonor(${i},false,this)">中張牌</button><button class="obtn mhonor-btn" onclick="fuMeldHonor(${i},true,this)">老頭・字牌</button></div></div>`).join('');
 })();
 </script>
 </body>
