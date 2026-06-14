@@ -433,6 +433,10 @@ const yaku = [
   { name:"天和", reading:"テンホウ", han:"役満", closed:true, desc:"親が配牌の時点で和了形になっている。ゲーム開始直後のみ成立。" },
   { name:"地和", reading:"チーホウ", han:"役満", closed:true, desc:"子が最初のツモで和了する。それまでに誰も鳴いてはいけない。" },
   { name:"人和", reading:"レンホウ", han:"役満", closed:true, local:true, desc:"自分の最初のツモ番が来る前に、他家の打牌でロン和了する。ローカル役で採用しないルールが多い。翻数も役満・8翻・満貫固定とルールによって大きく異なる。" },
+  { name:"大七星", reading:"ダイチセイ", han:"役満", closed:true, local:true, desc:"東・南・西・北・白・發・中の7種すべてを対子にする字牌だけの七対子。字一色と複合するルールも。" },
+  { name:"大車輪", reading:"ダイシャリン", han:"役満", closed:true, local:true, desc:"ピンズの2〜8を各2枚ずつ使った七対子（22334455667788）。ピンズのみの七対子形。" },
+  { name:"三連刻", reading:"サンレンコウ", han:"2翻", closed:false, local:true, desc:"同じ種類の数牌で連続する数字の刻子を3組揃える（例：333・444・555ピン）。翻数はルールによって異なる。" },
+  { name:"一色三順", reading:"イッショクサンジュン", han:"役満", closed:true, local:true, desc:"同じ種類の同じ順子を3組揃える（例：123マン×3）。完全一色三順とも呼ばれる。" },
 ];
 function hanGroup(h){if(h.includes('役満'))return'yakuman';if(h==='満貫')return'3';if(h.includes('6')||h.includes('5')||h.includes('3'))return'3';if(h.includes('2'))return'2';return'1';}
 function badgeClass(h){if(h.includes('ダブル'))return'dym';if(h.includes('役満'))return'ym';if(h==='満貫')return'mg';return'';}
