@@ -1,0 +1,168 @@
+:root {
+  --bg: #f5f6f8;
+  --panel: #ffffff;
+  --border: #e2e5ea;
+  --text: #1f2733;
+  --muted: #8a93a2;
+  --accent: #c0392b;
+  --tier-a: #c0392b;
+  --tier-b: #2c5fa8;
+  --tier-c: #3a8c4f;
+  --tier-d: #7d5ba6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-header {
+  padding: 16px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.app-header h1 { margin: 0; font-size: 20px; }
+.subtitle { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  align-items: flex-start;
+}
+
+/* --- サイドバー --- */
+.sidebar {
+  width: 280px;
+  flex: 0 0 280px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  position: sticky;
+  top: 16px;
+}
+.org-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.org-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.org-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.mleague-btn { border-color: #b8860b; color: #b8860b; }
+.mleague-btn.active { background: #b8860b; color: #fff; border-color: #b8860b; }
+.filter-sep { display: block; width: 1px; height: 20px; background: var(--border); margin: 0 2px; align-self: center; }
+
+.search {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.player-count { font-size: 12px; color: var(--muted); margin: 8px 2px; }
+
+.player-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+}
+.player-list li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.player-list li:hover { background: #f0f2f5; }
+.player-list li.selected { background: #eaf0fb; }
+.player-list .pname { font-size: 14px; }
+.player-list .porg { font-size: 11px; color: var(--muted); }
+
+/* --- 詳細 --- */
+.detail {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  min-height: 300px;
+}
+.placeholder { color: var(--muted); text-align: center; padding: 60px 0; }
+
+.detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.detail-head h2 { margin: 0; font-size: 22px; }
+.detail-head .league-name { color: var(--accent); font-weight: 600; }
+.detail-head .org-name { color: var(--muted); font-size: 13px; }
+
+.summary { display: flex; gap: 18px; flex-wrap: wrap; margin: 14px 0 6px; }
+.stat { background: #f7f8fa; border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; }
+.stat .num { font-size: 20px; font-weight: 700; }
+.stat .lbl { font-size: 11px; color: var(--muted); }
+
+/* 年表テーブル */
+.timeline { width: 100%; border-collapse: collapse; margin-top: 14px; }
+.timeline th, .timeline td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  font-size: 14px;
+}
+.timeline th { color: var(--muted); font-size: 12px; font-weight: 600; }
+.timeline td.term { font-weight: 600; width: 90px; }
+.timeline td.points { font-variant-numeric: tabular-nums; width: 110px; }
+.timeline tr.ongoing { background: #fafafa; color: var(--muted); }
+
+.tier-badge {
+  display: inline-block;
+  min-width: 30px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.tier-A { background: var(--tier-a); }
+.tier-B { background: var(--tier-b); }
+.tier-C { background: var(--tier-c); }
+.tier-D { background: var(--tier-d); }
+.tier-E { background: #c77f1a; }
+.tier-F { background: #5b6b7a; }
+.tier-other { background: var(--muted); }
+
+.result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
+.result-demotion { color: var(--tier-b); font-weight: 600; }
+.result-champion { color: #b8860b; font-weight: 700; }
+.result-stay { color: var(--text); }
+.result-ongoing, .result-other { color: var(--muted); }
+
+.rank { color: var(--muted); font-size: 11px; }
+.half { color: var(--muted); font-size: 10px; background: #eef0f3; border-radius: 3px; padding: 1px 4px; margin-left: 2px; }
+
+.pts-neg { color: var(--accent); }
+.pts-pos { color: var(--text); }
+
+.source-link { margin-top: 16px; font-size: 12px; }
+.source-link a { color: var(--muted); }
+
+/* 折れ線 */
+.chart { margin-top: 16px; }
+.chart svg { width: 100%; height: 140px; display: block; }
+
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; flex: none; position: static; }
+  .player-list { max-height: 280px; }
+}

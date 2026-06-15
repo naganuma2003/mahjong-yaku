@@ -13,6 +13,7 @@
   header.score { background: linear-gradient(135deg,#0d47a1,#1565c0); }
   header.play { background: linear-gradient(135deg,#7f0000,#b71c1c); }
   header.drill { background: linear-gradient(135deg,#e65100,#f57f17); }
+  header.pro { background: linear-gradient(135deg,#311b92,#5e35b1); }
   header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
   header p { font-size: 14px; opacity: .8; margin-top: 8px; }
 
@@ -23,11 +24,14 @@
   .tab-nav-btn.play-btn.active { color: #c62828; border-bottom-color: #c62828; }
   .tab-nav-btn.drill-btn { border: none; border-bottom: 3px solid transparent; border-radius: 0; background: none; padding: 14px; margin-bottom: -2px; }
   .tab-nav-btn.drill-btn.active { color: #f57f17; border-bottom-color: #f57f17; }
+  .tab-nav-btn.pro-btn.active { color: #5e35b1; border-bottom-color: #5e35b1; }
 
   .tab-section { display: none; }
   .tab-section.active { display: block; }
   #tab-play { height: calc(100vh - 176px); overflow: hidden; }
   #tab-play iframe { width: 100%; height: 100%; border: none; display: block; }
+  #tab-pro { height: calc(100vh - 176px); overflow: hidden; }
+  #tab-pro iframe { width: 100%; height: 100%; border: none; display: block; }
 
   /* ===== 点数計算ドリル ===== */
   .drill-card { padding: 0 !important; overflow: hidden; }
@@ -251,6 +255,7 @@
     .ref-grid { grid-template-columns: 1fr; }
     .meld-sub { padding-left: 0; }
     #tab-play { height: calc(100vh - 140px); }
+    #tab-pro { height: calc(100vh - 140px); }
     .drill-btn { font-size: 13px; padding: 11px 6px; }
     .d-tile { width: 28px; height: 40px; font-size: 9px; }
     .d-meld { padding: 5px 5px 3px; }
@@ -269,6 +274,7 @@
   <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
   <button class="tab-nav-btn drill-btn" onclick="showTab('drill',this)">ドリル</button>
   <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">プレイする</button>
+  <button class="tab-nav-btn pro-btn" onclick="showTab('pro',this)">プロ検索</button>
 </div>
 
 <!-- 役一覧タブ -->
@@ -519,6 +525,11 @@
   <iframe src="game.html" title="麻雀ゲーム"></iframe>
 </div>
 
+<!-- プロ検索タブ -->
+<div id="tab-pro" class="tab-section">
+  <iframe src="pro/index.html" title="麻雀プロ検索"></iframe>
+</div>
+
 <!-- ドリルタブ -->
 <div id="tab-drill" class="tab-section">
   <div class="calc-wrap">
@@ -704,7 +715,7 @@ function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEa
 function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
 function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
 function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
-function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');h.classList.toggle('drill',id==='drill');}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');h.classList.toggle('drill',id==='drill');h.classList.toggle('pro',id==='pro');}
 updateCalc();
 
 /* ===== 符計算 ===== */
