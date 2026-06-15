@@ -246,7 +246,9 @@ function stat(num, lbl) {
 
 // 期 → 西暦変換（団体別）
 function termToYear(orgId, term) {
-  if (orgId === "renmei") return 1983 + term;
+  if (orgId === "renmei")     return 1983 + term; // 第1期=1984
+  if (orgId === "saikouisen") return 1975 + term; // 第1期=1976
+  if (orgId === "kyokai")     return 2000 + term; // 第1期=2001
   return term;
 }
 
