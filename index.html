@@ -279,21 +279,21 @@
 </head>
 <body>
 
-<header>
+<header class="pro">
   <h1>こんにちおはたろう</h1>
   <p>🀄 麻雀Yesa</p>
 </header>
 
 <div class="tabs-nav">
-  <button class="tab-nav-btn pro-btn" onclick="showTab('pro',this)">麻雀プロ検索</button>
+  <button class="tab-nav-btn pro-btn active" onclick="showTab('pro',this)">麻雀プロ検索</button>
   <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">Play</button>
   <button class="tab-nav-btn drill-btn" onclick="showTab('drill',this)">ドリル</button>
-  <button class="tab-nav-btn yaku-btn active" onclick="showTab('yaku',this)">役一覧</button>
+  <button class="tab-nav-btn yaku-btn" onclick="showTab('yaku',this)">役一覧</button>
   <button class="tab-nav-btn score-btn" onclick="showTab('score',this)">点数計算</button>
 </div>
 
 <!-- 役一覧タブ -->
-<div id="tab-yaku" class="tab-section active">
+<div id="tab-yaku" class="tab-section">
   <div class="search-wrap">
     <div class="search-box">
       <input type="text" id="yaku-search" placeholder="役名・読み・説明で検索…" oninput="onSearch(this.value)">
@@ -541,7 +541,7 @@
 </div>
 
 <!-- プロ検索タブ -->
-<div id="tab-pro" class="tab-section">
+<div id="tab-pro" class="tab-section active">
   <iframe src="pro/index.html" title="麻雀プロ検索"></iframe>
 </div>
 
