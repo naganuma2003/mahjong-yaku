@@ -1,5 +1,5 @@
 "use strict";
-
+// v2026-06-16 女流リーグ成績追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
