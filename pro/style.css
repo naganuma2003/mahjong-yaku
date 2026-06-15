@@ -144,6 +144,9 @@ body {
 .tier-F { background: #5b6b7a; }
 .tier-other { background: var(--muted); }
 
+.timeline tr.gap-row td { color: var(--muted); font-size: 12px; background: #fafafa; font-style: italic; }
+.timeline tr.gap-row td.term { font-weight: 400; }
+
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
 .result-demotion { color: var(--tier-b); font-weight: 600; }
 .result-champion { color: #b8860b; font-weight: 700; }

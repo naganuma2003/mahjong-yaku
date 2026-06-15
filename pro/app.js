@@ -145,23 +145,51 @@ function renderDetail(p) {
 
   html += chartSvg(recs);
 
+  // ギャップ行を含む表示リストを構築（期の昇順→降順で表示）
+  const termsSorted = recs.slice().sort((a, b) => a.term - b.term);
+  const displayItems = [];
+  for (let i = 0; i < termsSorted.length; i++) {
+    if (i > 0) {
+      const prev = termsSorted[i - 1].term;
+      const curr = termsSorted[i].term;
+      if (curr - prev > 1) {
+        displayItems.push({ gap: true, from: prev + 1, to: curr - 1 });
+      }
+    }
+    displayItems.push({ gap: false, rec: termsSorted[i] });
+  }
+  displayItems.reverse();
+
   html += '<table class="timeline"><thead><tr>' +
           "<th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th>" +
           "</tr></thead><tbody>";
-  recs.forEach(r => {
-    const rowCls = r.ongoing ? ' class="ongoing"' : "";
-    const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
-    const rankHtml = (r.rank !== undefined && r.rank !== null)
-      ? ' <span class="rank">' + r.rank + "位</span>" : "";
-    const halfHtml = (r.half && r.half !== "annual")
-      ? ' <span class="half">' + r.half + "</span>" : "";
-    const resultText = (r.result || "") + rankHtml + halfHtml || "—";
-    html += "<tr" + rowCls + ">" +
-      '<td class="term">第' + r.term + "期</td>" +
-      '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
-      '<td class="result-' + r.category + '">' + resultText + "</td>" +
-      '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td>" +
-      "</tr>";
+  displayItems.forEach(item => {
+    if (item.gap) {
+      const count = item.to - item.from + 1;
+      const label = item.from === item.to
+        ? "第" + item.from + "期"
+        : "第" + item.from + "期〜第" + item.to + "期";
+      const note = count >= 3 ? "休戦の可能性" : "データなし";
+      html += '<tr class="gap-row">' +
+        '<td class="term">' + label + "</td>" +
+        '<td colspan="3">' + note + "（" + count + "期分）</td>" +
+        "</tr>";
+    } else {
+      const r = item.rec;
+      const rowCls = r.ongoing ? ' class="ongoing"' : "";
+      const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
+      const rankHtml = (r.rank !== undefined && r.rank !== null)
+        ? ' <span class="rank">' + r.rank + "位</span>" : "";
+      const halfHtml = (r.half && r.half !== "annual")
+        ? ' <span class="half">' + r.half + "</span>" : "";
+      const resultText = (r.result || "") + rankHtml + halfHtml || "—";
+      html += "<tr" + rowCls + ">" +
+        '<td class="term">第' + r.term + "期</td>" +
+        '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
+        '<td class="result-' + r.category + '">' + resultText + "</td>" +
+        '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td>" +
+        "</tr>";
+    }
   });
   html += "</tbody></table>";
 
