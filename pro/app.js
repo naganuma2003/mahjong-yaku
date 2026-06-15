@@ -51,6 +51,9 @@ const MLEAGUE_TEAMS = [
   { id:"beast",   name:"BEAST Japanext",          short:"BEAST",      color:"#263238",
     current:new Set(["鈴木大介","中田花奈","猿川真寿","菅原千瑛"]),
     former: new Set([]) },
+  { id:"team9",   name:"新チーム(2025-26)",         short:"新チーム",   color:"#00695c",
+    current:new Set(["萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広"]),
+    former: new Set([]) },
 ];
 
 // M関係: 実況
