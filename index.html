@@ -238,27 +238,42 @@
   footer { text-align: center; padding: 24px; font-size: 13px; color: #aaa; }
 
   @media (max-width: 600px) {
-    header { padding: 24px 16px; }
-    header h1 { font-size: 22px; }
-    .tab-nav-btn { font-size: 13px; padding: 12px 8px; }
-    .filter { padding: 16px 12px 12px; gap: 6px; }
-    .filter button { padding: 6px 13px; font-size: 13px; }
+    header { padding: 18px 14px; }
+    header h1 { font-size: 20px; }
+    header p { font-size: 12px; margin-top: 5px; }
+
+    /* タブ: 横スクロール対応（"麻雀プロ検索"等の長いラベルが収まらないため） */
+    .tabs-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs-nav::-webkit-scrollbar { display: none; }
+    .tab-nav-btn { flex: 0 0 auto; font-size: 12px; padding: 11px 14px; white-space: nowrap; }
+    .tab-nav-btn.drill-btn { flex: 0 0 auto; padding: 11px 14px; }
+
+    #tab-play { height: calc(100vh - 115px); }
+    #tab-pro { height: calc(100vh - 115px); }
+
+    .search-wrap { padding: 14px 12px 0; }
+    .filter { padding: 12px 10px 10px; gap: 5px; }
+    .filter button { padding: 6px 11px; font-size: 12px; }
     .filter-break { display: block; width: 100%; }
-    .grid { grid-template-columns: 1fr; padding: 8px 12px 40px; gap: 12px; }
-    .card { padding: 16px; }
+    .grid { grid-template-columns: 1fr; padding: 8px 10px 40px; gap: 10px; }
+    .card { padding: 14px; }
     .yaku-name { font-size: 16px; }
     .han-badge { font-size: 11px; }
-    .res-pts { font-size: 40px; }
-    .calc-card { padding: 14px; }
+
+    .calc-wrap { padding: 14px 10px 40px; }
+    .res-pts { font-size: 38px; }
+    .calc-card { padding: 12px; }
     .score-tbl { font-size: 10px; }
     .score-tbl th, .score-tbl td { padding: 4px 5px; }
     .ref-grid { grid-template-columns: 1fr; }
     .meld-sub { padding-left: 0; }
-    #tab-play { height: calc(100vh - 140px); }
-    #tab-pro { height: calc(100vh - 140px); }
+
     .drill-btn { font-size: 13px; padding: 11px 6px; }
     .d-tile { width: 28px; height: 40px; font-size: 9px; }
     .d-meld { padding: 5px 5px 3px; }
+    .mx-tile { width: 30px !important; height: 43px !important; }
+    .mx-choice { width: 36px !important; height: 51px !important; }
+    .d2-yaku-btn { padding: 8px 10px; font-size: 12px; }
   }
 </style>
 </head>
