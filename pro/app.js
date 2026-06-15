@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, query: "", selectedId: null };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, query: "", selectedId: null };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -23,6 +23,22 @@ const MLEAGUE_CURRENT = new Set([
 const MLEAGUE_FORMER = new Set([
   "前原雄大","藤崎智","和久津晶","朝倉康心","石橋伸洋",
   "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未",
+]);
+
+// M関係: 実況
+const MCAST = new Set([
+  "小林未沙","松嶋桃","日吉辰哉","古橋崇志",
+]);
+
+// M関係: 解説（公式解説者 — 現役Mリーガー以外）
+const MANALYST = new Set([
+  "土田浩翔","藤崎智","河野直也","朝倉康心","石橋伸洋",
+  "村上淳","忍田幸夫","沢崎誠","谷井茂文","近藤誠一","前田直哉",
+]);
+
+// M関係: リポーター
+const MREPORTER = new Set([
+  "松本圭世","襟川麻衣子",
 ]);
 
 // Mトーナメント出場歴（2023〜2026 団体推薦枠で出場した選手）
@@ -110,11 +126,14 @@ function filteredPlayers() {
   return DATA.players
     .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
     .filter(p => {
-      if (!state.mleagueC && !state.mleagueF && !state.mtourn) return true;
+      if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mcast && !state.manalyst && !state.mreporter) return true;
       const n = normalize(p.name);
-      return (state.mleagueC && MLEAGUE_CURRENT.has(n)) ||
-             (state.mleagueF && MLEAGUE_FORMER.has(n)) ||
-             (state.mtourn  && MTOURNAMENT.has(n));
+      return (state.mleagueC    && MLEAGUE_CURRENT.has(n)) ||
+             (state.mleagueF    && MLEAGUE_FORMER.has(n))  ||
+             (state.mtourn      && MTOURNAMENT.has(n))      ||
+             (state.mcast       && MCAST.has(n))            ||
+             (state.manalyst    && MANALYST.has(n))         ||
+             (state.mreporter   && MREPORTER.has(n));
     })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !q || normalize(p.name).includes(q))
@@ -160,6 +179,30 @@ function renderOrgFilter() {
   tb.textContent = "最高リーグ";
   tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(tb);
+
+  // M関係セクション
+  const mlabel = document.createElement("span");
+  mlabel.className = "filter-section-label";
+  mlabel.textContent = "M関係";
+  el.orgFilter.appendChild(mlabel);
+
+  const cast = document.createElement("button");
+  cast.className = "org-btn mcast-btn" + (state.mcast ? " active" : "");
+  cast.textContent = "実況";
+  cast.onclick = () => { state.mcast = !state.mcast; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(cast);
+
+  const analyst = document.createElement("button");
+  analyst.className = "org-btn manalyst-btn" + (state.manalyst ? " active" : "");
+  analyst.textContent = "解説";
+  analyst.onclick = () => { state.manalyst = !state.manalyst; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(analyst);
+
+  const reporter = document.createElement("button");
+  reporter.className = "org-btn mreporter-btn" + (state.mreporter ? " active" : "");
+  reporter.textContent = "リポーター";
+  reporter.onclick = () => { state.mreporter = !state.mreporter; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(reporter);
 }
 
 function renderList() {
@@ -286,6 +329,10 @@ function renderDetail(p) {
 
     if (isMultiOrg) html += "</div>";
   });
+
+  if (!allRecs.length) {
+    html += '<p style="color:var(--muted);margin-top:16px">リーグ成績データなし</p>';
+  }
 
   if (p.sourceUrl) {
     html += '<div class="source-link">出典: <a href="' + p.sourceUrl + '" target="_blank" rel="noopener">' + p.sourceUrl + "</a></div>";
