@@ -68,6 +68,24 @@ function normalize(s) {
   return (s || "").replace(/\s|　/g, "");
 }
 
+// 選手が所属（または過去に所属）していた全団体IDを返す
+function playerOrgIds(p) {
+  const ids = new Set([p.org]);
+  (p.records || []).forEach(r => { if (r.orgId) ids.add(r.orgId); });
+  return [...ids];
+}
+
+// 最新レコードの団体（移籍後が最新）
+function currentOrgId(p) {
+  if (!p.records || p.records.length === 0) return p.org;
+  const latest = p.records.slice().sort((a, b) => {
+    const ya = termToYear(a.orgId || p.org, a.term);
+    const yb = termToYear(b.orgId || p.org, b.term);
+    return yb - ya;
+  })[0];
+  return latest.orgId || p.org;
+}
+
 // --- 選手一覧 ---------------------------------------------------------
 function isMleagueC(p)  { return MLEAGUE_CURRENT.has(normalize(p.name)); }
 function isMleagueF(p)  { return MLEAGUE_FORMER.has(normalize(p.name)); }
@@ -75,17 +93,22 @@ function isMtournament(p) { return MTOURNAMENT.has(normalize(p.name)); }
 
 function isTopLeague(p) {
   if (!p.records || p.records.length === 0) return false;
-  const org = ORGS[p.org];
+  const latest = p.records.slice().sort((a, b) => {
+    const ya = termToYear(a.orgId || p.org, a.term);
+    const yb = termToYear(b.orgId || p.org, b.term);
+    return yb - ya;
+  })[0];
+  const orgId = latest.orgId || p.org;
+  const org = ORGS[orgId];
   if (!org) return false;
   const topTier = (org.league.tiers || [])[0];
-  // records は term降順で格納されているので [0] が最新期
-  return p.records[0].tier === topTier;
+  return latest.tier === topTier;
 }
 
 function filteredPlayers() {
   const q = normalize(state.query);
   return DATA.players
-    .filter(p => state.org === "all" || p.org === state.org)
+    .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
     .filter(p => {
       if (!state.mleagueC && !state.mleagueF && !state.mtourn) return true;
       const n = normalize(p.name);
@@ -146,10 +169,12 @@ function renderList() {
   list.forEach(p => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
-    const org = ORGS[p.org];
+    const curOrg = ORGS[currentOrgId(p)];
+    const isTransfer = playerOrgIds(p).length > 1;
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
-      '<span class="porg">' + (org ? org.shortName : "") + "</span>";
+      '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
+      (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>";
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
   });
@@ -157,84 +182,113 @@ function renderList() {
 
 // --- 年表 -------------------------------------------------------------
 function renderDetail(p) {
-  const org = ORGS[p.org] || {};
-  const league = org.league || {};
-  const recs = p.records.slice().sort((a, b) => b.term - a.term);
+  const allRecs = p.records.slice().sort((a, b) => b.term - a.term);
 
-  const terms = recs.map(r => r.term);
-  const span = terms.length ? Math.max(...terms) - Math.min(...terms) + 1 : 0;
-  const playoffs = recs.filter(r => r.category === "playoff" || r.category === "champion").length;
-  const topTier = recs
-    .map(r => r.tier)
-    .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] || "-";
-
-  let html = "";
-  html += '<div class="detail-head">';
-  html += "<h2>" + p.name + "</h2>";
-  html += '<span class="org-name">' + (org.name || "") + "</span>";
-  html += "</div>";
-  html += '<div class="detail-head"><span class="league-name">' +
-          (league.name || "") + " 成績</span></div>";
-
-  html += '<div class="summary">';
-  html += stat(recs.length, "出場期数");
-  html += stat(topTier, "最高到達");
-  html += stat(playoffs, "決定戦/優勝");
-  html += "</div>";
-
-  html += chartSvg(recs, p.org);
-
-  // ギャップ行を含む表示リストを構築（期の昇順→降順で表示）
-  const termsSorted = recs.slice().sort((a, b) => a.term - b.term);
-  const displayItems = [];
-  for (let i = 0; i < termsSorted.length; i++) {
-    if (i > 0) {
-      const prev = termsSorted[i - 1].term;
-      const curr = termsSorted[i].term;
-      if (curr - prev > 1) {
-        displayItems.push({ gap: true, from: prev + 1, to: curr - 1 });
-      }
-    }
-    displayItems.push({ gap: false, rec: termsSorted[i] });
-  }
-  displayItems.reverse();
-
-  html += '<table class="timeline"><thead><tr>' +
-          "<th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th>" +
-          "</tr></thead><tbody>";
-  displayItems.forEach(item => {
-    if (item.gap) {
-      const count = item.to - item.from + 1;
-      const label = item.from === item.to
-        ? "第" + item.from + "期"
-        : "第" + item.from + "期〜第" + item.to + "期";
-      const note = count >= 3 ? "休戦の可能性" : "データなし";
-      html += '<tr class="gap-row">' +
-        '<td class="term">' + label + "</td>" +
-        '<td colspan="3">' + note + "（" + count + "期分）</td>" +
-        "</tr>";
-    } else {
-      const r = item.rec;
-      const rowCls = r.ongoing ? ' class="ongoing"' : "";
-      const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
-      const rankHtml = (r.rank !== undefined && r.rank !== null)
-        ? ' <span class="rank">' + r.rank + "位</span>" : "";
-      const halfHtml = (r.half && r.half !== "annual")
-        ? ' <span class="half">' + r.half + "</span>" : "";
-      const resultText = (r.result || "") + rankHtml + halfHtml || "—";
-      html += "<tr" + rowCls + ">" +
-        '<td class="term">第' + r.term + "期</td>" +
-        '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
-        '<td class="result-' + r.category + '">' + resultText + "</td>" +
-        '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td>" +
-        "</tr>";
-    }
+  // 団体ごとにグループ分け
+  const orgGroups = {};
+  allRecs.forEach(r => {
+    const oid = r.orgId || p.org;
+    if (!orgGroups[oid]) orgGroups[oid] = [];
+    orgGroups[oid].push(r);
   });
-  html += "</tbody></table>";
+  const orgIds = Object.keys(orgGroups).sort((a, b) => {
+    const minA = Math.min(...orgGroups[a].map(r => termToYear(a, r.term)));
+    const minB = Math.min(...orgGroups[b].map(r => termToYear(b, r.term)));
+    return minA - minB;
+  });
+  const isMultiOrg = orgIds.length > 1;
+
+  const totalPlayoffs = allRecs.filter(r => r.category === "playoff" || r.category === "champion").length;
+
+  let html = '<div class="detail-head"><h2>' + p.name + "</h2>";
+  if (isMultiOrg) {
+    html += '<span class="transfer-badge">移籍歴あり</span>';
+  } else {
+    const org = ORGS[p.org] || {};
+    html += '<span class="org-name">' + (org.name || "") + "</span>";
+  }
+  html += "</div>";
+
+  if (isMultiOrg) {
+    html += '<div class="summary">';
+    html += stat(allRecs.length, "総出場期数");
+    html += stat(totalPlayoffs, "決定戦/優勝");
+    html += "</div>";
+  }
+
+  orgIds.forEach((oid, idx) => {
+    const org = ORGS[oid] || {};
+    const league = org.league || {};
+    const groupRecs = orgGroups[oid].slice().sort((a, b) => b.term - a.term);
+    const groupPlayoffs = groupRecs.filter(r => r.category === "playoff" || r.category === "champion").length;
+    const topTier = groupRecs
+      .map(r => r.tier)
+      .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] || "-";
+
+    if (isMultiOrg) {
+      html += '<div class="org-section' + (idx === 0 ? " org-section-first" : "") + '">';
+      html += '<div class="org-section-head">';
+      html += '<span class="org-name">' + (org.name || "") + "</span>";
+      html += '<span class="league-name">' + (league.name || "") + "</span>";
+      html += "</div>";
+      html += '<div class="summary summary-sm">';
+      html += stat(groupRecs.length, "出場期数");
+      html += stat(topTier, "最高到達");
+      html += stat(groupPlayoffs, "決定戦/優勝");
+      html += "</div>";
+    } else {
+      html += '<div class="detail-head"><span class="league-name">' + (league.name || "") + " 成績</span></div>";
+      html += '<div class="summary">';
+      html += stat(groupRecs.length, "出場期数");
+      html += stat(topTier, "最高到達");
+      html += stat(groupPlayoffs, "決定戦/優勝");
+      html += "</div>";
+    }
+
+    html += chartSvg(groupRecs, oid);
+
+    const termsSorted = groupRecs.slice().sort((a, b) => a.term - b.term);
+    const displayItems = [];
+    for (let i = 0; i < termsSorted.length; i++) {
+      if (i > 0) {
+        const prev = termsSorted[i - 1].term;
+        const curr = termsSorted[i].term;
+        if (curr - prev > 1) displayItems.push({ gap: true, from: prev + 1, to: curr - 1 });
+      }
+      displayItems.push({ gap: false, rec: termsSorted[i] });
+    }
+    displayItems.reverse();
+
+    html += '<table class="timeline"><thead><tr><th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th></tr></thead><tbody>';
+    displayItems.forEach(item => {
+      if (item.gap) {
+        const count = item.to - item.from + 1;
+        const label = item.from === item.to
+          ? "第" + item.from + "期"
+          : "第" + item.from + "期〜第" + item.to + "期";
+        const note = count >= 3 ? "休戦の可能性" : "データなし";
+        html += '<tr class="gap-row"><td class="term">' + label + "</td><td colspan='3'>" + note + "（" + count + "期分）</td></tr>";
+      } else {
+        const r = item.rec;
+        const rowCls = r.ongoing ? ' class="ongoing"' : "";
+        const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
+        const rankHtml = (r.rank !== undefined && r.rank !== null) ? ' <span class="rank">' + r.rank + "位</span>" : "";
+        const halfHtml = (r.half && r.half !== "annual") ? ' <span class="half">' + r.half + "</span>" : "";
+        const resultText = (r.result || "") + rankHtml + halfHtml || "—";
+        html += "<tr" + rowCls + ">" +
+          '<td class="term">第' + r.term + "期</td>" +
+          '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
+          '<td class="result-' + r.category + '">' + resultText + "</td>" +
+          '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td></tr>";
+      }
+    });
+    html += "</tbody></table>";
+
+    if (isMultiOrg) html += "</div>";
+  });
 
   if (p.sourceUrl) {
-    html += '<div class="source-link">出典: <a href="' + p.sourceUrl +
-            '" target="_blank" rel="noopener">' + p.sourceUrl + "</a></div>";
+    html += '<div class="source-link">出典: <a href="' + p.sourceUrl + '" target="_blank" rel="noopener">' + p.sourceUrl + "</a></div>";
   }
   el.detail.innerHTML = html;
 }
@@ -276,7 +330,6 @@ function chartSvg(recs, orgId) {
   const padL = 48, padR = 16, padT = 12, padB = 34;
   const chartH = H - padT - padB;
 
-  // V値: tiers配列内の小さいindex（上位）→大きいV（上方）
   const MAX_RANK = 16;
   function toV(tier, rank) {
     const i = tiers.indexOf(tier) - showMin;
@@ -290,7 +343,6 @@ function chartSvg(recs, orgId) {
                            : (yr - minYr) / (maxYr - minYr)) * (W - padL - padR);
   const yFn = v  => padT + (1 - v / numBands) * chartH;
 
-  // X軸目盛り
   const yearRange = maxYr - minYr;
   const xStep = yearRange > 20 ? 5 : yearRange > 10 ? 2 : 1;
   const xTicks = [];
@@ -301,7 +353,6 @@ function chartSvg(recs, orgId) {
 
   let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">';
 
-  // tierバンド（薄い背景色＋境界線＋ラベル）
   tiers.slice(showMin, showMax + 1).forEach((tier, i) => {
     const top = yFn(numBands - i).toFixed(1);
     const bot = yFn(numBands - i - 1).toFixed(1);
@@ -317,7 +368,6 @@ function chartSvg(recs, orgId) {
   svg += '<line x1="' + padL + '" y1="' + yFn(0).toFixed(1) + '" x2="' + (W - padR) +
          '" y2="' + yFn(0).toFixed(1) + '" stroke="#e2e5ea"/>';
 
-  // X軸
   svg += '<line x1="' + padL + '" y1="' + axisY + '" x2="' + (W - padR) + '" y2="' + axisY + '" stroke="#ccc"/>';
   xTicks.forEach(yr => {
     if (yr < minYr || yr > maxYr) return;
@@ -327,14 +377,12 @@ function chartSvg(recs, orgId) {
            '" text-anchor="middle" font-size="10" fill="#8a93a2">' + yr + '</text>';
   });
 
-  // 折れ線
   const path = pts.map((d, i) => {
     const v = toV(d.tier, d.rank);
     return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
   }).join(' ');
   svg += '<path d="' + path + '" fill="none" stroke="#555" stroke-width="1.5"/>';
 
-  // ドット（リーグ色）
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
     const c = TC[d.tier.charAt(0)] || '#8a93a2';
