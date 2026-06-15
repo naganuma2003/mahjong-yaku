@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, query: "", selectedId: null };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -24,6 +24,34 @@ const MLEAGUE_FORMER = new Set([
   "前原雄大","藤崎智","和久津晶","朝倉康心","石橋伸洋",
   "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未",
 ]);
+
+// Mリーグ チーム別メンバー（2024-25現役 + 歴代）
+const MLEAGUE_TEAMS = [
+  { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#b71c1c",
+    current:new Set(["園田賢","鈴木たろう","浅見真紀","渡辺太"]),
+    former: new Set(["村上淳","丸山奏子"]) },
+  { id:"furin",   name:"EX風林火山",            short:"風林火山",    color:"#4527a0",
+    current:new Set(["二階堂亜樹","勝又健志","松ヶ瀬隆弥","二階堂瑠美"]),
+    former: new Set(["滝沢和典"]) },
+  { id:"sakura",  name:"KADOKAWAサクラナイツ",  short:"サクラナイツ",color:"#ad1457",
+    current:new Set(["岡田紗佳","堀慎吾","渋川難波","内川幸太郎"]),
+    former: new Set(["沢崎誠"]) },
+  { id:"konami",  name:"KONAMI麻雀格闘倶楽部",  short:"格闘倶楽部", color:"#c62828",
+    current:new Set(["佐々木寿人","高宮まり","伊達朱里紗","滝沢和典"]),
+    former: new Set(["前原雄大","藤崎智"]) },
+  { id:"abemas",  name:"渋谷ABEMAS",             short:"ABEMAS",     color:"#0277bd",
+    current:new Set(["多井隆晴","白鳥翔","松本吉弘","日向藍子"]),
+    former: new Set([]) },
+  { id:"phoenix", name:"セガサミーフェニックス",  short:"フェニックス",color:"#e65100",
+    current:new Set(["茅森早香","醍醐大","竹内元太","浅井堂岐"]),
+    former: new Set(["近藤誠一","魚谷侑未","和久津晶","東城りお"]) },
+  { id:"pirates", name:"U-NEXTパイレーツ",       short:"パイレーツ", color:"#1565c0",
+    current:new Set(["小林剛","瑞原明奈","鈴木優","仲林圭"]),
+    former: new Set(["朝倉康心","石橋伸洋"]) },
+  { id:"beast",   name:"BEAST Japanext",          short:"BEAST",      color:"#263238",
+    current:new Set(["鈴木大介","中田花奈","猿川真寿","菅原千瑛"]),
+    former: new Set([]) },
+];
 
 // M関係: 実況
 const MCAST = new Set([
@@ -121,23 +149,42 @@ function isTopLeague(p) {
   return latest.tier === topTier;
 }
 
+// 選手がチームに所属（現役/元）しているか返す
+function playerTeamStatus(name, team) {
+  const n = normalize(name);
+  if (team.current.has(n)) return "current";
+  if (team.former.has(n))  return "former";
+  return null;
+}
+
 function filteredPlayers() {
   const q = normalize(state.query);
+  const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
+
   return DATA.players
     .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
     .filter(p => {
-      if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mcast && !state.manalyst && !state.mreporter) return true;
+      if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mcast && !state.manalyst && !state.mreporter && !activeTeam) return true;
       const n = normalize(p.name);
-      return (state.mleagueC    && MLEAGUE_CURRENT.has(n)) ||
-             (state.mleagueF    && MLEAGUE_FORMER.has(n))  ||
-             (state.mtourn      && MTOURNAMENT.has(n))      ||
-             (state.mcast       && MCAST.has(n))            ||
-             (state.manalyst    && MANALYST.has(n))         ||
-             (state.mreporter   && MREPORTER.has(n));
+      return (state.mleagueC  && MLEAGUE_CURRENT.has(n))      ||
+             (state.mleagueF  && MLEAGUE_FORMER.has(n))        ||
+             (state.mtourn    && MTOURNAMENT.has(n))            ||
+             (state.mcast     && MCAST.has(n))                  ||
+             (state.manalyst  && MANALYST.has(n))               ||
+             (state.mreporter && MREPORTER.has(n))              ||
+             (activeTeam      && playerTeamStatus(n, activeTeam) !== null);
     })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !q || normalize(p.name).includes(q))
-    .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+    .sort((a, b) => {
+      // チーム絞り込み中は現役メンバーを先頭に
+      if (activeTeam) {
+        const sa = playerTeamStatus(normalize(a.name), activeTeam);
+        const sb = playerTeamStatus(normalize(b.name), activeTeam);
+        if (sa !== sb) return sa === "current" ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name, "ja");
+    });
 }
 
 function renderOrgFilter() {
@@ -203,21 +250,51 @@ function renderOrgFilter() {
   reporter.textContent = "リポーター";
   reporter.onclick = () => { state.mreporter = !state.mreporter; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(reporter);
+
+  // Mチームセクション
+  const tlabel = document.createElement("span");
+  tlabel.className = "filter-section-label";
+  tlabel.textContent = "Mチーム";
+  el.orgFilter.appendChild(tlabel);
+
+  MLEAGUE_TEAMS.forEach(t => {
+    const b = document.createElement("button");
+    const isActive = state.mteam === t.id;
+    b.className = "org-btn team-btn";
+    b.textContent = t.short;
+    b.style.borderColor = t.color;
+    b.style.color = isActive ? "#fff" : t.color;
+    b.style.background = isActive ? t.color : "#fff";
+    b.onclick = () => {
+      state.mteam = state.mteam === t.id ? null : t.id;
+      renderOrgFilter();
+      renderList();
+    };
+    el.orgFilter.appendChild(b);
+  });
 }
 
 function renderList() {
   const list = filteredPlayers();
   el.playerCount.textContent = list.length + " 名";
   el.playerList.innerHTML = "";
+  const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   list.forEach(p => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
     const curOrg = ORGS[currentOrgId(p)];
     const isTransfer = playerOrgIds(p).length > 1;
+    let teamBadge = "";
+    if (activeTeam) {
+      const status = playerTeamStatus(normalize(p.name), activeTeam);
+      if (status === "current") teamBadge = '<span class="pteam pteam-current">現役</span>';
+      else if (status === "former") teamBadge = '<span class="pteam pteam-former">元</span>';
+    }
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
-      (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>";
+      (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
+      teamBadge;
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
   });
