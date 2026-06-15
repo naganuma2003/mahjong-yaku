@@ -236,6 +236,12 @@ function renderDetail(p) {
     html += '<div class="source-link">出典: <a href="' + p.sourceUrl +
             '" target="_blank" rel="noopener">' + p.sourceUrl + "</a></div>";
   }
+
+  if (p.wrecords && p.wrecords.length) {
+    html += '<hr class="section-divider">';
+    html += renderWleagueSection(p);
+  }
+
   el.detail.innerHTML = html;
 }
 
@@ -250,6 +256,12 @@ function termToYear(orgId, term) {
   if (orgId === "saikouisen") return 1975 + term; // 第1期=1976
   if (orgId === "kyokai")     return 2000 + term; // 第1期=2001
   return term;
+}
+
+// 女流リーグ用 期 → 西暦変換（wleague.termOffset を使用）
+function wTermToYear(wleague, term) {
+  const offset = (wleague && wleague.termOffset) ? wleague.termOffset : 0;
+  return offset ? offset + term : term;
 }
 
 // 期ごとのリーグ・順位推移（上位リーグ＝上、同リーグ内は順位で調整）
@@ -342,6 +354,159 @@ function chartSvg(recs, orgId) {
 
   svg += '</svg>';
   return '<div class="chart">' + svg + '</div>';
+}
+
+// 女流リーグ用折れ線グラフ（wleague設定を使用）
+function wchartSvg(wrecords, wleague) {
+  const tiers = (wleague || {}).tiers || [];
+  if (!tiers.length) return "";
+
+  const pts = wrecords
+    .filter(r => tiers.includes(r.tier))
+    .map(r => ({ year: wTermToYear(wleague, r.term), tier: r.tier, rank: r.rank || null }))
+    .sort((a, b) => a.year - b.year);
+  if (pts.length < 2) return "";
+
+  const usedIdx = pts.map(d => tiers.indexOf(d.tier));
+  const showMin = Math.max(0, Math.min(...usedIdx) - 1);
+  const showMax = Math.min(tiers.length - 1, Math.max(...usedIdx) + 1);
+  const numBands = showMax - showMin + 1;
+
+  const W = 600, H = 160;
+  const padL = 52, padR = 16, padT = 12, padB = 34;
+  const chartH = H - padT - padB;
+
+  const MAX_RANK = 12;
+  function toV(tier, rank) {
+    const i = tiers.indexOf(tier) - showMin;
+    const adj = rank != null ? (MAX_RANK - Math.min(rank, MAX_RANK)) / MAX_RANK : 0.5;
+    return (numBands - 1 - i) + adj;
+  }
+
+  const years = pts.map(d => d.year);
+  const minYr = Math.min(...years), maxYr = Math.max(...years);
+  const xFn = yr => padL + (maxYr === minYr ? (W - padL - padR) / 2
+                           : (yr - minYr) / (maxYr - minYr)) * (W - padL - padR);
+  const yFn = v  => padT + (1 - v / numBands) * chartH;
+
+  const yearRange = maxYr - minYr;
+  const xStep = yearRange > 20 ? 5 : yearRange > 10 ? 2 : 1;
+  const xTicks = [];
+  for (let yr = Math.ceil(minYr / xStep) * xStep; yr <= maxYr; yr += xStep) xTicks.push(yr);
+
+  const axisY = padT + chartH;
+  const TC = { A: '#c0392b', B: '#2c5fa8', C: '#3a8c4f', D: '#7d5ba6', E: '#c77f1a' };
+
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">';
+
+  tiers.slice(showMin, showMax + 1).forEach((tier, i) => {
+    const top = yFn(numBands - i).toFixed(1);
+    const bot = yFn(numBands - i - 1).toFixed(1);
+    const c = TC[tier.charAt(0)] || '#8a93a2';
+    svg += '<rect x="' + padL + '" y="' + top + '" width="' + (W - padL - padR) +
+           '" height="' + (parseFloat(bot) - parseFloat(top)).toFixed(1) +
+           '" fill="' + c + '" fill-opacity="0.05"/>';
+    svg += '<line x1="' + padL + '" y1="' + top + '" x2="' + (W - padR) + '" y2="' + top + '" stroke="#e2e5ea"/>';
+    const midY = ((parseFloat(top) + parseFloat(bot)) / 2 + 4).toFixed(1);
+    const label = tier.length > 2 ? tier : "女流" + tier;
+    svg += '<text x="' + (padL - 5) + '" y="' + midY +
+           '" text-anchor="end" font-size="10" fill="' + c + '" font-weight="700">' + label + '</text>';
+  });
+  svg += '<line x1="' + padL + '" y1="' + yFn(0).toFixed(1) + '" x2="' + (W - padR) +
+         '" y2="' + yFn(0).toFixed(1) + '" stroke="#e2e5ea"/>';
+
+  svg += '<line x1="' + padL + '" y1="' + axisY + '" x2="' + (W - padR) + '" y2="' + axisY + '" stroke="#ccc"/>';
+  xTicks.forEach(yr => {
+    if (yr < minYr || yr > maxYr) return;
+    const cx = xFn(yr).toFixed(1);
+    svg += '<line x1="' + cx + '" y1="' + axisY + '" x2="' + cx + '" y2="' + (axisY + 4) + '" stroke="#aaa"/>';
+    svg += '<text x="' + cx + '" y="' + (axisY + 16) +
+           '" text-anchor="middle" font-size="10" fill="#8a93a2">' + yr + '</text>';
+  });
+
+  const path = pts.map((d, i) => {
+    const v = toV(d.tier, d.rank);
+    return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
+  }).join(' ');
+  svg += '<path d="' + path + '" fill="none" stroke="#d08090" stroke-width="1.5"/>';
+
+  pts.forEach(d => {
+    const v = toV(d.tier, d.rank);
+    const c = TC[d.tier.charAt(0)] || '#d08090';
+    svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
+           '" r="3" fill="' + c + '"/>';
+  });
+
+  svg += '</svg>';
+  return '<div class="chart">' + svg + '</div>';
+}
+
+// 女流リーグ表示セクション（renderDetail内で呼ぶ）
+function renderWleagueSection(p) {
+  const wl = p.wleague || {};
+  const wrecords = (p.wrecords || []).slice().sort((a, b) => b.term - a.term);
+  if (!wrecords.length) return "";
+
+  const tiers = wl.tiers || [];
+  const topTier = wrecords
+    .map(r => r.tier)
+    .sort((a, b) => tiers.indexOf(a) - tiers.indexOf(b))[0] || "-";
+
+  let html = '<div class="wleague-section">';
+  html += '<div class="wleague-head"><span class="wleague-name">' +
+          (wl.name || "女流リーグ") + ' 成績</span></div>';
+
+  html += '<div class="summary">';
+  html += stat(wrecords.length, "出場期数");
+  html += stat(topTier, "最高到達");
+  html += '</div>';
+
+  html += wchartSvg(wrecords, wl);
+
+  const termsSorted = wrecords.slice().sort((a, b) => a.term - b.term);
+  const displayItems = [];
+  for (let i = 0; i < termsSorted.length; i++) {
+    if (i > 0) {
+      const prev = termsSorted[i - 1].term;
+      const curr = termsSorted[i].term;
+      if (curr - prev > 1) {
+        displayItems.push({ gap: true, from: prev + 1, to: curr - 1 });
+      }
+    }
+    displayItems.push({ gap: false, rec: termsSorted[i] });
+  }
+  displayItems.reverse();
+
+  html += '<table class="timeline"><thead><tr>' +
+          '<th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th>' +
+          '</tr></thead><tbody>';
+  displayItems.forEach(item => {
+    if (item.gap) {
+      const count = item.to - item.from + 1;
+      const label = item.from === item.to
+        ? "第" + item.from + "期"
+        : "第" + item.from + "期〜第" + item.to + "期";
+      html += '<tr class="gap-row">' +
+        '<td class="term">' + label + '</td>' +
+        '<td colspan="3">データなし（' + count + '期分）</td>' +
+        '</tr>';
+    } else {
+      const r = item.rec;
+      const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
+      const rankHtml = (r.rank !== undefined && r.rank !== null)
+        ? ' <span class="rank">' + r.rank + '位</span>' : "";
+      const tierLabel = r.tier.length <= 2 ? "女流" + r.tier : r.tier;
+      html += '<tr>' +
+        '<td class="term">第' + r.term + '期</td>' +
+        '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + tierLabel + '</span></td>' +
+        '<td class="result-' + r.category + '">' + (r.result || "—") + rankHtml + '</td>' +
+        '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + '</td>' +
+        '</tr>';
+    }
+  });
+  html += '</tbody></table>';
+  html += '</div>';
+  return html;
 }
 
 // --- 起動 -------------------------------------------------------------
