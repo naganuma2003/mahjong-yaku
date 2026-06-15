@@ -143,7 +143,7 @@ function renderDetail(p) {
   html += stat(playoffs, "決定戦/優勝");
   html += "</div>";
 
-  html += chartSvg(recs);
+  html += chartSvg(recs, p.org);
 
   // ギャップ行を含む表示リストを構築（期の昇順→降順で表示）
   const termsSorted = recs.slice().sort((a, b) => a.term - b.term);
@@ -205,31 +205,93 @@ function stat(num, lbl) {
          '</div><div class="lbl">' + lbl + "</div></div>";
 }
 
-// 期ごとのポイント推移（取得できた値のみ）
-function chartSvg(recs) {
+// 期 → 西暦変換（団体別）
+function termToYear(orgId, term) {
+  if (orgId === "renmei") return 1983 + term;
+  return term;
+}
+
+// 期ごとのポイント推移（軸付き）
+function chartSvg(recs, orgId) {
   const pts = recs.filter(r => r.points !== null)
-                  .map(r => ({ term: r.term, p: r.points }))
-                  .sort((a, b) => a.term - b.term);
+                  .map(r => ({ year: termToYear(orgId, r.term), p: r.points }))
+                  .sort((a, b) => a.year - b.year);
   if (pts.length < 2) return "";
-  const W = 600, H = 140, pad = 24;
-  const terms = pts.map(d => d.term);
+
+  const W = 600, H = 180;
+  const padL = 50, padR = 16, padT = 14, padB = 34;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  const years = pts.map(d => d.year);
+  const minYr = Math.min(...years), maxYr = Math.max(...years);
   const vals = pts.map(d => d.p);
-  const minT = Math.min(...terms), maxT = Math.max(...terms);
-  const minV = Math.min(...vals, 0), maxV = Math.max(...vals, 0);
-  const x = t => pad + (maxT === minT ? 0 : (t - minT) / (maxT - minT)) * (W - pad * 2);
-  const y = v => H - pad - (maxV === minV ? 0 : (v - minV) / (maxV - minV)) * (H - pad * 2);
+  const dataMin = Math.min(...vals, 0), dataMax = Math.max(...vals, 0);
+  const padV = (dataMax - dataMin) * 0.08 || 20;
+  const vMin = dataMin - padV, vMax = dataMax + padV;
 
-  const zeroY = y(0);
-  let path = pts.map((d, i) => (i ? "L" : "M") + x(d.term).toFixed(1) + " " + y(d.p).toFixed(1)).join(" ");
-  let dots = pts.map(d =>
-    '<circle cx="' + x(d.term).toFixed(1) + '" cy="' + y(d.p).toFixed(1) +
-    '" r="2.5" fill="' + (d.p < 0 ? "#c0392b" : "#2c5fa8") + '"/>').join("");
+  const xFn = yr => padL + (maxYr === minYr ? chartW / 2 : (yr - minYr) / (maxYr - minYr)) * chartW;
+  const yFn = v  => padT  + (1 - (v - vMin) / (vMax - vMin)) * chartH;
 
-  return '<div class="chart"><svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none">' +
-    '<line x1="' + pad + '" y1="' + zeroY.toFixed(1) + '" x2="' + (W - pad) +
-    '" y2="' + zeroY.toFixed(1) + '" stroke="#ccc" stroke-dasharray="3 3"/>' +
-    '<path d="' + path + '" fill="none" stroke="#2c5fa8" stroke-width="1.5"/>' +
-    dots + "</svg></div>";
+  // Y軸の目盛り間隔（きりのよい数値）
+  function niceStep(range, n) {
+    if (!range) return 10;
+    const r = range / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(r)));
+    const norm = r / mag;
+    return (norm < 1.5 ? 1 : norm < 3.5 ? 2 : norm < 7.5 ? 5 : 10) * mag;
+  }
+  const yStep = niceStep(vMax - vMin, 5);
+  const yTicks = [];
+  for (let v = Math.ceil(vMin / yStep) * yStep; v <= vMax + 0.001; v = Math.round((v + yStep) * 100) / 100) {
+    yTicks.push(v);
+    if (yTicks.length > 10) break;
+  }
+
+  // X軸の目盛り（西暦）
+  const yearRange = maxYr - minYr;
+  const xStep = yearRange > 20 ? 5 : yearRange > 10 ? 2 : 1;
+  const xTicks = [];
+  for (let yr = Math.ceil(minYr / xStep) * xStep; yr <= maxYr; yr += xStep) xTicks.push(yr);
+
+  const axisY = H - padB;
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Y軸グリッド＋ラベル
+  yTicks.forEach(v => {
+    const cy = yFn(v).toFixed(1);
+    const isZero = v === 0;
+    svg += '<line x1="' + padL + '" y1="' + cy + '" x2="' + (W - padR) + '" y2="' + cy +
+           '" stroke="' + (isZero ? '#aaa' : '#e9ebee') + '"' + (isZero ? ' stroke-dasharray="3 3"' : '') + '/>';
+    const lbl = v === 0 ? '0' : (v > 0 ? '+' + Math.round(v) : String(Math.round(v)));
+    svg += '<text x="' + (padL - 5) + '" y="' + (parseFloat(cy) + 4) +
+           '" text-anchor="end" font-size="10" fill="#8a93a2">' + lbl + '</text>';
+  });
+
+  // X軸ライン
+  svg += '<line x1="' + padL + '" y1="' + axisY + '" x2="' + (W - padR) + '" y2="' + axisY + '" stroke="#ccc"/>';
+
+  // X軸目盛り＋ラベル
+  xTicks.forEach(yr => {
+    if (yr < minYr || yr > maxYr) return;
+    const cx = xFn(yr).toFixed(1);
+    svg += '<line x1="' + cx + '" y1="' + axisY + '" x2="' + cx + '" y2="' + (axisY + 4) + '" stroke="#aaa"/>';
+    svg += '<text x="' + cx + '" y="' + (axisY + 16) +
+           '" text-anchor="middle" font-size="10" fill="#8a93a2">' + yr + '</text>';
+  });
+
+  // データ折れ線
+  const path = pts.map((d, i) => (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(d.p).toFixed(1)).join(' ');
+  svg += '<path d="' + path + '" fill="none" stroke="#2c5fa8" stroke-width="1.5"/>';
+
+  // ドット
+  pts.forEach(d => {
+    svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(d.p).toFixed(1) +
+           '" r="2.5" fill="' + (d.p < 0 ? '#c0392b' : '#2c5fa8') + '"/>';
+  });
+
+  svg += '</svg>';
+  return '<div class="chart">' + svg + '</div>';
 }
 
 // --- 起動 -------------------------------------------------------------
