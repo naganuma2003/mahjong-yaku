@@ -249,6 +249,8 @@ function termToYear(orgId, term) {
   if (orgId === "renmei")     return 1983 + term; // 第1期=1984
   if (orgId === "saikouisen") return 1975 + term; // 第1期=1976
   if (orgId === "kyokai")     return 2000 + term; // 第1期=2001
+  if (orgId === "rmu")        return 2006 + term; // 第1期=2007
+  if (orgId === "mu")         return 2002 + term; // 第1期=2003
   return term;
 }
 
