@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleague: false, query: "", selectedId: null };
+const state = { org: "all", mleague: false, topLeague: false, query: "", selectedId: null };
 
 // Mリーガー（現役2024-25 + 歴代）スペースなし正規化
 const MLEAGUE_NAMES = new Set([
@@ -52,11 +52,21 @@ function isMleague(p) {
   return MLEAGUE_NAMES.has(normalize(p.name));
 }
 
+function isTopLeague(p) {
+  if (!p.records || p.records.length === 0) return false;
+  const org = ORGS[p.org];
+  if (!org) return false;
+  const topTier = (org.league.tiers || [])[0];
+  // records は term降順で格納されているので [0] が最新期
+  return p.records[0].tier === topTier;
+}
+
 function filteredPlayers() {
   const q = normalize(state.query);
   return DATA.players
     .filter(p => state.org === "all" || p.org === state.org)
     .filter(p => !state.mleague || isMleague(p))
+    .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !q || normalize(p.name).includes(q))
     .sort((a, b) => a.name.localeCompare(b.name, "ja"));
 }
@@ -72,7 +82,7 @@ function renderOrgFilter() {
     el.orgFilter.appendChild(b);
   });
 
-  // Mリーガーボタン（団体フィルタとは独立してトグル）
+  // 独立トグル（Mリーガー / 最高リーグ）
   const sep = document.createElement("span");
   sep.className = "filter-sep";
   el.orgFilter.appendChild(sep);
@@ -82,6 +92,12 @@ function renderOrgFilter() {
   mb.textContent = "Mリーガー";
   mb.onclick = () => { state.mleague = !state.mleague; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(mb);
+
+  const tb = document.createElement("button");
+  tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
+  tb.textContent = "最高リーグ";
+  tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(tb);
 }
 
 function renderList() {
