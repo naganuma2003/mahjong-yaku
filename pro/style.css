@@ -66,6 +66,13 @@ body {
 .topleague-btn { border-color: #0077aa; color: #0077aa; }
 .topleague-btn.active { background: #0077aa; color: #fff; border-color: #0077aa; }
 .filter-sep { display: block; width: 1px; height: 20px; background: var(--border); margin: 0 2px; align-self: center; }
+.filter-section-label { display: block; width: 100%; font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: .07em; margin-top: 4px; }
+.mcast-btn    { border-color: #c0392b; color: #c0392b; }
+.mcast-btn.active    { background: #c0392b; color: #fff; border-color: #c0392b; }
+.manalyst-btn { border-color: #1565c0; color: #1565c0; }
+.manalyst-btn.active { background: #1565c0; color: #fff; border-color: #1565c0; }
+.mreporter-btn{ border-color: #2e7d32; color: #2e7d32; }
+.mreporter-btn.active{ background: #2e7d32; color: #fff; border-color: #2e7d32; }
 
 .search {
   width: 100%;
@@ -96,6 +103,7 @@ body {
 .player-list li.selected { background: #eaf0fb; }
 .player-list .pname { font-size: 14px; }
 .player-list .porg { font-size: 11px; color: var(--muted); }
+.player-list .porg.transfer { color: #7b1fa2; font-weight: 600; }
 
 /* --- 詳細 --- */
 .detail {
@@ -117,6 +125,17 @@ body {
 .stat { background: #f7f8fa; border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; }
 .stat .num { font-size: 20px; font-weight: 700; }
 .stat .lbl { font-size: 11px; color: var(--muted); }
+
+/* 移籍歴あり */
+.transfer-badge { background: #f3e5f5; color: #7b1fa2; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
+.org-section { border-top: 2px solid var(--border); margin-top: 20px; padding-top: 14px; }
+.org-section-first { border-top: none; margin-top: 0; padding-top: 0; }
+.org-section-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.org-section-head .org-name { color: var(--muted); font-size: 13px; }
+.org-section-head .league-name { color: var(--accent); font-weight: 600; font-size: 14px; }
+.summary-sm { margin: 8px 0 4px; }
+.summary-sm .stat { padding: 5px 10px; }
+.summary-sm .stat .num { font-size: 16px; }
 
 /* 年表テーブル */
 .timeline { width: 100%; border-collapse: collapse; margin-top: 14px; }
