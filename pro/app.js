@@ -4,11 +4,10 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleague: false, topLeague: false, query: "", selectedId: null };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, query: "", selectedId: null };
 
-// Mリーガー（現役2024-25 + 歴代）スペースなし正規化
-const MLEAGUE_NAMES = new Set([
-  // 2024-25現役
+// Mリーグ 2024-25 現役選手
+const MLEAGUE_CURRENT = new Set([
   "園田賢","鈴木たろう","浅見真紀","渡辺太",
   "二階堂亜樹","勝又健志","松ヶ瀬隆弥","二階堂瑠美",
   "内川幸太郎","岡田紗佳","堀慎吾","渋川難波",
@@ -18,9 +17,17 @@ const MLEAGUE_NAMES = new Set([
   "萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広",
   "猿川真寿","菅原千瑛","鈴木大介","中田花奈",
   "小林剛","瑞原明奈","鈴木優","仲林圭",
-  // 歴代（退団済み）
+]);
+
+// Mリーグ 退団済み（歴代）
+const MLEAGUE_FORMER = new Set([
   "前原雄大","藤崎智","和久津晶","朝倉康心","石橋伸洋",
   "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未",
+]);
+
+// Mトーナメント出場歴（Mリーグ外のMリーグ関連トーナメント出場者）
+const MTOURNAMENT = new Set([
+  // ここに追加
 ]);
 
 const el = {
@@ -48,9 +55,9 @@ function normalize(s) {
 }
 
 // --- 選手一覧 ---------------------------------------------------------
-function isMleague(p) {
-  return MLEAGUE_NAMES.has(normalize(p.name));
-}
+function isMleagueC(p)  { return MLEAGUE_CURRENT.has(normalize(p.name)); }
+function isMleagueF(p)  { return MLEAGUE_FORMER.has(normalize(p.name)); }
+function isMtournament(p) { return MTOURNAMENT.has(normalize(p.name)); }
 
 function isTopLeague(p) {
   if (!p.records || p.records.length === 0) return false;
@@ -65,7 +72,13 @@ function filteredPlayers() {
   const q = normalize(state.query);
   return DATA.players
     .filter(p => state.org === "all" || p.org === state.org)
-    .filter(p => !state.mleague || isMleague(p))
+    .filter(p => {
+      if (!state.mleagueC && !state.mleagueF && !state.mtourn) return true;
+      const n = normalize(p.name);
+      return (state.mleagueC && MLEAGUE_CURRENT.has(n)) ||
+             (state.mleagueF && MLEAGUE_FORMER.has(n)) ||
+             (state.mtourn  && MTOURNAMENT.has(n));
+    })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !q || normalize(p.name).includes(q))
     .sort((a, b) => a.name.localeCompare(b.name, "ja"));
@@ -87,11 +100,23 @@ function renderOrgFilter() {
   sep.className = "filter-sep";
   el.orgFilter.appendChild(sep);
 
-  const mb = document.createElement("button");
-  mb.className = "org-btn mleague-btn" + (state.mleague ? " active" : "");
-  mb.textContent = "Mリーガー";
-  mb.onclick = () => { state.mleague = !state.mleague; renderOrgFilter(); renderList(); };
-  el.orgFilter.appendChild(mb);
+  const mc = document.createElement("button");
+  mc.className = "org-btn mleague-btn" + (state.mleagueC ? " active" : "");
+  mc.textContent = "現Mリーガー";
+  mc.onclick = () => { state.mleagueC = !state.mleagueC; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(mc);
+
+  const mf = document.createElement("button");
+  mf.className = "org-btn mleague-former-btn" + (state.mleagueF ? " active" : "");
+  mf.textContent = "旧Mリーガー";
+  mf.onclick = () => { state.mleagueF = !state.mleagueF; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(mf);
+
+  const mt = document.createElement("button");
+  mt.className = "org-btn mtourn-btn" + (state.mtourn ? " active" : "");
+  mt.textContent = "Mトーナメント";
+  mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(mt);
 
   const tb = document.createElement("button");
   tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
