@@ -1525,5 +1525,10 @@ window.addEventListener("popstate", function(e) {
   state.selectedId = null;
   document.title = "麻雀プロ検索";
   renderList();
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
+  showPlaceholder();
 });
+
+// デスクトップでは検索欄に初期フォーカス
+if (window.innerWidth > 760 && !location.search) {
+  el.search.focus();
+}
