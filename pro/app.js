@@ -591,15 +591,18 @@ function renderDetail(p) {
   el.detail.querySelectorAll(".chart").forEach(chart => {
     const tip = chart.querySelector(".chart-tip");
     chart.querySelectorAll("circle[data-tip]").forEach(c => {
-      c.addEventListener("mouseenter", e => {
+      function showTip() {
         tip.textContent = c.dataset.tip;
         tip.style.display = "block";
         const rect = chart.getBoundingClientRect();
         const cr = c.getBoundingClientRect();
         tip.style.left = (cr.left - rect.left + cr.width / 2) + "px";
         tip.style.top  = (cr.top  - rect.top) + "px";
-      });
+      }
+      c.addEventListener("mouseenter", showTip);
       c.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+      c.addEventListener("touchstart", e => { e.preventDefault(); showTip(); }, { passive: false });
+      c.addEventListener("touchend", () => { setTimeout(() => { tip.style.display = "none"; }, 1500); });
     });
   });
   el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {
