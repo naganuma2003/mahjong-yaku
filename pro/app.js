@@ -696,8 +696,13 @@ function renderDetail(p) {
         const name = typeof item === "string" ? item : item.name;
         const sub  = typeof item === "object" ? '<span class="mate-sub">' + item.label + '</span>' : "";
         const mate = DATA.players.find(x => normalize(x.name) === normalize(name));
+        let tierTag = "";
         if (mate) {
-          html += '<button class="teammate-btn" data-id="' + mate.id + '" style="border-color:' + team.color + ';color:' + team.color + '">' + name + sub + '</button>';
+          const mLatest = (mate.records || []).filter(r => !r.ongoing)
+            .sort((a, b) => termToYear(b.orgId || mate.org, b.term) - termToYear(a.orgId || mate.org, a.term))[0];
+          const mTier = mLatest ? ((mLatest.tier === "後期" || mLatest.tier === "前期") ? (mLatest.result || mLatest.tier) : mLatest.tier) : null;
+          if (mTier) tierTag = '<span class="tier-badge ' + tierClass(mTier) + ' tb-tier" style="margin-left:3px">' + mTier + '</span>';
+          html += '<button class="teammate-btn" data-id="' + mate.id + '" style="border-color:' + team.color + ';color:' + team.color + '">' + name + sub + tierTag + '</button>';
         } else {
           html += '<span class="teammate-btn" style="border-color:#ccc;color:#999">' + name + sub + '</span>';
         }
