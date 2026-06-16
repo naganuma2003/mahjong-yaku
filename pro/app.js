@@ -1634,7 +1634,21 @@ function showPlaceholder() {
         '</div></div>';
     }
   }
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + pickupSection;
+  // 今日のピックアップ（日付ベースのシード選択）
+  let dailySection = "";
+  const todayKey = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const seed = parseInt(todayKey, 10) % DATA.players.length;
+  const dailyPlayer = DATA.players[seed];
+  if (dailyPlayer) {
+    const dpAllRecs = (dailyPlayer.records || []).filter(r => !r.ongoing);
+    const dpPts = dpAllRecs.filter(r => r.points != null);
+    const dpTotal = dpPts.length ? dpPts.reduce((s, r) => s + r.points, 0) : null;
+    const dpDesc = dpAllRecs.length + "期出場" + (dpTotal != null ? " / 通算" + (dpTotal >= 0 ? "+" : "") + dpTotal.toFixed(1) + "pt" : "");
+    dailySection = '<div class="recent-section"><div class="recent-head">📅 今日のピックアップ</div><div class="recent-list">' +
+      '<button class="recent-btn" data-id="' + dailyPlayer.id + '" title="' + dpDesc + '">' + dailyPlayer.name + '</button>' +
+      '</div><div style="font-size:10px;color:var(--muted);margin-top:2px">' + dpDesc + '</div></div>';
+  }
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + dailySection + pickupSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
