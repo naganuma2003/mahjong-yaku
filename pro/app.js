@@ -755,7 +755,7 @@ function renderList() {
       : "";
     // ソート順に応じたコンテキストバッジ
     let contextBadge = "";
-    if (state.sort === "totalpts" || state.sort === "avgpts" || state.sort === "avgrank" || state.sort === "debut" || state.sort === "career" || state.sort === "records") {
+    if (state.sort === "totalpts" || state.sort === "avgpts" || state.sort === "avgrank" || state.sort === "debut" || state.sort === "career" || state.sort === "records" || state.sort === "name") {
       const allRecs2 = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
       if (state.sort === "totalpts" && allRecs2.length >= 2) {
         const tot = allRecs2.reduce((s, r) => s + r.points, 0);
@@ -765,6 +765,18 @@ function renderList() {
         const avg = allRecs2.reduce((s, r) => s + r.points, 0) / allRecs2.length;
         const sign = avg >= 0 ? "+" : "";
         contextBadge = '<span class="p-ctx' + (avg >= 0 ? " pos" : " neg") + '">' + sign + avg.toFixed(1) + 'avg</span>';
+      } else if (state.sort === "name") {
+        // 直近3期平均ptを表示
+        const recent3 = allRecs2.slice().sort((a, b) => {
+          const ya = termToYear(a.orgId || p.org, a.term) || wTermToYear(p.wleague || {}, a.term);
+          const yb = termToYear(b.orgId || p.org, b.term) || wTermToYear(p.wleague || {}, b.term);
+          return yb - ya;
+        }).slice(0, 3);
+        if (recent3.length >= 2) {
+          const r3avg = recent3.reduce((s, r) => s + r.points, 0) / recent3.length;
+          const sign = r3avg >= 0 ? "+" : "";
+          contextBadge = '<span class="p-ctx' + (r3avg >= 0 ? " pos" : " neg") + '" title="直近' + recent3.length + '期平均">' + sign + r3avg.toFixed(1) + '</span>';
+        }
       } else if (state.sort === "avgrank") {
         const rankRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.rank != null);
         if (rankRecs.length >= 2) {
