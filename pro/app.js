@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null, sort: "name" };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -94,6 +94,7 @@ const MTOURNAMENT = new Set([
 const el = {
   orgFilter: document.getElementById("orgFilter"),
   search: document.getElementById("search"),
+  sortSelect: document.getElementById("sortSelect"),
   playerCount: document.getElementById("playerCount"),
   playerList: document.getElementById("playerList"),
   detail: document.getElementById("detail"),
@@ -188,6 +189,10 @@ function filteredPlayers() {
         const sa = playerTeamStatus(normalize(a.name), activeTeam);
         const sb = playerTeamStatus(normalize(b.name), activeTeam);
         if (sa !== sb) return sa === "current" ? -1 : 1;
+      }
+      if (state.sort === "records") {
+        return (b.records.length + (b.wrecords ? b.wrecords.length : 0)) -
+               (a.records.length + (a.wrecords ? a.wrecords.length : 0));
       }
       return a.name.localeCompare(b.name, "ja");
     });
@@ -699,5 +704,6 @@ function renderWleagueSection(p) {
 
 // --- 起動 -------------------------------------------------------------
 el.search.addEventListener("input", e => { state.query = e.target.value; renderList(); });
+el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; renderList(); });
 renderOrgFilter();
 renderList();

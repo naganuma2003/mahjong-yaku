@@ -16,7 +16,13 @@
   <aside class="sidebar">
     <button class="filter-toggle" id="filterToggle" onclick="toggleFilter()">▼ 絞り込みを表示</button>
     <div class="org-filter" id="orgFilter"></div>
-    <input class="search" id="search" type="search" placeholder="選手名で検索…">
+    <div class="search-row">
+      <input class="search" id="search" type="search" placeholder="選手名で検索…">
+      <select class="sort-select" id="sortSelect">
+        <option value="name">名前順</option>
+        <option value="records">データ数順</option>
+      </select>
+    </div>
     <div class="player-count" id="playerCount"></div>
     <ul class="player-list" id="playerList"></ul>
   </aside>

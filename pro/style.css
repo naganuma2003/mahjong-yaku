@@ -80,12 +80,22 @@ body {
 .mreporter-btn{ border-color: #2e7d32; color: #2e7d32; }
 .mreporter-btn.active{ background: #2e7d32; color: #fff; border-color: #2e7d32; }
 
+.search-row { display: flex; gap: 6px; }
 .search {
-  width: 100%;
+  flex: 1;
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
+}
+.sort-select {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  background: #fff;
+  cursor: pointer;
+  color: var(--muted);
 }
 .player-count { font-size: 12px; color: var(--muted); margin: 8px 2px; }
 
