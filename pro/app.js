@@ -251,6 +251,13 @@ function filteredPlayers() {
         };
         return ongoingPts(b) - ongoingPts(a);
       }
+      if (state.sort === "avgpts") {
+        const avgPts = p => {
+          const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+          return recs.length >= 3 ? recs.reduce((s, r) => s + r.points, 0) / recs.length : -Infinity;
+        };
+        return avgPts(b) - avgPts(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
 }
