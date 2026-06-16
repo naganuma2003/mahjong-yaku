@@ -1524,6 +1524,10 @@ document.addEventListener("keydown", e => {
     if (typeof openRandomPlayer === "function") openRandomPlayer();
     return;
   }
+  if (e.key === "s" && document.activeElement !== el.search && state.selectedId) {
+    if (typeof copyPlayerLink === "function") copyPlayerLink();
+    return;
+  }
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
