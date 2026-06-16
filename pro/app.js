@@ -258,6 +258,12 @@ function filteredPlayers() {
         };
         return avgPts(b) - avgPts(a);
       }
+      if (state.sort === "playoff") {
+        const playoffCount = p =>
+          (p.records || []).filter(r => r.category === "playoff").length +
+          (p.wrecords || []).filter(r => r.category === "playoff").length;
+        return playoffCount(b) - playoffCount(a);
+      }
       if (state.sort === "totalpts") {
         const totalPts = p => {
           const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
