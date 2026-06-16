@@ -896,6 +896,15 @@ function renderDetail(p) {
       }
       c.addEventListener("mouseenter", showTip);
       c.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+      c.addEventListener("click", () => {
+        const m = (c.dataset.tip || "").match(/^(\d{4})年/);
+        if (m) {
+          const yr = m[1];
+          state.year = yr === state.year ? "" : yr;
+          document.getElementById("yearFilter").value = state.year;
+          renderList();
+        }
+      });
       c.addEventListener("touchstart", e => { e.preventDefault(); showTip(); }, { passive: false });
       c.addEventListener("touchend", () => { setTimeout(() => { tip.style.display = "none"; }, 1500); });
     });
