@@ -795,6 +795,13 @@ function renderDetail(p) {
       : Infinity;
     const topFirstYearStr = topFirstYear < Infinity ? topFirstYear + "年" : "-";
 
+    // 昇級率
+    const promotions = groupRecs.filter(r => r.category === "promotion").length;
+    const completedRecs = groupRecs.filter(r => !r.ongoing && r.category !== "other" || r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff");
+    const promoRateStr = completedRecs.length >= 5
+      ? Math.round(promotions / completedRecs.length * 100) + "%"
+      : null;
+
     // 最長連続出場
     const sortedTerms = groupRecs.map(r => r.term).sort((a, b) => a - b);
     let maxStreak = 1, curStreak = 1;
@@ -816,6 +823,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       if (streakStr) html += stat(streakStr, "最長連続");
+      if (promoRateStr) html += stat(promoRateStr, "昇級率");
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
@@ -830,6 +838,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       if (streakStr) html += stat(streakStr, "最長連続");
+      if (promoRateStr) html += stat(promoRateStr, "昇級率");
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
