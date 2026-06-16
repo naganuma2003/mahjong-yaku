@@ -320,9 +320,19 @@ function renderOrgFilter() {
     teamWrap.appendChild(b);
   });
 
+  // モバイル用フィルタートグルボタンのラベルを更新
+  const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
+    state.topLeague, state.wleague, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year]
+    .filter(Boolean).length;
+  const toggleBtn = document.getElementById("filterToggle");
+  if (toggleBtn) {
+    const isOpen = el.orgFilter.classList.contains("open");
+    toggleBtn.textContent = (isOpen ? "▲ 絞り込みを隠す" : "▼ 絞り込みを表示") +
+      (activeCount ? " (" + activeCount + ")" : "");
+  }
+
   // フィルタークリアボタン
-  const anyActive = state.org !== "all" || state.mleagueC || state.mleagueF || state.mtourn ||
-    state.topLeague || state.wleague || state.mcast || state.manalyst || state.mreporter || state.mteam || state.year;
+  const anyActive = activeCount > 0;
   if (anyActive) {
     const clr = document.createElement("button");
     clr.className = "org-btn clear-btn";
@@ -483,8 +493,8 @@ function renderDetail(p) {
     const topTierName = (league.tiers || [])[0];
     const topFirstYear = topTierName
       ? groupRecs
-          .filter(r => r.tier === topTierName)
-          .map(r => termToYear(oid, r.term))
+          .filter(r => (r.tier === "後期" || r.tier === "前期" ? r.result : r.tier) === topTierName)
+          .map(r => termToYear(r.orgId || oid, r.term))
           .filter(y => y > 1000)
           .reduce((min, y) => Math.min(min, y), Infinity)
       : Infinity;

@@ -63,11 +63,10 @@ function copyPlayerLink() {
   });
 }
 function toggleFilter() {
-  const btn = document.getElementById('filterToggle');
   const filter = document.getElementById('orgFilter');
   const open = filter.classList.contains('open');
   filter.classList.toggle('open', !open);
-  btn.textContent = open ? '▼ 絞り込みを表示' : '▲ 絞り込みを隠す';
+  renderOrgFilter();
 }
 </script>
 </body>
