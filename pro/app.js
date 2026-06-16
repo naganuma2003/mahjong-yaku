@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16e 平均順位・最高得点期ハイライト・直近3期トレンド追加
+// v2026-06-16f 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中セクション追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1740,7 +1740,36 @@ function showPlaceholder() {
       '<button class="recent-btn" data-id="' + dailyPlayer.id + '" title="' + dpDesc + '">' + dailyPlayer.name + '</button>' +
       '</div><div style="font-size:10px;color:var(--muted);margin-top:2px">' + dpDesc + '</div></div>';
   }
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + dailySection + pickupSection;
+  // 今期出場中の選手（ongoingあり）をポイント順でorg別に表示
+  let ongoingSection = "";
+  {
+    const ongoingByOrg = {};
+    DATA.players.forEach(p => {
+      const ongs = (p.records || []).filter(r => r.ongoing);
+      ongs.forEach(r => {
+        const oid = r.orgId || p.org;
+        if (!ongoingByOrg[oid]) ongoingByOrg[oid] = [];
+        ongoingByOrg[oid].push({ p, points: r.points });
+      });
+    });
+    const orgOrder = Object.keys(ongoingByOrg);
+    if (orgOrder.length) {
+      ongoingSection = '<div class="recent-section"><div class="recent-head">🏆 今期出場中</div>';
+      orgOrder.forEach(oid => {
+        const org = ORGS[oid] || {};
+        const sorted = ongoingByOrg[oid].slice().sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity)).slice(0, 6);
+        ongoingSection += '<div style="font-size:10px;color:var(--muted);margin:4px 0 2px">' + (org.shortName || oid) + '</div>';
+        ongoingSection += '<div class="recent-list">';
+        sorted.forEach(({ p, points }) => {
+          const ptsStr = points != null ? ' (' + (points >= 0 ? '+' : '') + points.toFixed(1) + ')' : '';
+          ongoingSection += '<button class="recent-btn" data-id="' + p.id + '" title="今期' + ptsStr + '">' + p.name + '</button>';
+        });
+        ongoingSection += '</div>';
+      });
+      ongoingSection += '</div>';
+    }
+  }
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + dailySection + pickupSection + ongoingSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
