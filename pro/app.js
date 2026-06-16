@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16u 決定戦全体ランキング表示・類似成績選手・インサイト強化
+// v2026-06-16v org絞り込み時に通算ptトップ選手を表示・決定戦ランク
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1994,6 +1994,29 @@ function addToHistory(p) {
 }
 
 function showPlaceholder() {
+  // org絞り込み中のトップ選手（通算pt順）
+  let orgTopSection = "";
+  if (state.org !== "all") {
+    const org = ORGS[state.org];
+    const orgPlayers = DATA.players.filter(p => playerOrgIds(p).includes(state.org));
+    const ranked = orgPlayers.map(p => {
+      const recs = (p.records || []).filter(r => (r.orgId || p.org) === state.org && !r.ongoing && r.points != null);
+      return recs.length >= 3 ? { p, total: recs.reduce((s, r) => s + r.points, 0), n: recs.length } : null;
+    }).filter(Boolean).sort((a, b) => b.total - a.total).slice(0, 8);
+    if (ranked.length >= 3) {
+      orgTopSection = '<div class="recent-section"><div class="recent-head">' + (org ? org.shortName : state.org) + ' 通算pt上位</div><div class="recent-list">';
+      ranked.forEach(({ p, total }, ri) => {
+        const sign = total >= 0 ? "+" : "";
+        const col = total >= 0 ? "color:#2a7a3a" : "color:#c0392b";
+        orgTopSection += '<button class="recent-btn" data-id="' + p.id + '">' +
+          '<span style="font-size:9px;color:var(--muted);margin-right:2px">' + (ri + 1) + '.</span>' +
+          p.name +
+          '<span style="font-size:10px;' + col + ';margin-left:4px">' + sign + total.toFixed(0) + 'pt</span>' +
+          '</button>';
+      });
+      orgTopSection += '</div></div>';
+    }
+  }
   const recent = renderRecentHistory();
   const favs = getFavs();
   let favSection = "";
@@ -2101,7 +2124,7 @@ function showPlaceholder() {
     '<span>今期出場: <strong>' + ongoingCount + '</strong></span>' +
     '<span>タイトル保有: <strong>' + titleCount + '</strong></span>' +
     '</div>';
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + birthdaySection + dailySection + pickupSection + ongoingSection;
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + orgTopSection + birthdaySection + dailySection + pickupSection + ongoingSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
