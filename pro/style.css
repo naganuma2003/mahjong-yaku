@@ -165,6 +165,12 @@ body {
 .detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .copy-link-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; font-size: 14px; cursor: pointer; color: var(--muted); line-height: 1.4; }
 .copy-link-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fav-toggle-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; font-size: 15px; cursor: pointer; color: var(--muted); line-height: 1.4; transition: all .15s; }
+.fav-toggle-btn.active { color: #c89000; border-color: #e0b800; }
+.fav-toggle-btn:hover { border-color: #e0b800; color: #c89000; }
+.fav-btn { border-color: #c89000 !important; color: #c89000 !important; }
+.fav-btn.active { background: #c89000 !important; color: #fff !important; }
+.p-fav { color: #c89000; font-size: 11px; margin-left: 2px; }
 .detail-head h2 { margin: 0; font-size: 22px; }
 .detail-head .league-name { color: var(--accent); font-weight: 600; }
 .detail-head .org-name { color: var(--muted); font-size: 13px; }

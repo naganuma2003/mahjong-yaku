@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name" };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -179,6 +179,7 @@ function filteredPlayers() {
     })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
+    .filter(p => !state.favOnly || getFavs().has(p.id))
     .filter(p => {
       if (!state.year) return true;
       const yr = parseInt(state.year, 10);
@@ -264,6 +265,12 @@ function renderOrgFilter() {
   wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(wb);
 
+  const favBtn = document.createElement("button");
+  favBtn.className = "org-btn fav-btn" + (state.favOnly ? " active" : "");
+  favBtn.textContent = "☆ お気に入り";
+  favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(favBtn);
+
   // M関係セクション
   const mlabel = document.createElement("span");
   mlabel.className = "filter-section-label";
@@ -322,7 +329,7 @@ function renderOrgFilter() {
 
   // モバイル用フィルタートグルボタンのラベルを更新
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year]
+    state.topLeague, state.wleague, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -339,7 +346,7 @@ function renderOrgFilter() {
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"" });
+        topLeague:false, wleague:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false });
       document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };
@@ -393,12 +400,13 @@ function renderList() {
       else if (MANALYST.has(pn))  roleLabel = '<span class="prole role-analyst">解説</span>';
       else if (MREPORTER.has(pn)) roleLabel = '<span class="prole role-reporter">リポーター</span>';
     }
+    const favStar = getFavs().has(p.id) ? '<span class="p-fav">★</span>' : "";
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + roleLabel + teamBadge +
+      ongoingBadge + tierBadge + roleLabel + teamBadge + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
@@ -438,8 +446,10 @@ function renderDetail(p) {
 
   const isOngoing = allRecs.some(r => r.ongoing);
   let html = '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧に戻る</button>';
+  const isFav = getFavs().has(p.id);
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
+    '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';
@@ -668,6 +678,15 @@ function renderDetail(p) {
   if (state.year) {
     const matchRow = el.detail.querySelector("tr.year-match");
     if (matchRow) setTimeout(() => matchRow.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+  }
+  const favToggle = document.getElementById("favToggleBtn");
+  if (favToggle) {
+    favToggle.addEventListener("click", () => {
+      const nowFav = toggleFav(p.id);
+      favToggle.textContent = nowFav ? "★" : "☆";
+      favToggle.classList.toggle("active", nowFav);
+      renderList();
+    });
   }
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1058,6 +1077,17 @@ function renderWleagueSection(p) {
 // --- 閲覧履歴 ---------------------------------------------------------
 const HISTORY_KEY = "mj_recent";
 const HISTORY_MAX = 8;
+const FAV_KEY = "mj_favs";
+
+function getFavs() { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")); } catch(e) { return new Set(); } }
+function toggleFav(id) {
+  try {
+    const favs = getFavs();
+    if (favs.has(id)) favs.delete(id); else favs.add(id);
+    localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
+    return favs.has(id);
+  } catch(e) { return false; }
+}
 
 function addToHistory(p) {
   try {
