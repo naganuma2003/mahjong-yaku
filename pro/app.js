@@ -1506,6 +1506,7 @@ function renderDetail(p) {
     const myTotalRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
     const myTotal = myTotalRecs.length >= 3 ? myTotalRecs.reduce((s, r) => s + r.points, 0) : null;
     const myAvg = myTotalRecs.length >= 3 ? myTotal / myTotalRecs.length : null;
+    const myPlayoffs = (p.records||[]).concat(p.wrecords||[]).filter(r=>r.category==="playoff").length;
     if (myTotal !== null && myAvg !== null) {
       const similar = DATA.players
         .filter(x => x.id !== p.id)
@@ -1514,7 +1515,11 @@ function renderDetail(p) {
           if (xRecs.length < 3) return null;
           const xTotal = xRecs.reduce((s, r) => s + r.points, 0);
           const xAvg = xTotal / xRecs.length;
-          const diff = Math.abs(xTotal - myTotal) / (Math.abs(myTotal) || 100) + Math.abs(xAvg - myAvg) / (Math.abs(myAvg) || 10);
+          const xPlayoffs = (x.records||[]).concat(x.wrecords||[]).filter(r=>r.category==="playoff").length;
+          const diff = Math.abs(xTotal - myTotal) / (Math.abs(myTotal) || 100)
+            + Math.abs(xAvg - myAvg) / (Math.abs(myAvg) || 10)
+            + Math.abs(xRecs.length - myTotalRecs.length) / (myTotalRecs.length || 5) * 0.3
+            + Math.abs(xPlayoffs - myPlayoffs) * 0.1;
           return { x, diff };
         })
         .filter(Boolean)
