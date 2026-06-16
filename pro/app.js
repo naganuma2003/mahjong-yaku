@@ -2017,9 +2017,24 @@ renderList();
 // 初期プレースホルダー（閲覧履歴・お気に入りがあれば表示）
 showPlaceholder();
 
-// URLパラメータで選手を直接選択（シェアリンク対応）
+// URLパラメータで初期状態を設定（シェアリンク対応）
 (function() {
   const params = new URLSearchParams(location.search);
+  // ?q=検索クエリ で検索を初期化
+  const q = params.get("q");
+  if (q) {
+    state.query = q;
+    el.search.value = q;
+    renderList();
+  }
+  // ?org=団体ID で団体フィルターを初期化
+  const org = params.get("org");
+  if (org && (org === "all" || DATA.organizations.find(o => o.id === org))) {
+    state.org = org;
+    renderOrgFilter();
+    renderList();
+  }
+  // ?p=選手ID で選手を直接選択
   const pid = params.get("p");
   if (pid) {
     const p = DATA.players.find(x => x.id === pid || normalize(x.name) === pid);
