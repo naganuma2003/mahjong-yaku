@@ -2788,6 +2788,16 @@ document.addEventListener("keydown", e => {
     if (btn) btn.click();
     return;
   }
+  // hキーでホーム（フィルター全解除）
+  if (document.activeElement !== el.search && e.key === "h" && !e.ctrlKey && !e.metaKey) {
+    if (state.query || state.org !== "all" || state.mleagueC || state.mleagueF || state.mtourn || state.topLeague || state.wleague || state.playoff || state.ongoingOnly || state.favOnly || state.year || state.debutDecade || state.positivePts || state.recentActive || state.hasTitle || state.ageMin != null || state.minRec != null) {
+      state.query = ""; el.search.value = "";
+      Object.assign(state, {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null,mcast:false,manalyst:false,mreporter:false,ageMin:null,ageMax:null,minRec:null});
+      const yf = document.getElementById("yearFilter"); if (yf) yf.value = "";
+      renderOrgFilter(); resetAndRenderList();
+    }
+    return;
+  }
   // 数字キーで団体フィルター切替（1=最高位戦、2=連盟、3=協会、4=RMU、5=μ、0=全て）
   if (document.activeElement !== el.search && /^[0-5]$/.test(e.key)) {
     const orgMap = { "0": "all", "1": "saikouisen", "2": "renmei", "3": "kyokai", "4": "rmu", "5": "mu" };
