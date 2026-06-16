@@ -1727,10 +1727,20 @@ function chartSvg(recs, orgId) {
     .sort((a, b) => a.year - b.year);
   if (!pts.length) return "";
 
+  // 統合・分離リーグの表示用マッピング（A⇔A1/A2 等）
+  // 同格tierは同じ表示位置にまとめ、Y軸ラベルは期に応じて切替
+  const TIER_EQUIV = { "A": "A1" };  // AはA1と同じ高さに表示
+  const displayTier = t => TIER_EQUIV[t] || t;
+
+  // 表示用tier一覧（統合後の重複を除去）
+  const displayTiers = [];
+  const seen = new Set();
+  tiers.forEach(t => { const d = displayTier(t); if (!seen.has(d)) { seen.add(d); displayTiers.push(d); } });
+
   // 表示tier範囲（実績±1）
-  const usedIdx = pts.map(d => tiers.indexOf(d.tier));
+  const usedIdx = pts.map(d => displayTiers.indexOf(displayTier(d.tier)));
   const showMin = Math.max(0, Math.min(...usedIdx) - 1);
-  const showMax = Math.min(tiers.length - 1, Math.max(...usedIdx) + 1);
+  const showMax = Math.min(displayTiers.length - 1, Math.max(...usedIdx) + 1);
   const numBands = showMax - showMin + 1;
 
   const W = 600, H = 200;
@@ -1739,7 +1749,7 @@ function chartSvg(recs, orgId) {
 
   const MAX_RANK = 16;
   function toV(tier, rank) {
-    const i = tiers.indexOf(tier) - showMin;
+    const i = displayTiers.indexOf(displayTier(tier)) - showMin;
     const adj = rank != null ? (MAX_RANK - Math.min(rank, MAX_RANK)) / MAX_RANK : 0.5;
     return (numBands - 1 - i) + adj;
   }
@@ -1760,7 +1770,15 @@ function chartSvg(recs, orgId) {
 
   let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">';
 
-  tiers.slice(showMin, showMax + 1).forEach((tier, i) => {
+  // TIER_EQUIV で統合された元tier一覧（ラベル表示用）
+  const equivSources = {};
+  Object.keys(TIER_EQUIV).forEach(k => {
+    const d = TIER_EQUIV[k];
+    if (!equivSources[d]) equivSources[d] = [];
+    equivSources[d].push(k);
+  });
+
+  displayTiers.slice(showMin, showMax + 1).forEach((tier, i) => {
     const top = yFn(numBands - i).toFixed(1);
     const bot = yFn(numBands - i - 1).toFixed(1);
     const c = TC[tierKey(tier)] || '#8a93a2';
@@ -1769,8 +1787,11 @@ function chartSvg(recs, orgId) {
            '" fill="' + c + '" fill-opacity="0.05"/>';
     svg += '<line x1="' + padL + '" y1="' + top + '" x2="' + (W - padR) + '" y2="' + top + '" stroke="#e2e5ea"/>';
     const midY = ((parseFloat(top) + parseFloat(bot)) / 2 + 4).toFixed(1);
+    // 統合tierはラベルに元の名前も併記（例: A1 に A が統合 → "A1/A"）
+    var label = tier;
+    if (equivSources[tier]) label = tier + '/' + equivSources[tier].join('/');
     svg += '<text x="' + (padL - 5) + '" y="' + midY +
-           '" text-anchor="end" font-size="11" fill="' + c + '" font-weight="700">' + tier + '</text>';
+           '" text-anchor="end" font-size="11" fill="' + c + '" font-weight="700">' + label + '</text>';
   });
   svg += '<line x1="' + padL + '" y1="' + yFn(0).toFixed(1) + '" x2="' + (W - padR) +
          '" y2="' + yFn(0).toFixed(1) + '" stroke="#e2e5ea"/>';
