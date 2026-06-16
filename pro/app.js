@@ -951,7 +951,8 @@ function renderList() {
       titleParts.push("通算" + (tot >= 0 ? "+" : "") + tot.toFixed(1) + "pt");
     }
     if (titleParts.length) li.title = titleParts.join(" / ");
-    const rankNum = showRank ? '<span class="list-rank">' + (listIdx + 1) + '</span>' : "";
+    const rankMedal = showRank && listIdx < 3 ? ["🥇","🥈","🥉"][listIdx] : null;
+    const rankNum = showRank ? '<span class="list-rank" title="' + (listIdx + 1) + '位">' + (rankMedal || (listIdx + 1)) + '</span>' : "";
     li.innerHTML =
       rankNum + '<span class="pname">' + highlightName(p.name, _qTerms) + "</span>" +
       '<span class="pright">' +
