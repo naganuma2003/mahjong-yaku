@@ -727,7 +727,9 @@ function renderList() {
   if (filterTags.length) {
     const tagHtml = filterTags.map(f => '<button class="filter-chip" data-fkey="' + f.key + '" title="このフィルターを解除">× ' + f.label + '</button>').join('');
     const clearAll = filterTags.length >= 2 ? '<button class="filter-chip filter-clear-all" title="すべてのフィルターを解除">✕ 全解除</button>' : '';
-    el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml + clearAll;
+    const yearSortHint = state.year && state.sort !== "pts" && list.some(p => (p.records||[]).concat(p.wrecords||[]).some(r => !r.ongoing && r.points != null))
+      ? '<button class="filter-chip" id="yearSortHint" style="background:#2a7a3a" title="この年のポイント順で並べ替え">pt順で見る</button>' : '';
+    el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml + clearAll + yearSortHint;
   } else {
     el.playerCount.textContent = countText;
   }
@@ -751,6 +753,14 @@ function renderList() {
     if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
   }
   // フィルターチップのクリックで個別解除
+  const yearSortHintBtn = el.playerCount.querySelector("#yearSortHint");
+  if (yearSortHintBtn) {
+    yearSortHintBtn.addEventListener("click", () => {
+      state.sort = "pts";
+      const sel = document.getElementById("sortSelect"); if (sel) sel.value = "pts";
+      resetAndRenderList();
+    });
+  }
   const clearAllBtn = el.playerCount.querySelector(".filter-clear-all");
   if (clearAllBtn) {
     clearAllBtn.addEventListener("click", () => {
