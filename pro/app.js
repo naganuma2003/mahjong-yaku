@@ -561,6 +561,19 @@ function renderList() {
       else if (MREPORTER.has(pn)) roleLabel = '<span class="prole role-reporter">リポーター</span>';
     }
     const favStar = _favs.has(p.id) ? '<span class="p-fav">★</span>' : "";
+    // ホバーtitleに要約情報
+    const titleParts = [];
+    if (latestTier) titleParts.push("最終ティア: " + latestTier);
+    const totalRecCount = (p.records || []).length + (p.wrecords || []).length;
+    if (totalRecCount) titleParts.push(totalRecCount + "期");
+    const playoffCount = (p.records || []).filter(r => r.category === "playoff").length + (p.wrecords || []).filter(r => r.category === "playoff").length;
+    if (playoffCount) titleParts.push("決定戦" + playoffCount + "回");
+    const allPtsRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+    if (allPtsRecs.length >= 2) {
+      const tot = allPtsRecs.reduce((s, r) => s + r.points, 0);
+      titleParts.push("通算" + (tot >= 0 ? "+" : "") + tot.toFixed(1) + "pt");
+    }
+    if (titleParts.length) li.title = titleParts.join(" / ");
     li.innerHTML =
       '<span class="pname">' + highlightName(p.name, _q) + "</span>" +
       '<span class="pright">' +
