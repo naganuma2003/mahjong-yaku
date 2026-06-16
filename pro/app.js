@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16n 検索にティア名マッチング追加・デビュー時年齢・前後ナビ
+// v2026-06-16o URLパラメータにフィルター状態を保存・復元対応
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -634,6 +634,14 @@ function renderList() {
     if (state.query) params.set("q", state.query);
     if (state.org !== "all") params.set("org", state.org);
     if (state.sort !== "name") params.set("sort", state.sort);
+    if (state.mteam) params.set("mteam", state.mteam);
+    if (state.mleagueC) params.set("mlc", "1");
+    if (state.mleagueF) params.set("mlf", "1");
+    if (state.ongoingOnly) params.set("ongoing", "1");
+    if (state.favOnly) params.set("fav", "1");
+    if (state.year) params.set("yr", state.year);
+    if (state.hasTitle) params.set("titled", "1");
+    if (state.positivePts) params.set("pos", "1");
     const qs = params.toString();
     const newUrl = location.pathname + (qs ? "?" + qs : "");
     if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
@@ -2177,6 +2185,15 @@ showPlaceholder();
     document.getElementById("sortSelect").value = sort;
     renderList();
   }
+  // 追加フィルターの復元
+  if (params.get("mteam")) { const t = MLEAGUE_TEAMS.find(x => x.id === params.get("mteam")); if (t) { state.mteam = t.id; renderOrgFilter(); renderList(); } }
+  if (params.get("mlc") === "1") { state.mleagueC = true; renderOrgFilter(); renderList(); }
+  if (params.get("mlf") === "1") { state.mleagueF = true; renderOrgFilter(); renderList(); }
+  if (params.get("ongoing") === "1") { state.ongoingOnly = true; renderOrgFilter(); renderList(); }
+  if (params.get("fav") === "1") { state.favOnly = true; renderOrgFilter(); renderList(); }
+  if (params.get("yr")) { const yr = params.get("yr"); state.year = yr; document.getElementById("yearFilter").value = yr; renderList(); }
+  if (params.get("titled") === "1") { state.hasTitle = true; renderOrgFilter(); renderList(); }
+  if (params.get("pos") === "1") { state.positivePts = true; renderOrgFilter(); renderList(); }
   // ?p=選手ID で選手を直接選択
   const pid = params.get("p");
   if (pid) {
