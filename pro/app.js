@@ -94,32 +94,35 @@ const MLEAGUE_FORMER = new Set([
 
 // Mリーグ チーム別メンバー（2024-25現役 + 歴代）
 const MLEAGUE_TEAMS = [
-  { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#b71c1c",
+  { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#8B0000",
     current:new Set(["園田賢","鈴木たろう","浅見真紀","渡辺太"]),
     former: new Set(["村上淳","丸山奏子"]) },
-  { id:"furin",   name:"EX風林火山",            short:"風林火山",    color:"#4527a0",
+  { id:"furin",   name:"EX風林火山",            short:"風林火山",    color:"#6A0DAD",
     current:new Set(["二階堂亜樹","勝又健志","松ヶ瀬隆弥","二階堂瑠美"]),
     former: new Set(["滝沢和典"]) },
-  { id:"sakura",  name:"KADOKAWAサクラナイツ",  short:"サクラナイツ",color:"#ad1457",
+  { id:"sakura",  name:"KADOKAWAサクラナイツ",  short:"サクラナイツ",color:"#E8739A",
     current:new Set(["岡田紗佳","堀慎吾","渋川難波","内川幸太郎"]),
     former: new Set(["沢崎誠"]) },
-  { id:"konami",  name:"KONAMI麻雀格闘倶楽部",  short:"格闘倶楽部", color:"#c62828",
+  { id:"konami",  name:"KONAMI麻雀格闘倶楽部",  short:"格闘倶楽部", color:"#CC0000",
     current:new Set(["佐々木寿人","高宮まり","伊達朱里紗","滝沢和典"]),
     former: new Set(["前原雄大","藤崎智"]) },
-  { id:"abemas",  name:"渋谷ABEMAS",             short:"ABEMAS",     color:"#0277bd",
+  { id:"abemas",  name:"渋谷ABEMAS",             short:"ABEMAS",     color:"#D4A017",
     current:new Set(["多井隆晴","白鳥翔","松本吉弘","日向藍子"]),
     former: new Set([]) },
-  { id:"phoenix", name:"セガサミーフェニックス",  short:"フェニックス",color:"#e65100",
+  { id:"phoenix", name:"セガサミーフェニックス",  short:"フェニックス",color:"#E86C00",
     current:new Set(["茅森早香","醍醐大","竹内元太","浅井堂岐"]),
     former: new Set(["近藤誠一","魚谷侑未","和久津晶","東城りお"]) },
-  { id:"pirates", name:"U-NEXTパイレーツ",       short:"パイレーツ", color:"#1565c0",
+  { id:"pirates", name:"U-NEXTパイレーツ",       short:"パイレーツ", color:"#001F5B",
     current:new Set(["小林剛","瑞原明奈","鈴木優","仲林圭"]),
     former: new Set(["朝倉康心","石橋伸洋"]) },
-  { id:"beast",   name:"BEAST Japanext",          short:"BEAST",      color:"#263238",
+  { id:"raiden",  name:"TEAM RAIDEN/雷電",       short:"雷電",       color:"#FFD700",
+    current:new Set(["萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広"]),
+    former: new Set([]) },
+  { id:"beast",   name:"BEAST X",                short:"BEAST X",    color:"#1A1A1A",
     current:new Set(["鈴木大介","中田花奈","猿川真寿","菅原千瑛"]),
     former: new Set([]) },
-  { id:"team9",   name:"新チーム(2025-26)",         short:"新チーム",   color:"#00695c",
-    current:new Set(["萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広"]),
+  { id:"earthjets", name:"EARTH JETS",           short:"アースジェッツ", color:"#228B22",
+    current:new Set(["石井一馬","三浦智博","逢川恵夢","HIRO柴田"]),
     former: new Set([]) },
 ];
 
@@ -542,8 +545,9 @@ function renderOrgFilter() {
     b.className = "org-btn team-btn";
     b.textContent = t.short;
     b.style.borderColor = t.color;
-    b.style.color = isActive ? "#fff" : t.color;
-    b.style.background = isActive ? t.color : "#fff";
+    const lightText = ["#FFD700","#D4A017","#E8739A"].includes(t.color);
+    b.style.color = isActive ? (lightText ? "#000" : "#fff") : t.color;
+    b.style.background = isActive ? t.color : "var(--bg)";
     b.onclick = () => {
       state.mteam = state.mteam === t.id ? null : t.id;
       renderOrgFilter();
