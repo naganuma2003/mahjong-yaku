@@ -26,6 +26,23 @@ function totalPtsRank(id) {
   const idx = _totalPtsRanking.findIndex(x => x.id === id);
   return idx >= 0 ? idx + 1 : null;
 }
+// 団体別通算ptランキング
+const _orgPtsRanking = {};
+["saikouisen","renmei","kyokai","rmu","mu"].forEach(oid => {
+  _orgPtsRanking[oid] = DATA.players
+    .map(p => {
+      const recs = (p.records||[]).filter(r => (r.orgId||p.org)===oid && !r.ongoing && r.points!=null);
+      return recs.length >= 3 ? { id: p.id, total: recs.reduce((s,r)=>s+r.points,0) } : null;
+    })
+    .filter(Boolean)
+    .sort((a,b)=>b.total-a.total);
+});
+function orgPtsRank(id, oid) {
+  const ranking = _orgPtsRanking[oid];
+  if (!ranking) return null;
+  const idx = ranking.findIndex(x => x.id === id);
+  return idx >= 0 ? idx + 1 : null;
+}
 // 決定戦進出回数ランキング（2回以上）
 const _playoffRanking = DATA.players
   .map(p => {
@@ -1059,7 +1076,13 @@ function renderDetail(p) {
     const totalPts = recsWithPts.length >= 2 ? recsWithPts.reduce((s, r) => s + r.points, 0) : null;
     const totalPtsStr = totalPts != null ? fmtPoints(totalPts) + "pt" : null;
     const ptRankHere = totalPtsRank(p.id);
-    const totalPtsTitle = totalPts != null && ptRankHere ? '全選手中通算pt ' + ptRankHere + '位（5期以上出場選手中）' : null;
+    const orgPtRankHere = orgPtsRank(p.id, oid);
+    const orgName = (ORGS[oid] || {}).shortName || oid;
+    const totalPtsTitle = totalPts != null
+      ? [ptRankHere ? '全選手中通算pt ' + ptRankHere + '位（5期以上）' : null,
+         orgPtRankHere ? orgName + '内通算pt ' + orgPtRankHere + '位（3期以上）' : null]
+          .filter(Boolean).join(' / ') || null
+      : null;
     const recsWithRank = groupRecs.filter(r => !r.ongoing && r.rank != null);
     const avgRank = recsWithRank.length >= 3
       ? (recsWithRank.reduce((s, r) => s + r.rank, 0) / recsWithRank.length)
