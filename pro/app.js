@@ -1669,3 +1669,14 @@ window.addEventListener("popstate", function(e) {
 if (window.innerWidth > 760 && !location.search) {
   el.search.focus();
 }
+
+// 検索プレースホルダーを循環表示（AND検索の使い方をヒント）
+(function() {
+  const hints = ["名前・タイトル・団体で検索…", "例: 瀬戸熊", "例: 連盟 A1", "例: 最高位 決定戦", "例: 田中"];
+  let hi = 0;
+  setInterval(function() {
+    if (document.activeElement === el.search || el.search.value) return;
+    hi = (hi + 1) % hints.length;
+    el.search.placeholder = hints[hi];
+  }, 3000);
+})();
