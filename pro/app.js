@@ -711,7 +711,14 @@ function renderDetail(p) {
   const filtList = filteredPlayers();
   const listPos = filtList.findIndex(x => x.id === p.id);
   const posLabel = listPos >= 0 ? '<span class="list-pos" title="現在の並び順">' + (listPos + 1) + '/' + filtList.length + '</span>' : "";
-  let html = '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧に戻る</button>';
+  const prevPlayer = listPos > 0 ? filtList[listPos - 1] : null;
+  const nextPlayer = listPos >= 0 && listPos < filtList.length - 1 ? filtList[listPos + 1] : null;
+  const prevBtn = prevPlayer ? '<button class="nav-btn prev-btn" data-nav-id="' + prevPlayer.id + '" title="' + prevPlayer.name + '">‹ ' + prevPlayer.name + '</button>' : '<span class="nav-btn nav-disabled"></span>';
+  const nextBtn = nextPlayer ? '<button class="nav-btn next-btn" data-nav-id="' + nextPlayer.id + '" title="' + nextPlayer.name + '">' + nextPlayer.name + ' ›</button>' : '<span class="nav-btn nav-disabled"></span>';
+  let html = '<div class="detail-nav">' +
+    '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧</button>' +
+    prevBtn + nextBtn +
+    '</div>';
   const isFav = getFavs().has(p.id);
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
@@ -1035,6 +1042,12 @@ function renderDetail(p) {
       renderList();
     });
   }
+  el.detail.querySelectorAll("[data-nav-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const np = DATA.players.find(x => x.id === btn.dataset.navId);
+      if (np) { state.selectedId = np.id; renderList(); scrollToSelected(); renderDetail(np); el.detail.scrollTop = 0; }
+    });
+  });
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const mate = DATA.players.find(x => x.id === btn.dataset.id);
