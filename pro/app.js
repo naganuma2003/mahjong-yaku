@@ -412,7 +412,8 @@ function scrollToSelected() {
 }
 
 function renderDetail(p) {
-  history.replaceState(null, "", "?p=" + encodeURIComponent(p.id));
+  const url = "?p=" + encodeURIComponent(p.id);
+  if (location.search !== url) history.pushState({ playerId: p.id }, "", url);
   document.title = p.name + " - 麻雀プロ検索";
   const allRecs = (p.records || []).slice().sort((a, b) => b.term - a.term);
 
@@ -1173,6 +1174,22 @@ renderList();
   const pid = params.get("p");
   if (pid) {
     const p = DATA.players.find(x => x.id === pid || normalize(x.name) === pid);
-    if (p) { state.selectedId = p.id; renderList(); renderDetail(p); }
+    if (p) {
+      history.replaceState({ playerId: p.id }, "", location.search);
+      state.selectedId = p.id; renderList(); renderDetail(p);
+    }
   }
 })();
+
+// ブラウザの「戻る」ボタン対応
+window.addEventListener("popstate", function(e) {
+  const pid = e.state && e.state.playerId;
+  if (pid) {
+    const p = DATA.players.find(x => x.id === pid);
+    if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); return; }
+  }
+  state.selectedId = null;
+  document.title = "麻雀プロ検索";
+  renderList();
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
+});
