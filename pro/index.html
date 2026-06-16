@@ -96,7 +96,7 @@ function quickRanking() {
 function copyPlayerList() {
   const list = filteredPlayers();
   if (!list.length) return;
-  const header = ["名前", "団体", "デビュー年", "出場期数", "通算pt"].join("\t");
+  const header = ["名前", "団体", "デビュー年", "出場期数", "決定戦", "通算pt", "平均pt", "直近ティア"].join("\t");
   const rows = list.map(function(p) {
     const orgId = (p.records && p.records.length) ? (p.records[p.records.length - 1].orgId || p.org) : p.org;
     const org = window.MJ_DATA.organizations.find(function(o) { return o.id === orgId; });
@@ -106,8 +106,14 @@ function copyPlayerList() {
     const debut = debutYrs.length ? Math.min.apply(null, debutYrs) : "";
     const recs = (p.records || []).concat(p.wrecords || []).filter(function(r) { return !r.ongoing && r.points != null; });
     const totalPts = recs.length ? recs.reduce(function(s, r) { return s + r.points; }, 0).toFixed(1) : "";
+    const avgPts = recs.length >= 3 ? (recs.reduce(function(s, r) { return s + r.points; }, 0) / recs.length).toFixed(1) : "";
     const totalRecs = (p.records || []).length + (p.wrecords || []).length;
-    return [p.name, org ? org.shortName : p.org, debut, totalRecs, totalPts].join("\t");
+    const playoffs = (p.records || []).filter(function(r) { return r.category === "playoff"; }).length + (p.wrecords || []).filter(function(r) { return r.category === "playoff"; }).length;
+    const latestRec = (p.records || []).filter(function(r) { return !r.ongoing; }).sort(function(a, b) {
+      return termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term);
+    })[0];
+    const latestTier = latestRec ? ((latestRec.tier === "後期" || latestRec.tier === "前期") ? (latestRec.result || latestRec.tier) : latestRec.tier) : "";
+    return [p.name, org ? org.shortName : p.org, debut, totalRecs, playoffs, totalPts, avgPts, latestTier].join("\t");
   });
   const text = header + "\n" + rows.join("\n");
   const btn = document.getElementById("copyListBtn");
