@@ -900,10 +900,17 @@ function renderProfile(p) {
   html += '<div class="profile-grid">';
   if (pf.birth) {
     const bd = pf.birth.split("-");
-    const birthStr = bd.length === 3
-      ? bd[0] + "年" + parseInt(bd[1]) + "月" + parseInt(bd[2]) + "日"
-      : pf.birth;
-    html += profileRow("生年月日", birthStr);
+    let birthStr = pf.birth;
+    let ageStr = "";
+    if (bd.length === 3) {
+      birthStr = bd[0] + "年" + parseInt(bd[1]) + "月" + parseInt(bd[2]) + "日";
+      const now = new Date();
+      const bDate = new Date(parseInt(bd[0]), parseInt(bd[1]) - 1, parseInt(bd[2]));
+      let age = now.getFullYear() - bDate.getFullYear();
+      if (now < new Date(now.getFullYear(), bDate.getMonth(), bDate.getDate())) age--;
+      if (age > 0 && age < 100) ageStr = ' <span style="color:var(--muted);font-size:12px">（' + age + '歳）</span>';
+    }
+    html += profileRow("生年月日", birthStr + ageStr);
   }
   if (pf.hometown) html += profileRow("出身", pf.hometown);
   if (pf.education) html += profileRow("学歴", pf.education);
