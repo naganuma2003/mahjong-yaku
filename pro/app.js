@@ -427,6 +427,13 @@ function renderDetail(p) {
       .map(r => r.tier)
       .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] || "-";
 
+    const groupYears = groupRecs.map(r => termToYear(oid, r.term)).filter(y => y > 1000);
+    const yearMin = groupYears.length ? Math.min(...groupYears) : null;
+    const yearMax = groupYears.length ? Math.max(...groupYears) : null;
+    const yearRange = yearMin
+      ? (yearMin === yearMax ? yearMin + "年" : yearMin + "〜" + yearMax + "年")
+      : "-";
+
     if (isMultiOrg) {
       html += '<div class="org-section' + (idx === 0 ? " org-section-first" : "") + '">';
       html += '<div class="org-section-head">';
@@ -437,6 +444,7 @@ function renderDetail(p) {
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
       html += stat(groupPlayoffs, "決定戦/優勝");
+      html += stat(yearRange, "活動期間");
       html += "</div>";
     } else {
       html += '<div class="detail-head"><span class="league-name">' + (league.name || "") + " 成績</span></div>";
@@ -444,6 +452,7 @@ function renderDetail(p) {
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
       html += stat(groupPlayoffs, "決定戦/優勝");
+      html += stat(yearRange, "活動期間");
       html += "</div>";
     }
 
@@ -789,9 +798,16 @@ function renderWleagueSection(p) {
   html += '<div class="wleague-head"><span class="wleague-name">' +
           (wl.name || "女流リーグ") + ' 成績</span></div>';
 
+  const wYears = wrecords.map(r => wTermToYear(wl, r.term)).filter(y => y > 1000);
+  const wYearRange = wYears.length
+    ? (Math.min(...wYears) === Math.max(...wYears)
+        ? Math.min(...wYears) + "年"
+        : Math.min(...wYears) + "〜" + Math.max(...wYears) + "年")
+    : "-";
   html += '<div class="summary">';
   html += stat(wrecords.length, "出場期数");
   html += stat(topTier, "最高到達");
+  html += stat(wYearRange, "活動期間");
   html += '</div>';
 
   html += wchartSvg(wrecords, wl);
