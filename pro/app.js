@@ -71,7 +71,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mRelated: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null, minRec: null, extraOpen: false };
+const state = { org: "all", mleagueC: true, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mRelated: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null, minRec: null, extraOpen: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -447,8 +447,24 @@ function filteredPlayers() {
 }
 
 function renderOrgFilter() {
-  const opts = [{ id: "all", shortName: "すべて" }].concat(DATA.organizations);
   el.orgFilter.innerHTML = "";
+
+  // 1. 現Mリーガー
+  const mc = document.createElement("button");
+  mc.className = "org-btn mleague-btn" + (state.mleagueC ? " active" : "");
+  mc.textContent = "現Mリーガー";
+  mc.onclick = () => { state.mleagueC = !state.mleagueC; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(mc);
+
+  // 2. 最高リーグ
+  const tb = document.createElement("button");
+  tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
+  tb.textContent = "最高リーグ (" + TOPLEAGUE_COUNT + ")"; tb.title = "各団体の最高位リーグに在籍経験あり";
+  tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(tb);
+
+  // 3. 3団体（すべて + 各団体）
+  const opts = [{ id: "all", shortName: "すべて" }].concat(DATA.organizations);
   opts.forEach(o => {
     const b = document.createElement("button");
     b.className = "org-btn" + (state.org === o.id ? " active" : "");
@@ -458,45 +474,7 @@ function renderOrgFilter() {
     el.orgFilter.appendChild(b);
   });
 
-  // 独立トグル（Mリーガー / 最高リーグ）
-  const sep = document.createElement("span");
-  sep.className = "filter-sep";
-  el.orgFilter.appendChild(sep);
-
-  const mc = document.createElement("button");
-  mc.className = "org-btn mleague-btn" + (state.mleagueC ? " active" : "");
-  mc.textContent = "現Mリーガー";
-  mc.onclick = () => { state.mleagueC = !state.mleagueC; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(mc);
-
-  const mf = document.createElement("button");
-  mf.className = "org-btn mleague-former-btn" + (state.mleagueF ? " active" : "");
-  mf.textContent = "旧Mリーガー";
-  mf.onclick = () => { state.mleagueF = !state.mleagueF; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(mf);
-
-  const mt = document.createElement("button");
-  mt.className = "org-btn mtourn-btn" + (state.mtourn ? " active" : "");
-  mt.textContent = "Mトーナメント";
-  mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(mt);
-
-  const sep2 = document.createElement("span");
-  sep2.className = "filter-sep";
-  el.orgFilter.appendChild(sep2);
-
-  const tb = document.createElement("button");
-  tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
-  tb.textContent = "最高リーグ (" + TOPLEAGUE_COUNT + ")"; tb.title = "各団体の最高位リーグに在籍経験あり";
-  tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(tb);
-
-  const wb = document.createElement("button");
-  wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
-  wb.textContent = "女流あり (" + WLEAGUE_COUNT + ")"; wb.title = "女流リーグの成績データあり";
-  wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(wb);
-
+  // 4. お気に入り
   const favBtn = document.createElement("button");
   favBtn.className = "org-btn fav-btn" + (state.favOnly ? " active" : "");
   const favCount = getFavs().size;
@@ -504,24 +482,47 @@ function renderOrgFilter() {
   favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(favBtn);
 
+  // 4. 決定戦経験
   const poBtn = document.createElement("button");
   poBtn.className = "org-btn playoff-btn" + (state.playoff ? " active" : "");
   poBtn.textContent = "★ 決定戦経験 (" + PLAYOFF_COUNT + ")"; poBtn.title = "決定戦（プレーオフ）進出経験あり";
   poBtn.onclick = () => { state.playoff = !state.playoff; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(poBtn);
 
+  // 5. 旧Mリーガー
+  const mf = document.createElement("button");
+  mf.className = "org-btn mleague-former-btn" + (state.mleagueF ? " active" : "");
+  mf.textContent = "旧Mリーガー";
+  mf.onclick = () => { state.mleagueF = !state.mleagueF; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(mf);
+
+  // 6. Mトーナメント
+  const mt = document.createElement("button");
+  mt.className = "org-btn mtourn-btn" + (state.mtourn ? " active" : "");
+  mt.textContent = "Mトーナメント";
+  mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(mt);
+
+  // 7. M関係
+  const mrel = document.createElement("button");
+  mrel.className = "org-btn mcast-btn" + (state.mRelated ? " active" : "");
+  mrel.textContent = "M関係（実況・解説等）";
+  mrel.onclick = () => { state.mRelated = !state.mRelated; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(mrel);
+
+  // 8. 今期出場中
   const onBtn = document.createElement("button");
   onBtn.className = "org-btn ongoing-filter-btn" + (state.ongoingOnly ? " active" : "");
   onBtn.textContent = "今期出場中 (" + ONGOING_COUNT + ")"; onBtn.title = "今シーズン現在リーグ出場中の選手";
   onBtn.onclick = () => { state.ongoingOnly = !state.ongoingOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(onBtn);
 
-  // M関係（実況・解説・リポーターまとめて1ボタン）
-  const mrel = document.createElement("button");
-  mrel.className = "org-btn mcast-btn" + (state.mRelated ? " active" : "");
-  mrel.textContent = "M関係（実況・解説等）";
-  mrel.onclick = () => { state.mRelated = !state.mRelated; renderOrgFilter(); resetAndRenderList(); };
-  el.orgFilter.appendChild(mrel);
+  // 女流あり
+  const wb = document.createElement("button");
+  wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
+  wb.textContent = "女流あり (" + WLEAGUE_COUNT + ")"; wb.title = "女流リーグの成績データあり";
+  wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(wb);
 
   // Mチームセクション（折りたたみ）
   const teamOpen = state.teamOpen || !!state.mteam;

@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "mahjong-yaku",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "5173", "."],
+      "name": "pro",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5173", "-d", "pro"],
       "port": 5173
     }
   ]
