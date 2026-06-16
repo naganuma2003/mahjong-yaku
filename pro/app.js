@@ -496,12 +496,38 @@ function renderDetail(p) {
     html += '<div class="source-link">出典: <a href="' + p.sourceUrl + '" target="_blank" rel="noopener">' + p.sourceUrl + "</a></div>";
   }
 
+  // チームメイトセクション
+  if (playerTeams.length) {
+    playerTeams.forEach(team => {
+      const teammates = [...team.current].filter(name => normalize(name) !== normalize(p.name));
+      if (!teammates.length) return;
+      html += '<div class="teammates-section">';
+      html += '<div class="teammates-head"><span style="color:' + team.color + ';font-weight:700">' + team.name + '</span> チームメイト</div>';
+      html += '<div class="teammates-list">';
+      teammates.forEach(name => {
+        const mate = DATA.players.find(x => normalize(x.name) === normalize(name));
+        if (mate) {
+          html += '<button class="teammate-btn" data-id="' + mate.id + '" style="border-color:' + team.color + ';color:' + team.color + '">' + name + '</button>';
+        } else {
+          html += '<span class="teammate-btn" style="border-color:#ccc;color:#999">' + name + '</span>';
+        }
+      });
+      html += '</div></div>';
+    });
+  }
+
   if (p.wrecords && p.wrecords.length) {
     html += '<hr class="section-divider">';
     html += renderWleagueSection(p);
   }
 
   el.detail.innerHTML = html;
+  el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mate = DATA.players.find(x => x.id === btn.dataset.id);
+      if (mate) { state.selectedId = mate.id; renderList(); renderDetail(mate); }
+    });
+  });
   if (window.innerWidth <= 760) {
     el.detail.scrollIntoView({ behavior: "smooth", block: "start" });
   }
