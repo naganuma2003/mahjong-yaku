@@ -801,9 +801,9 @@ function chartSvg(recs, orgId) {
   if (!tiers.length) return "";
 
   const pts = recs
-    .filter(r => tiers.includes(r.tier))
+    .filter(r => tiers.includes(r.tier) && !r.ongoing)
     .map(r => ({ year: termToYear(orgId, r.term), tier: r.tier, rank: r.rank || null,
-                 points: r.points, result: r.result }))
+                 points: r.points, result: r.result, playoff: r.category === "playoff" }))
     .sort((a, b) => a.year - b.year);
   if (!pts.length) return "";
 
@@ -875,10 +875,16 @@ function chartSvg(recs, orgId) {
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
     const c = TC[tierKey(d.tier)] || '#8a93a2';
+    const cx = xFn(d.year).toFixed(1), cy = yFn(v).toFixed(1);
     const tip = d.year + '年 ' + d.tier + (d.rank ? ' ' + d.rank + '位' : '') +
                 (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
-                (d.result ? ' ' + d.result : '');
-    svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
+                (d.result ? ' ' + d.result : '') +
+                (d.playoff ? ' ★決定戦' : '');
+    if (d.playoff) {
+      // 決定戦進出は外周リング付きで強調
+      svg += '<circle cx="' + cx + '" cy="' + cy + '" r="8" fill="none" stroke="' + c + '" stroke-width="2" opacity="0.6"/>';
+    }
+    svg += '<circle cx="' + cx + '" cy="' + cy +
            '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
   });
 
@@ -892,9 +898,9 @@ function wchartSvg(wrecords, wleague) {
   if (!tiers.length) return "";
 
   const pts = wrecords
-    .filter(r => tiers.includes(r.tier))
+    .filter(r => tiers.includes(r.tier) && !r.ongoing)
     .map(r => ({ year: wTermToYear(wleague, r.term), tier: r.tier, rank: r.rank || null,
-                 points: r.points, result: r.result }))
+                 points: r.points, result: r.result, playoff: r.category === "playoff" }))
     .sort((a, b) => a.year - b.year);
   if (!pts.length) return "";
 
@@ -966,10 +972,15 @@ function wchartSvg(wrecords, wleague) {
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
     const c = TC[tierKey(d.tier)] || '#d08090';
+    const cx = xFn(d.year).toFixed(1), cy = yFn(v).toFixed(1);
     const tip = d.year + '年 ' + d.tier + (d.rank ? ' ' + d.rank + '位' : '') +
                 (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
-                (d.result ? ' ' + d.result : '');
-    svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
+                (d.result ? ' ' + d.result : '') +
+                (d.playoff ? ' ★決定戦' : '');
+    if (d.playoff) {
+      svg += '<circle cx="' + cx + '" cy="' + cy + '" r="8" fill="none" stroke="' + c + '" stroke-width="2" opacity="0.6"/>';
+    }
+    svg += '<circle cx="' + cx + '" cy="' + cy +
            '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
   });
 
