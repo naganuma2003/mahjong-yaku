@@ -635,11 +635,14 @@ function renderDetail(p) {
 
   const isOngoing = allRecs.some(r => r.ongoing);
   const debutYears = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).filter(y => y > 1000);
-  const debutYear = debutYears.length ? Math.min(...debutYears) : null;
+  const wDebutYears = (p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)).filter(y => y > 1000);
+  const debutYear = [...debutYears, ...wDebutYears].length ? Math.min(...debutYears, ...wDebutYears) : null;
+  const currentYear = 2026;
+  const careerYrs = debutYear ? currentYear - debutYear + 1 : null;
   let html = '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧に戻る</button>';
   const isFav = getFavs().has(p.id);
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" +
-    (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー</span>' : '') +
+    (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回">★決定戦×' + totalPlayoffs + '</span>' : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
