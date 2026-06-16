@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16k ソート順に応じたコンテキストバッジをリストに表示
+// v2026-06-16l 詳細ビューに前後ナビゲーション・リストコンテキストバッジ
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -903,6 +903,24 @@ function renderDetail(p) {
   if (MANALYST.has(n))  html += '<span class="role-badge role-analyst">解説</span>';
   if (MREPORTER.has(n)) html += '<span class="role-badge role-reporter">リポーター</span>';
   html += "</div>";
+  // 前後ナビゲーション
+  {
+    const list = filteredPlayers();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0 && list.length > 1) {
+      const prev = idx > 0 ? list[idx - 1] : null;
+      const next = idx < list.length - 1 ? list[idx + 1] : null;
+      html += '<div class="player-nav">';
+      html += prev
+        ? '<button class="player-nav-btn" data-nav-id="' + prev.id + '" title="前の選手: ' + prev.name + '">‹ ' + prev.name + '</button>'
+        : '<span class="player-nav-btn disabled"></span>';
+      html += '<span class="player-nav-pos">' + (idx + 1) + ' / ' + list.length + '</span>';
+      html += next
+        ? '<button class="player-nav-btn" data-nav-id="' + next.id + '" title="次の選手: ' + next.name + '">' + next.name + ' ›</button>'
+        : '<span class="player-nav-btn disabled"></span>';
+      html += '</div>';
+    }
+  }
 
   html += renderProfile(p);
 

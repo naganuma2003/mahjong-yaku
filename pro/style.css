@@ -237,6 +237,11 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .ongoing-filter-btn { border-color: #856404 !important; color: #856404 !important; }
 .ongoing-filter-btn.active { background: #856404 !important; color: #fff !important; }
 .p-fav { color: #c89000; font-size: 11px; margin-left: 2px; }
+.player-nav { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin: 4px 0 8px; }
+.player-nav-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: var(--muted); cursor: pointer; max-width: 44%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: inherit; }
+.player-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.player-nav-btn.disabled { border: none; cursor: default; }
+.player-nav-pos { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
 .p-ctx { font-size: 10px; font-weight: 600; margin-left: 3px; padding: 1px 4px; border-radius: 3px; background: var(--bg); border: 1px solid var(--border); }
 .p-ctx.pos { color: #2a7a3a; border-color: #b8e0c0; }
 .p-ctx.neg { color: #c0392b; border-color: #f0c0bc; }
