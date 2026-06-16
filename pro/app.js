@@ -4,6 +4,16 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
+// 全選手の通算pt・平均ptをソートしてパーセンタイル計算用にキャッシュ
+const _allAvgPts = DATA.players.map(p => {
+  const recs = (p.records||[]).concat(p.wrecords||[]).filter(r => !r.ongoing && r.points != null);
+  return recs.length >= 3 ? recs.reduce((s,r)=>s+r.points,0)/recs.length : null;
+}).filter(v => v !== null).sort((a,b)=>a-b);
+function avgPtsPercentile(avg) {
+  if (avg == null || !_allAvgPts.length) return null;
+  const rank = _allAvgPts.filter(v => v <= avg).length;
+  return Math.round(rank / _allAvgPts.length * 100);
+}
 const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
 const PLAYOFF_COUNT = DATA.players.filter(p =>
   (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff")
@@ -860,7 +870,10 @@ function renderDetail(p) {
     const avgPts = recsWithPts.length >= 3
       ? (recsWithPts.reduce((s, r) => s + r.points, 0) / recsWithPts.length)
       : null;
-    const avgPtsStr = avgPts != null ? fmtPoints(avgPts) + "pt" : null;
+    const avgPtsPct = avgPtsPercentile(avgPts);
+    const avgPtsStr = avgPts != null
+      ? fmtPoints(avgPts) + "pt" + (avgPtsPct != null && recsWithPts.length >= 5 ? ' <span style="font-size:9px;color:var(--muted)">(上位' + (100 - avgPtsPct) + '%)</span>' : '')
+      : null;
     const bestPts = recsWithPts.length
       ? recsWithPts.reduce((max, r) => r.points > max ? r.points : max, -Infinity)
       : null;
