@@ -288,6 +288,9 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .player-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 .player-nav-btn.disabled { border: none; cursor: default; }
 .player-nav-pos { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.player-nav-center { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.player-share-btn { background: none; border: none; cursor: pointer; font-size: 12px; padding: 0 2px; opacity: 0.5; transition: opacity 0.15s; }
+.player-share-btn:hover { opacity: 1; }
 .p-ctx { font-size: 10px; font-weight: 600; margin-left: 3px; padding: 1px 4px; border-radius: 3px; background: var(--bg); border: 1px solid var(--border); }
 .p-ctx.pos { color: #2a7a3a; border-color: #b8e0c0; }
 .p-ctx.neg { color: #c0392b; border-color: #f0c0bc; }

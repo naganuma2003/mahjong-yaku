@@ -1006,7 +1006,8 @@ function renderDetail(p) {
       html += prev
         ? '<button class="player-nav-btn" data-nav-id="' + prev.id + '" title="前の選手: ' + prev.name + '">‹ ' + prev.name + '</button>'
         : '<span class="player-nav-btn disabled"></span>';
-      html += '<span class="player-nav-pos">' + (idx + 1) + ' / ' + list.length + '</span>';
+      const shareUrl = location.origin + location.pathname + '?p=' + encodeURIComponent(p.id);
+      html += '<span class="player-nav-center"><span class="player-nav-pos">' + (idx + 1) + ' / ' + list.length + '</span><button class="player-share-btn" onclick="(async()=>{try{await navigator.clipboard.writeText(\'' + shareUrl.replace(/'/g, "\\'") + '\');this.textContent=\'✓\';setTimeout(()=>this.textContent=\'🔗\',1200);}catch(e){}})()" title="URLをコピー">🔗</button></span>';
       html += next
         ? '<button class="player-nav-btn" data-nav-id="' + next.id + '" title="次の選手: ' + next.name + '">' + next.name + ' ›</button>'
         : '<span class="player-nav-btn disabled"></span>';
