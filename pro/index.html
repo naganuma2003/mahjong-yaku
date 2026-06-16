@@ -187,17 +187,27 @@ function copyPlayerStats() {
   const allRecs = (p.records || []).concat(p.wrecords || []);
   const ptsRecs = allRecs.filter(function(r) { return !r.ongoing && r.points != null; });
   const totalPts = ptsRecs.length ? ptsRecs.reduce(function(s, r) { return s + r.points; }, 0) : null;
+  const avgPts = ptsRecs.length >= 3 ? totalPts / ptsRecs.length : null;
+  const bestRec = ptsRecs.length ? ptsRecs.reduce(function(m, r) { return r.points > m.points ? r : m; }) : null;
   const playoffN = allRecs.filter(function(r) { return r.category === "playoff"; }).length;
   const debutYrs = (p.records || []).map(function(r) { return termToYear(r.orgId || p.org, r.term); }).filter(function(y) { return y > 1000; });
   const debutYear = debutYrs.length ? Math.min.apply(null, debutYrs) : null;
-  let lines = [p.name];
-  if (debutYear) lines.push(debutYear + "年デビュー");
-  lines.push("出場: " + allRecs.length + "期");
-  if (playoffN) lines.push("決定戦: " + playoffN + "回");
-  if (totalPts != null) lines.push("通算: " + (totalPts >= 0 ? "+" : "") + totalPts.toFixed(1) + "pt");
-  lines.push(location.origin + location.pathname + "?p=" + encodeURIComponent(pid));
-  navigator.clipboard.writeText(lines.join("\n")).then(function() {
-    if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📄"; }, 1500); }
+  const org = window.MJ_DATA.organizations.find(function(o) { return o.id === p.org; });
+  const titles = p.profile && p.profile.titles && p.profile.titles.length ? p.profile.titles.join('・') : null;
+  let lines = ['【' + p.name + '】'];
+  if (org) lines[0] += ' (' + org.shortName + ')';
+  if (titles) lines.push('称号: ' + titles);
+  if (debutYear) lines.push(debutYear + '年デビュー / ' + allRecs.filter(function(r){return !r.ongoing;}).length + '期出場');
+  if (playoffN) lines.push('決定戦進出: ' + playoffN + '回');
+  if (totalPts != null) lines.push('通算pt: ' + (totalPts >= 0 ? '+' : '') + totalPts.toFixed(1));
+  if (avgPts != null) lines.push('平均pt: ' + (avgPts >= 0 ? '+' : '') + avgPts.toFixed(1) + ' (' + ptsRecs.length + '期)');
+  if (bestRec) {
+    const bestYr = termToYear(bestRec.orgId || p.org, bestRec.term);
+    lines.push('ベスト: ' + (bestRec.points >= 0 ? '+' : '') + bestRec.points.toFixed(1) + 'pt' + (bestYr > 1000 ? ' (' + bestYr + '年)' : ''));
+  }
+  lines.push(location.origin + location.pathname + '?p=' + encodeURIComponent(pid));
+  navigator.clipboard.writeText(lines.join('\n')).then(function() {
+    if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '📄'; }, 1500); }
   });
 }
 function shareFilterUrl() {
