@@ -1386,6 +1386,10 @@ document.addEventListener("keydown", e => {
     }
     return;
   }
+  if (e.key === "r" && document.activeElement !== el.search) {
+    if (typeof openRandomPlayer === "function") openRandomPlayer();
+    return;
+  }
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
