@@ -605,7 +605,7 @@ function renderOrgFilter() {
   });
 
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive, state.hasTitle]
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.ageMin != null]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -1255,7 +1255,7 @@ function renderDetail(p) {
           '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
           '<td><span class="tier-badge ' + tierClass(displayTier) + '">' + displayTier + "</span>" + halfLabel + "</td>" +
           '<td class="result-' + r.category + '">' + catIcon + displayResult + "</td>" +
-          '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td></tr>";
+          '<td class="points ' + ptsCls + '">' + (r.points != null ? fmtPoints(r.points) : "—") + "</td></tr>";
       }
     });
     html += "</tbody></table>";
