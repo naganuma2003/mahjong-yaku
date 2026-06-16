@@ -2405,12 +2405,13 @@ document.addEventListener("keydown", e => {
     }
     return;
   }
-  if (e.key === "Escape" && state.selectedId) {
+  if ((e.key === "Escape" || (e.key === "Backspace" && !e.shiftKey && !e.ctrlKey && !e.metaKey)) && state.selectedId && document.activeElement !== el.search) {
     state.selectedId = null;
-    history.replaceState(null, "", location.pathname);
+    history.replaceState(null, "", location.pathname + (location.search.replace(/[?&]p=[^&]*/g, '').replace(/^&/, '?') || ''));
     document.title = "麻雀プロ検索";
     renderList();
     showPlaceholder();
+    e.preventDefault();
     return;
   }
   if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "PageDown" || e.key === "PageUp") {
