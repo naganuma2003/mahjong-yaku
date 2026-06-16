@@ -1862,10 +1862,16 @@ function showPlaceholder() {
   const seed = parseInt(todayKey, 10) % DATA.players.length;
   const dailyPlayer = DATA.players[seed];
   if (dailyPlayer) {
-    const dpAllRecs = (dailyPlayer.records || []).filter(r => !r.ongoing);
+    const dpAllRecs = (dailyPlayer.records || []).concat(dailyPlayer.wrecords || []).filter(r => !r.ongoing);
     const dpPts = dpAllRecs.filter(r => r.points != null);
     const dpTotal = dpPts.length ? dpPts.reduce((s, r) => s + r.points, 0) : null;
-    const dpDesc = dpAllRecs.length + "期出場" + (dpTotal != null ? " / 通算" + (dpTotal >= 0 ? "+" : "") + dpTotal.toFixed(1) + "pt" : "");
+    const dpPlayoffs = dpAllRecs.filter(r => r.category === "playoff").length;
+    const dpNick = dailyPlayer.profile && dailyPlayer.profile.nickname ? '"' + dailyPlayer.profile.nickname + '"' : null;
+    const dpDescParts = [dpAllRecs.length + "期出場"];
+    if (dpTotal != null) dpDescParts.push("通算" + (dpTotal >= 0 ? "+" : "") + dpTotal.toFixed(1) + "pt");
+    if (dpPlayoffs) dpDescParts.push("決定戦" + dpPlayoffs + "回");
+    if (dpNick) dpDescParts.push(dpNick);
+    const dpDesc = dpDescParts.join(" / ");
     dailySection = '<div class="recent-section"><div class="recent-head">📅 今日のピックアップ</div><div class="recent-list">' +
       '<button class="recent-btn" data-id="' + dailyPlayer.id + '" title="' + dpDesc + '">' + dailyPlayer.name + '</button>' +
       '</div><div style="font-size:10px;color:var(--muted);margin-top:2px">' + dpDesc + '</div></div>';
