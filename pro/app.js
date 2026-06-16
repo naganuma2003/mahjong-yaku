@@ -514,6 +514,13 @@ function renderList() {
     more.textContent = "もっと見る（残り " + (list.length - visibleList.length) + " 名）";
     more.onclick = () => { state.showAll = true; renderList(); };
     el.playerList.appendChild(more);
+    // スクロールで自動展開
+    if (window.IntersectionObserver) {
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { obs.disconnect(); state.showAll = true; renderList(); }
+      }, { threshold: 0.1 });
+      obs.observe(more);
+    }
   }
 }
 
