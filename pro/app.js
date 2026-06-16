@@ -222,6 +222,15 @@ function filteredPlayers() {
         };
         return latestYear(b) - latestYear(a);
       }
+      if (state.sort === "debut") {
+        const debutYear = p => {
+          const years = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+            .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+            .filter(y => y > 1000);
+          return years.length ? Math.min(...years) : 9999;
+        };
+        return debutYear(a) - debutYear(b);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
 }
