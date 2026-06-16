@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null, sort: "name" };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null, sort: "name" };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -22,7 +22,7 @@ const MLEAGUE_CURRENT = new Set([
 // Mリーグ 退団済み（歴代）
 const MLEAGUE_FORMER = new Set([
   "前原雄大","藤崎智","和久津晶","朝倉康心","石橋伸洋",
-  "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未",
+  "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未","東城りお",
 ]);
 
 // Mリーグ チーム別メンバー（2024-25現役 + 歴代）
@@ -138,10 +138,6 @@ function currentOrgId(p) {
 }
 
 // --- 選手一覧 ---------------------------------------------------------
-function isMleagueC(p)  { return MLEAGUE_CURRENT.has(normalize(p.name)); }
-function isMleagueF(p)  { return MLEAGUE_FORMER.has(normalize(p.name)); }
-function isMtournament(p) { return MTOURNAMENT.has(normalize(p.name)); }
-
 function isTopLeague(p) {
   if (!p.records || p.records.length === 0) return false;
   const latest = p.records.slice().sort((a, b) => {
@@ -182,6 +178,7 @@ function filteredPlayers() {
              (activeTeam      && playerTeamStatus(n, activeTeam) !== null);
     })
     .filter(p => !state.topLeague || isTopLeague(p))
+    .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
     .filter(p => !q || normalize(p.name).includes(q))
     .sort((a, b) => {
       // チーム絞り込み中は現役メンバーを先頭に
@@ -238,6 +235,12 @@ function renderOrgFilter() {
   tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(tb);
 
+  const wb = document.createElement("button");
+  wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
+  wb.textContent = "女流あり";
+  wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); renderList(); };
+  el.orgFilter.appendChild(wb);
+
   // M関係セクション
   const mlabel = document.createElement("span");
   mlabel.className = "filter-section-label";
@@ -286,14 +289,14 @@ function renderOrgFilter() {
 
   // フィルタークリアボタン
   const anyActive = state.org !== "all" || state.mleagueC || state.mleagueF || state.mtourn ||
-    state.topLeague || state.mcast || state.manalyst || state.mreporter || state.mteam;
+    state.topLeague || state.wleague || state.mcast || state.manalyst || state.mreporter || state.mteam;
   if (anyActive) {
     const clr = document.createElement("button");
     clr.className = "org-btn clear-btn";
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, mcast:false, manalyst:false, mreporter:false, mteam:null });
+        topLeague:false, wleague:false, mcast:false, manalyst:false, mreporter:false, mteam:null });
       renderOrgFilter(); renderList();
     };
     el.orgFilter.appendChild(clr);

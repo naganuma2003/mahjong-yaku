@@ -71,6 +71,8 @@ body {
 .mtourn-btn.active { background: #7b3fa0; color: #fff; border-color: #7b3fa0; }
 .topleague-btn { border-color: #0077aa; color: #0077aa; }
 .topleague-btn.active { background: #0077aa; color: #fff; border-color: #0077aa; }
+.wleague-btn { border-color: #b05070; color: #b05070; }
+.wleague-btn.active { background: #b05070; color: #fff; border-color: #b05070; }
 .filter-sep { display: block; width: 1px; height: 20px; background: var(--border); margin: 0 2px; align-self: center; }
 .filter-section-label { display: block; width: 100%; font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: .07em; margin-top: 4px; }
 .clear-btn { border-color: var(--accent) !important; color: var(--accent) !important; margin-top: 4px; width: 100%; }
