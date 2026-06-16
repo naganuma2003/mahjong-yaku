@@ -555,6 +555,20 @@ function renderDetail(p) {
   }
 
   el.detail.innerHTML = html;
+  el.detail.querySelectorAll(".chart").forEach(chart => {
+    const tip = chart.querySelector(".chart-tip");
+    chart.querySelectorAll("circle[data-tip]").forEach(c => {
+      c.addEventListener("mouseenter", e => {
+        tip.textContent = c.dataset.tip;
+        tip.style.display = "block";
+        const rect = chart.getBoundingClientRect();
+        const cr = c.getBoundingClientRect();
+        tip.style.left = (cr.left - rect.left + cr.width / 2) + "px";
+        tip.style.top  = (cr.top  - rect.top) + "px";
+      });
+      c.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+    });
+  });
   el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const mate = DATA.players.find(x => x.id === btn.dataset.id);
@@ -705,10 +719,10 @@ function chartSvg(recs, orgId) {
                 (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
                 (d.result ? ' ' + d.result : '');
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
-           '" r="4" fill="' + c + '"><title>' + tip + '</title></circle>';
+           '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
   });
 
-  svg += '</svg>';
+  svg += '</svg><div class="chart-tip"></div>';
   return '<div class="chart">' + svg + '</div>';
 }
 
@@ -796,10 +810,10 @@ function wchartSvg(wrecords, wleague) {
                 (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
                 (d.result ? ' ' + d.result : '');
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
-           '" r="4" fill="' + c + '"><title>' + tip + '</title></circle>';
+           '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
   });
 
-  svg += '</svg>';
+  svg += '</svg><div class="chart-tip"></div>';
   return '<div class="chart">' + svg + '</div>';
 }
 
