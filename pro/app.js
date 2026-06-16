@@ -621,7 +621,8 @@ function wchartSvg(wrecords, wleague) {
 
   const pts = wrecords
     .filter(r => tiers.includes(r.tier))
-    .map(r => ({ year: wTermToYear(wleague, r.term), tier: r.tier, rank: r.rank || null }))
+    .map(r => ({ year: wTermToYear(wleague, r.term), tier: r.tier, rank: r.rank || null,
+                 points: r.points, result: r.result }))
     .sort((a, b) => a.year - b.year);
   if (pts.length < 2) return "";
 
@@ -691,8 +692,11 @@ function wchartSvg(wrecords, wleague) {
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
     const c = TC[tierKey(d.tier)] || '#d08090';
+    const tip = d.year + '年 ' + d.tier + (d.rank ? ' ' + d.rank + '位' : '') +
+                (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
+                (d.result ? ' ' + d.result : '');
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
-           '" r="3" fill="' + c + '"/>';
+           '" r="4" fill="' + c + '"><title>' + tip + '</title></circle>';
   });
 
   svg += '</svg>';
