@@ -300,7 +300,8 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .half { color: var(--muted); font-size: 10px; background: #eef0f3; border-radius: 3px; padding: 1px 4px; margin-left: 2px; }
 
 .pts-neg { color: var(--accent); }
-.pts-pos { color: var(--text); }
+.pts-pos { color: #2a7a3a; }
+@media (prefers-color-scheme: dark) { .pts-pos { color: #5cb87a; } }
 
 .source-link { margin-top: 16px; font-size: 12px; }
 .source-link a { color: var(--muted); }
