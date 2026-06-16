@@ -326,6 +326,9 @@ function renderDetail(p) {
 
   const totalPlayoffs = allRecs.filter(r => r.category === "playoff" || r.category === "champion").length;
 
+  // Mリーグチーム情報
+  const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
+
   let html = '<div class="detail-head"><h2>' + p.name + "</h2>";
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';
@@ -333,6 +336,11 @@ function renderDetail(p) {
     const org = ORGS[p.org] || {};
     html += '<span class="org-name">' + (org.name || "") + "</span>";
   }
+  playerTeams.forEach(t => {
+    const status = playerTeamStatus(p.name, t);
+    const label = status === "current" ? t.name : t.name + "（元）";
+    html += '<span class="mteam-badge" style="background:' + t.color + '">' + label + '</span>';
+  });
   html += "</div>";
 
   if (isMultiOrg) {
