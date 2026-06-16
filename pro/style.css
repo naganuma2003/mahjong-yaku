@@ -300,6 +300,8 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .tier-other { background: var(--muted); }
 
 .timeline tr.gap-row td { color: var(--muted); font-size: 12px; background: #fafafa; font-style: italic; }
+.fold-btn { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--muted); cursor: pointer; width: 100%; }
+.fold-btn:hover { border-color: var(--accent); color: var(--accent); }
 .timeline tr.year-match { background: #fffde7; outline: 1px solid #ffe082; }
 .timeline tr.best-rec { background: #f0fff4; }
 .timeline tr.best-rec td.points { font-weight: 700; }

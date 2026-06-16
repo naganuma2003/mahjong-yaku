@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16f 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中セクション追加
+// v2026-06-16g 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中・テーブル折りたたみ追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -966,8 +966,19 @@ function renderDetail(p) {
     }
     displayItems.reverse();
 
-    html += '<table class="timeline"><thead><tr><th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th></tr></thead><tbody>';
-    displayItems.forEach(item => {
+    const FOLD_THRESHOLD = 15, FOLD_SHOW = 10;
+    const needsFold = displayItems.length > FOLD_THRESHOLD && !state.year;
+    const hasYearMatchInOld = state.year && displayItems.slice(FOLD_SHOW).some(item => !item.gap && termToYear(item.rec.orgId || oid, item.rec.term) === parseInt(state.year, 10));
+    const doFold = needsFold && !hasYearMatchInOld;
+    const tableId = "tbl-" + oid + "-" + idx;
+
+    html += '<table class="timeline" id="' + tableId + '"><thead><tr><th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th></tr></thead><tbody>';
+    displayItems.forEach((item, itemIdx) => {
+      if (doFold && itemIdx === FOLD_SHOW) {
+        const hiddenCount = displayItems.length - FOLD_SHOW;
+        html += '<tr class="fold-toggle-row"><td colspan="4"><button class="fold-btn" data-table="' + tableId + '" data-hidden="' + hiddenCount + '">▼ 過去' + hiddenCount + '期を表示</button></td></tr>';
+        html += '</tbody><tbody class="fold-body" id="' + tableId + '-old" style="display:none">';
+      }
       if (item.gap) {
         const count = item.to - item.from + 1;
         const gyrFrom = termToYear(oid, item.from);
@@ -1007,6 +1018,9 @@ function renderDetail(p) {
       }
     });
     html += "</tbody></table>";
+    if (doFold) {
+      html += '<div style="font-size:10px;color:var(--muted);margin-top:-4px">最近' + FOLD_SHOW + '期のみ表示</div>';
+    }
 
     if (isMultiOrg) html += "</div>";
   });
@@ -1130,6 +1144,17 @@ function renderDetail(p) {
   addToHistory(p);
 
   el.detail.innerHTML = html;
+  el.detail.querySelectorAll(".fold-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tbl = document.getElementById(btn.dataset.table + "-old");
+      if (!tbl) return;
+      const shown = tbl.style.display !== "none";
+      tbl.style.display = shown ? "none" : "";
+      btn.textContent = shown ? "▼ 過去" + btn.dataset.hidden + "期を表示" : "▲ 折りたたむ";
+      const hint = btn.closest("table").nextElementSibling;
+      if (hint && hint.tagName !== "TABLE") hint.style.display = shown ? "" : "none";
+    });
+  });
   if (state.year) {
     const matchRow = el.detail.querySelector("tr.year-match");
     if (matchRow) setTimeout(() => matchRow.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
