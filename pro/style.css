@@ -305,8 +305,19 @@ hr.section-divider {
 .wleague-section .chart svg { height: 160px; }
 .wleague-section .chart { position: relative; }
 
+.back-to-list { display: none; }
 @media (max-width: 760px) {
   .layout { flex-direction: column; }
   .sidebar { width: 100%; flex: none; position: static; }
   .player-list { max-height: 280px; }
+  .back-to-list {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0 0 12px;
+    font-family: inherit;
+  }
 }

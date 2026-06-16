@@ -403,7 +403,8 @@ function renderDetail(p) {
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
 
   const isOngoing = allRecs.some(r => r.ongoing);
-  let html = '<div class="detail-head"><h2>' + p.name + "</h2>" +
+  let html = '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧に戻る</button>';
+  html += '<div class="detail-head"><h2>' + p.name + "</h2>" +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
   if (isMultiOrg) {
