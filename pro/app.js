@@ -1770,11 +1770,11 @@ function showPlaceholder() {
   {
     const ongoingByOrg = {};
     DATA.players.forEach(p => {
-      const ongs = (p.records || []).filter(r => r.ongoing);
-      ongs.forEach(r => {
-        const oid = r.orgId || p.org;
+      const ongs = (p.records || []).filter(r => r.ongoing).map(r => ({ r, oid: r.orgId || p.org }));
+      const wongs = (p.wrecords || []).filter(r => r.ongoing).map(r => ({ r, oid: (p.wleague || {}).id || "wleague" }));
+      [...ongs, ...wongs].forEach(({ r, oid }) => {
         if (!ongoingByOrg[oid]) ongoingByOrg[oid] = [];
-        ongoingByOrg[oid].push({ p, points: r.points });
+        ongoingByOrg[oid].push({ p, points: r.points, tier: r.tier });
       });
     });
     const orgOrder = Object.keys(ongoingByOrg);
@@ -1782,12 +1782,15 @@ function showPlaceholder() {
       ongoingSection = '<div class="recent-section"><div class="recent-head">🏆 今期出場中</div>';
       orgOrder.forEach(oid => {
         const org = ORGS[oid] || {};
-        const sorted = ongoingByOrg[oid].slice().sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity)).slice(0, 6);
+        const sorted = ongoingByOrg[oid].slice().sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity)).slice(0, 8);
         ongoingSection += '<div style="font-size:10px;color:var(--muted);margin:4px 0 2px">' + (org.shortName || oid) + '</div>';
         ongoingSection += '<div class="recent-list">';
-        sorted.forEach(({ p, points }) => {
-          const ptsStr = points != null ? ' (' + (points >= 0 ? '+' : '') + points.toFixed(1) + ')' : '';
-          ongoingSection += '<button class="recent-btn" data-id="' + p.id + '" title="今期' + ptsStr + '">' + p.name + '</button>';
+        sorted.forEach(({ p, points, tier }) => {
+          const ptsStr = points != null ? (points >= 0 ? '+' : '') + points.toFixed(1) + 'pt' : '';
+          const ptsCls = points != null ? (points >= 0 ? 'style="color:#2a7a3a"' : 'style="color:#c0392b"') : '';
+          const tierBadge = tier ? '<span class="tier-badge ' + tierClass(tier) + '" style="font-size:9px;padding:1px 3px;margin-left:2px">' + tier + '</span>' : '';
+          const ptsSpan = ptsStr ? ' <span ' + ptsCls + ' style="font-size:10px">' + ptsStr + '</span>' : '';
+          ongoingSection += '<button class="recent-btn" data-id="' + p.id + '">' + p.name + tierBadge + ptsSpan + '</button>';
         });
         ongoingSection += '</div>';
       });
