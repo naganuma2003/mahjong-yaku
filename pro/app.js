@@ -116,7 +116,9 @@ function fmtPoints(p) {
 }
 
 function normalize(s) {
-  return (s || "").replace(/\s|　/g, "");
+  // スペース除去 + カタカナ→ひらがな変換（どちらで検索しても一致するよう）
+  return (s || "").replace(/\s|　/g, "")
+    .replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
 }
 
 // 選手が所属（または過去に所属）していた全団体IDを返す
