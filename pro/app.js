@@ -282,31 +282,31 @@ function renderOrgFilter() {
 
   const tb = document.createElement("button");
   tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
-  tb.textContent = "最高リーグ";
+  tb.textContent = "最高リーグ"; tb.title = "各団体の最高位リーグに在籍経験あり";
   tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(tb);
 
   const wb = document.createElement("button");
   wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
-  wb.textContent = "女流あり";
+  wb.textContent = "女流あり"; wb.title = "女流リーグの成績データあり";
   wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(wb);
 
   const favBtn = document.createElement("button");
   favBtn.className = "org-btn fav-btn" + (state.favOnly ? " active" : "");
-  favBtn.textContent = "☆ お気に入り";
+  favBtn.textContent = "☆ お気に入り"; favBtn.title = "お気に入り登録した選手のみ表示";
   favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(favBtn);
 
   const poBtn = document.createElement("button");
   poBtn.className = "org-btn playoff-btn" + (state.playoff ? " active" : "");
-  poBtn.textContent = "★ 決定戦経験";
+  poBtn.textContent = "★ 決定戦経験"; poBtn.title = "決定戦（プレーオフ）進出経験あり";
   poBtn.onclick = () => { state.playoff = !state.playoff; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(poBtn);
 
   const onBtn = document.createElement("button");
   onBtn.className = "org-btn ongoing-filter-btn" + (state.ongoingOnly ? " active" : "");
-  onBtn.textContent = "今期出場中";
+  onBtn.textContent = "今期出場中"; onBtn.title = "今シーズン現在リーグ出場中の選手";
   onBtn.onclick = () => { state.ongoingOnly = !state.ongoingOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(onBtn);
 
