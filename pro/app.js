@@ -815,9 +815,13 @@ function renderWleagueSection(p) {
       const label = item.from === item.to
         ? "第" + item.from + "期"
         : "第" + item.from + "期〜第" + item.to + "期";
+      const gyrFrom = wTermToYear(wl, item.from);
+      const gyrTo   = wTermToYear(wl, item.to);
+      const gyrStr  = gyrFrom > 1000 ? (gyrFrom === gyrTo ? gyrFrom : gyrFrom + "〜" + gyrTo) + "年 " : "";
+      const note = count >= 3 ? "休戦の可能性" : "データなし";
       html += '<tr class="gap-row">' +
         '<td class="term">' + label + '</td>' +
-        '<td colspan="3">データなし（' + count + '期分）</td>' +
+        '<td colspan="3">' + gyrStr + note + "（" + count + '期分）</td>' +
         '</tr>';
     } else {
       const r = item.rec;
