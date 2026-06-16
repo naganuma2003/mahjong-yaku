@@ -591,6 +591,9 @@ function renderList() {
   if (state.mleagueF) filterTags.push({label: "Mリーグ元", key: "mleagueF", val: false});
   if (state.mtourn)   filterTags.push({label: "Mトーナメント", key: "mtourn", val: false});
   if (state.mteam)    { const t = MLEAGUE_TEAMS.find(x => x.id === state.mteam); if (t) filterTags.push({label: t.short, key: "mteam", val: null}); }
+  if (state.mcast)    filterTags.push({label: "実況", key: "mcast", val: false});
+  if (state.manalyst) filterTags.push({label: "解説", key: "manalyst", val: false});
+  if (state.mreporter) filterTags.push({label: "リポーター", key: "mreporter", val: false});
   if (state.topLeague) filterTags.push({label: "最高リーグ", key: "topLeague", val: false});
   if (state.wleague)   filterTags.push({label: "女流あり", key: "wleague", val: false});
   if (state.playoff)   filterTags.push({label: "決定戦経験", key: "playoff", val: false});
@@ -623,7 +626,7 @@ function renderList() {
   el.playerCount.querySelectorAll(".filter-chip[data-fkey]").forEach(chip => {
     chip.addEventListener("click", () => {
       const key = chip.dataset.fkey;
-      const defaults = {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null};
+      const defaults = {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null,mcast:false,manalyst:false,mreporter:false};
       if (key in defaults) {
         state[key] = defaults[key];
         if (key === "year") document.getElementById("yearFilter").value = "";
