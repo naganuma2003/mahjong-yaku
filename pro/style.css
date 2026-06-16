@@ -46,7 +46,9 @@ body {
   position: sticky;
   top: 16px;
 }
+.filter-toggle { display: none; width: 100%; padding: 8px; background: #f0f2f5; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 8px; text-align: left; }
 .org-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+@media (max-width: 760px) { .filter-toggle { display: block; } }
 .org-btn {
   border: 1px solid var(--border);
   background: #fff;
