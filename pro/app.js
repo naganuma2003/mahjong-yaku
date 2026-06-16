@@ -380,7 +380,7 @@ function scrollToSelected() {
 function renderDetail(p) {
   history.replaceState(null, "", "?p=" + encodeURIComponent(p.id));
   document.title = p.name + " - 麻雀プロ検索";
-  const allRecs = p.records.slice().sort((a, b) => b.term - a.term);
+  const allRecs = (p.records || []).slice().sort((a, b) => b.term - a.term);
 
   // 団体ごとにグループ分け
   const orgGroups = {};

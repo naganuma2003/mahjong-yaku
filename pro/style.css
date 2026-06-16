@@ -303,6 +303,7 @@ hr.section-divider {
   color: #b05070;
 }
 .wleague-section .chart svg { height: 160px; }
+.wleague-section .chart { position: relative; }
 
 @media (max-width: 760px) {
   .layout { flex-direction: column; }
