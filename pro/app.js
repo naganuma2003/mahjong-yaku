@@ -1591,6 +1591,28 @@ function renderDetail(p) {
   }
 
   // 同期デビュー選手セクション
+  // 決定戦進出年ハイライト（3回以上）
+  if (totalPlayoffs >= 3) {
+    const playoffRecs = allRecs.filter(r => r.category === "playoff").sort((a, b) => {
+      const ya = termToYear(a.orgId||p.org, a.term); const yb = termToYear(b.orgId||p.org, b.term);
+      return ya - yb;
+    });
+    html += '<div class="recent-section"><div class="recent-head">★ 決定戦進出年</div><div class="recent-list">';
+    playoffRecs.forEach(r => {
+      const yr = termToYear(r.orgId||p.org, r.term);
+      const oid2 = r.orgId || p.org;
+      const orgShort = (ORGS[oid2] || {}).shortName || oid2;
+      const ptsStr = r.points != null ? (r.points >= 0 ? '+' : '') + r.points.toFixed(1) + 'pt' : '';
+      const ptsCls = r.points != null ? (r.points >= 0 ? 'color:#2a7a3a' : 'color:#c0392b') : '';
+      html += '<span class="recent-btn" style="cursor:default">' +
+        (yr > 1000 ? yr + '年' : '') +
+        '<span style="font-size:9px;color:var(--muted);margin-left:2px">' + orgShort + '</span>' +
+        (ptsStr ? '<span style="font-size:9px;' + ptsCls + ';margin-left:3px">' + ptsStr + '</span>' : '') +
+        '</span>';
+    });
+    html += '</div></div>';
+  }
+
   const pDebutYears = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).filter(y => y > 1000);
   if (pDebutYears.length) {
     const pDebutYear = Math.min(...pDebutYears);
