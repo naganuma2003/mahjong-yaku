@@ -830,7 +830,6 @@ function renderDetail(p) {
         html += '<tr class="gap-row"><td class="term">' + label + '</td><td colspan="3">' + gyrStr + note + "（" + count + "期分）</td></tr>";
       } else {
         const r = item.rec;
-        const rowCls = r.ongoing ? ' class="ongoing"' : "";
         const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
         const rankHtml = (r.rank !== undefined && r.rank !== null) ? ' <span class="rank">' + r.rank + "位</span>" : "";
         const halfHtml = (r.half && r.half !== "annual") ? ' <span class="half">' + r.half + "</span>" : "";
@@ -838,7 +837,8 @@ function renderDetail(p) {
         const yr = termToYear(r.orgId || oid, r.term);
         const yrHtml = yr > 1000 ? '<span class="rec-year yr-link" data-yr="' + yr + '" title="' + yr + '年で絞り込む">' + yr + '</span>' : '';
         const isYearMatch = state.year && yr === parseInt(state.year, 10);
-        if (isYearMatch) { rowCls = ' class="year-match"'; }
+        let rowCls = r.ongoing ? ' class="ongoing"' : "";
+        if (isYearMatch) rowCls = ' class="year-match"';
         const catIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
                       : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
                       : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
