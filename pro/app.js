@@ -602,7 +602,7 @@ function chartSvg(recs, orgId) {
     .map(r => ({ year: termToYear(orgId, r.term), tier: r.tier, rank: r.rank || null,
                  points: r.points, result: r.result }))
     .sort((a, b) => a.year - b.year);
-  if (pts.length < 2) return "";
+  if (!pts.length) return "";
 
   // 表示tier範囲（実績±1）
   const usedIdx = pts.map(d => tiers.indexOf(d.tier));
@@ -661,11 +661,13 @@ function chartSvg(recs, orgId) {
            '" text-anchor="middle" font-size="10" fill="#8a93a2">' + yr + '</text>';
   });
 
-  const path = pts.map((d, i) => {
-    const v = toV(d.tier, d.rank);
-    return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
-  }).join(' ');
-  svg += '<path d="' + path + '" fill="none" stroke="#555" stroke-width="1.5"/>';
+  if (pts.length >= 2) {
+    const path = pts.map((d, i) => {
+      const v = toV(d.tier, d.rank);
+      return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
+    }).join(' ');
+    svg += '<path d="' + path + '" fill="none" stroke="#555" stroke-width="1.5"/>';
+  }
 
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
@@ -691,7 +693,7 @@ function wchartSvg(wrecords, wleague) {
     .map(r => ({ year: wTermToYear(wleague, r.term), tier: r.tier, rank: r.rank || null,
                  points: r.points, result: r.result }))
     .sort((a, b) => a.year - b.year);
-  if (pts.length < 2) return "";
+  if (!pts.length) return "";
 
   const usedIdx = pts.map(d => tiers.indexOf(d.tier));
   const showMin = Math.max(0, Math.min(...usedIdx) - 1);
@@ -750,11 +752,13 @@ function wchartSvg(wrecords, wleague) {
            '" text-anchor="middle" font-size="10" fill="#8a93a2">' + yr + '</text>';
   });
 
-  const path = pts.map((d, i) => {
-    const v = toV(d.tier, d.rank);
-    return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
-  }).join(' ');
-  svg += '<path d="' + path + '" fill="none" stroke="#d08090" stroke-width="1.5"/>';
+  if (pts.length >= 2) {
+    const path = pts.map((d, i) => {
+      const v = toV(d.tier, d.rank);
+      return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
+    }).join(' ');
+    svg += '<path d="' + path + '" fill="none" stroke="#d08090" stroke-width="1.5"/>';
+  }
 
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
