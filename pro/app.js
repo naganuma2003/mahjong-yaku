@@ -905,6 +905,18 @@ function renderWleagueSection(p) {
 
 // --- 起動 -------------------------------------------------------------
 el.search.addEventListener("input", e => { state.query = e.target.value; renderList(); });
+el.search.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const items = filteredPlayers();
+    if (!items.length) return;
+    const p = items[0];
+    state.selectedId = p.id;
+    renderList();
+    scrollToSelected();
+    renderDetail(p);
+    el.search.blur();
+  }
+});
 el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; renderList(); });
 document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== el.search) {
