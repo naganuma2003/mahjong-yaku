@@ -336,6 +336,7 @@ function renderList() {
 
 // --- 年表 -------------------------------------------------------------
 function renderDetail(p) {
+  history.replaceState(null, "", "?p=" + encodeURIComponent(p.id));
   const allRecs = p.records.slice().sort((a, b) => b.term - a.term);
 
   // 団体ごとにグループ分け
@@ -802,3 +803,13 @@ document.addEventListener("keydown", e => {
 });
 renderOrgFilter();
 renderList();
+
+// URLパラメータで選手を直接選択（シェアリンク対応）
+(function() {
+  const params = new URLSearchParams(location.search);
+  const pid = params.get("p");
+  if (pid) {
+    const p = DATA.players.find(x => x.id === pid || normalize(x.name) === pid);
+    if (p) { state.selectedId = p.id; renderList(); renderDetail(p); }
+  }
+})();
