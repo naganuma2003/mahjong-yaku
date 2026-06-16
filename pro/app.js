@@ -258,6 +258,22 @@ function filteredPlayers() {
         };
         return avgPts(b) - avgPts(a);
       }
+      if (state.sort === "tier") {
+        const bestTierIdx = p => {
+          let best = 9999;
+          (p.records || []).forEach(r => {
+            const oid = r.orgId || p.org;
+            const org = ORGS[oid];
+            if (!org) return;
+            const tiers = (org.league || {}).tiers || [];
+            const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+            const idx = tiers.indexOf(t);
+            if (idx >= 0 && idx < best) best = idx;
+          });
+          return best;
+        };
+        return bestTierIdx(a) - bestTierIdx(b);
+      }
       if (state.sort === "playoff") {
         const playoffCount = p =>
           (p.records || []).filter(r => r.category === "playoff").length +
