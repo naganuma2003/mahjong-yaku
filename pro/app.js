@@ -294,6 +294,13 @@ function filteredPlayers() {
         };
         return avgPts(b) - avgPts(a);
       }
+      if (state.sort === "avgrank") {
+        const avgRank = p => {
+          const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.rank != null);
+          return recs.length >= 3 ? recs.reduce((s, r) => s + r.rank, 0) / recs.length : Infinity;
+        };
+        return avgRank(a) - avgRank(b); // 小さい順位（1位=最高）を先頭に
+      }
       if (state.sort === "career") {
         const careerYears = p => {
           const years = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
