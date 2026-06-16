@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16h 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中・テーブル折りたたみ・直近5年フィルター追加
+// v2026-06-16i 女流セクション統計強化・折りたたみ・最高得点期ハイライト追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1635,13 +1635,22 @@ function renderWleagueSection(p) {
   const wTotalPtsStr = wTotalPts != null ? fmtPoints(wTotalPts) + "pt" : null;
   const wLatestPts = wRecsWithPts.slice().sort((a, b) => wTermToYear(wl, b.term) - wTermToYear(wl, a.term))[0];
   const wLatestPtsStr = wLatestPts ? fmtPoints(wLatestPts.points) + "pt" : null;
+  const wRecsWithRank = wrecords.filter(r => !r.ongoing && r.rank != null);
+  const wAvgRank = wRecsWithRank.length >= 3 ? (wRecsWithRank.reduce((s, r) => s + r.rank, 0) / wRecsWithRank.length) : null;
+  const wAvgRankStr = wAvgRank != null ? wAvgRank.toFixed(1) + "位" : null;
+  const wBestPtsRec = wRecsWithPts.length ? wRecsWithPts.reduce((best, r) => r.points > best.points ? r : best) : null;
+  const wPromos = wrecords.filter(r => r.category === "promotion").length;
+  const wCompleted = wrecords.filter(r => !r.ongoing && (r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff"));
+  const wPromoRateStr = wCompleted.length >= 5 ? Math.round(wPromos / wCompleted.length * 100) + "%" : null;
   html += stat(wrecords.length, "出場期数");
   html += stat(topTier, "最高到達");
   html += stat(wPlayoffs, "決定戦進出");
   if (wStreakStr) html += stat(wStreakStr, "最長連続");
+  if (wPromoRateStr) html += stat(wPromoRateStr, "昇級率");
   if (wTotalPtsStr) html += stat(wTotalPtsStr, "通算pt");
   if (wBestPtsStr) html += stat(wBestPtsStr, "最高pt");
   if (wAvgPtsStr) html += stat(wAvgPtsStr, "平均pt");
+  if (wAvgRankStr) html += stat(wAvgRankStr, "平均順位");
   if (wLatestPtsStr) html += stat(wLatestPtsStr, "直近pt");
   html += stat(wYearRange, "活動期間");
   html += '</div>';
@@ -1671,10 +1680,17 @@ function renderWleagueSection(p) {
   }
   displayItems.reverse();
 
-  html += '<table class="timeline"><thead><tr>' +
+  const wNeedsFold = displayItems.length > 15 && !state.year;
+  const wTableId = "wtbl-" + (p.id || "w");
+  html += '<table class="timeline" id="' + wTableId + '"><thead><tr>' +
           '<th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th>' +
           '</tr></thead><tbody>';
-  displayItems.forEach(item => {
+  displayItems.forEach((item, wItemIdx) => {
+    if (wNeedsFold && wItemIdx === 10) {
+      const wHiddenCount = displayItems.length - 10;
+      html += '<tr class="fold-toggle-row"><td colspan="4"><button class="fold-btn" data-table="' + wTableId + '" data-hidden="' + wHiddenCount + '">▼ 過去' + wHiddenCount + '期を表示</button></td></tr>';
+      html += '</tbody><tbody class="fold-body" id="' + wTableId + '-old" style="display:none">';
+    }
     if (item.gap) {
       const count = item.to - item.from + 1;
       const label = item.from === item.to
@@ -1700,7 +1716,9 @@ function renderWleagueSection(p) {
                      : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
                      : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
                      : "";
-      html += '<tr>' +
+      const wIsBest = wBestPtsRec && !r.ongoing && r.points != null && r.term === wBestPtsRec.term && r.points === wBestPtsRec.points;
+      const wRowCls = wIsBest ? ' class="best-rec"' : '';
+      html += '<tr' + wRowCls + '>' +
         '<td class="term">第' + r.term + '期' + wyrHtml + '</td>' +
         '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + tierLabel + '</span></td>' +
         '<td class="result-' + r.category + '">' + wCatIcon + (r.result || "—") + rankHtml + '</td>' +
