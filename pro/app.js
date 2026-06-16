@@ -1124,10 +1124,20 @@ function renderWleagueSection(p) {
     else wCurStreak = 1;
   }
   const wStreakStr = wSortedTerms.length > 1 && wMaxStreak >= 3 ? wMaxStreak + "期" : null;
+  const wRecsWithPts = wrecords.filter(r => !r.ongoing && r.points != null);
+  const wBestPts = wRecsWithPts.length ? wRecsWithPts.reduce((m, r) => r.points > m ? r.points : m, -Infinity) : null;
+  const wBestPtsStr = wBestPts != null && wBestPts > -Infinity ? fmtPoints(wBestPts) + "pt" : null;
+  const wAvgPts = wRecsWithPts.length >= 3 ? (wRecsWithPts.reduce((s, r) => s + r.points, 0) / wRecsWithPts.length) : null;
+  const wAvgPtsStr = wAvgPts != null ? fmtPoints(wAvgPts) + "pt" : null;
+  const wLatestPts = wRecsWithPts.slice().sort((a, b) => wTermToYear(wl, b.term) - wTermToYear(wl, a.term))[0];
+  const wLatestPtsStr = wLatestPts ? fmtPoints(wLatestPts.points) + "pt" : null;
   html += stat(wrecords.length, "出場期数");
   html += stat(topTier, "最高到達");
   html += stat(wPlayoffs, "決定戦進出");
   if (wStreakStr) html += stat(wStreakStr, "最長連続");
+  if (wBestPtsStr) html += stat(wBestPtsStr, "最高pt");
+  if (wAvgPtsStr) html += stat(wAvgPtsStr, "平均pt");
+  if (wLatestPtsStr) html += stat(wLatestPtsStr, "直近pt");
   html += stat(wYearRange, "活動期間");
   html += '</div>';
 
