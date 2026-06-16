@@ -3,6 +3,7 @@
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
+const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
 
 const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
 
@@ -342,7 +343,7 @@ function renderOrgFilter() {
 
   const wb = document.createElement("button");
   wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
-  wb.textContent = "女流あり"; wb.title = "女流リーグの成績データあり";
+  wb.textContent = "女流あり (" + WLEAGUE_COUNT + ")"; wb.title = "女流リーグの成績データあり";
   wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(wb);
 
