@@ -201,6 +201,7 @@ body {
 .result-ongoing, .result-other { color: var(--muted); }
 
 .rank { color: var(--muted); font-size: 11px; }
+.rec-year { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
 .half { color: var(--muted); font-size: 10px; background: #eef0f3; border-radius: 3px; padding: 1px 4px; margin-left: 2px; }
 
 .pts-neg { color: var(--accent); }

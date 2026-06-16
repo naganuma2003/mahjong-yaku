@@ -439,8 +439,10 @@ function renderDetail(p) {
         const rankHtml = (r.rank !== undefined && r.rank !== null) ? ' <span class="rank">' + r.rank + "位</span>" : "";
         const halfHtml = (r.half && r.half !== "annual") ? ' <span class="half">' + r.half + "</span>" : "";
         const resultText = (r.result || "") + rankHtml + halfHtml || "—";
+        const yr = termToYear(r.orgId || oid, r.term);
+        const yrHtml = yr > 1000 ? '<span class="rec-year">' + yr + '</span>' : '';
         html += "<tr" + rowCls + ">" +
-          '<td class="term">第' + r.term + "期</td>" +
+          '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
           '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
           '<td class="result-' + r.category + '">' + resultText + "</td>" +
           '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td></tr>";
