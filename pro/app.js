@@ -767,7 +767,7 @@ function renderDetail(p) {
         const halfHtml = (r.half && r.half !== "annual") ? ' <span class="half">' + r.half + "</span>" : "";
         const resultText = (r.result || "") + rankHtml + halfHtml || "—";
         const yr = termToYear(r.orgId || oid, r.term);
-        const yrHtml = yr > 1000 ? '<span class="rec-year">' + yr + '</span>' : '';
+        const yrHtml = yr > 1000 ? '<span class="rec-year yr-link" data-yr="' + yr + '" title="' + yr + '年で絞り込む">' + yr + '</span>' : '';
         const isYearMatch = state.year && yr === parseInt(state.year, 10);
         if (isYearMatch) { rowCls = ' class="year-match"'; }
         const catIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
@@ -898,6 +898,15 @@ function renderDetail(p) {
       c.addEventListener("mouseleave", () => { tip.style.display = "none"; });
       c.addEventListener("touchstart", e => { e.preventDefault(); showTip(); }, { passive: false });
       c.addEventListener("touchend", () => { setTimeout(() => { tip.style.display = "none"; }, 1500); });
+    });
+  });
+  el.detail.querySelectorAll(".yr-link[data-yr]").forEach(span => {
+    span.addEventListener("click", e => {
+      e.stopPropagation();
+      const yr = span.dataset.yr;
+      state.year = yr === state.year ? "" : yr;
+      document.getElementById("yearFilter").value = state.year;
+      renderList();
     });
   });
   el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {
