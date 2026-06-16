@@ -652,7 +652,13 @@ function renderProfile(p) {
   if (pf.nickname) html += '<div class="profile-nickname">' + pf.nickname + '</div>';
 
   html += '<div class="profile-grid">';
-  if (pf.birth) html += profileRow("生年月日", pf.birth);
+  if (pf.birth) {
+    const bd = pf.birth.split("-");
+    const birthStr = bd.length === 3
+      ? bd[0] + "年" + parseInt(bd[1]) + "月" + parseInt(bd[2]) + "日"
+      : pf.birth;
+    html += profileRow("生年月日", birthStr);
+  }
   if (pf.hometown) html += profileRow("出身", pf.hometown);
   if (pf.education) html += profileRow("学歴", pf.education);
   if (pf.proYear) html += profileRow("プロ入会", pf.proYear + "年");
