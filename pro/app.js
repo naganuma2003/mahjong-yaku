@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", selectedId: null, sort: "name" };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", year: "", selectedId: null, sort: "name" };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -179,6 +179,13 @@ function filteredPlayers() {
     })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
+    .filter(p => {
+      if (!state.year) return true;
+      const yr = parseInt(state.year, 10);
+      if (!yr) return true;
+      return (p.records || []).some(r => termToYear(r.orgId || p.org, r.term) === yr) ||
+             (p.wrecords || []).some(r => wTermToYear(p.wleague || {}, r.term) === yr);
+    })
     .filter(p => !q || normalize(p.name).includes(q))
     .sort((a, b) => {
       // チーム絞り込み中は現役メンバーを先頭に
@@ -905,6 +912,7 @@ function renderWleagueSection(p) {
 
 // --- 起動 -------------------------------------------------------------
 el.search.addEventListener("input", e => { state.query = e.target.value; renderList(); });
+document.getElementById("yearFilter").addEventListener("input", e => { state.year = e.target.value; renderList(); });
 el.search.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     const items = filteredPlayers();
