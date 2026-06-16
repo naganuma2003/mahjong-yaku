@@ -1388,11 +1388,22 @@ function renderDetail(p) {
         const displayTier = isHalfSeason && r.result ? r.result : r.tier;
         const halfLabel = isHalfSeason ? '<span class="half">' + r.tier + '</span>' : "";
         const displayResult = isHalfSeason ? "" : resultText;
+        // 前期比delta
+        let deltaHtml = "";
+        if (!r.ongoing && r.points != null) {
+          const prevTermRec = termsSorted.find(x => x.term === r.term - 1 && !x.ongoing && x.points != null);
+          if (prevTermRec) {
+            const delta = r.points - prevTermRec.points;
+            const dSign = delta >= 0 ? "+" : "";
+            const dCls = delta >= 0 ? "color:#2a7a3a" : "color:#c0392b";
+            deltaHtml = ' <span style="font-size:9px;' + dCls + '" title="前期比">' + dSign + delta.toFixed(1) + '</span>';
+          }
+        }
         html += "<tr" + rowCls + ">" +
           '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
           '<td><span class="tier-badge ' + tierClass(displayTier) + '">' + displayTier + "</span>" + halfLabel + "</td>" +
           '<td class="result-' + r.category + '">' + catIcon + displayResult + "</td>" +
-          '<td class="points ' + ptsCls + '">' + (r.points != null ? fmtPoints(r.points) : "—") + "</td></tr>";
+          '<td class="points ' + ptsCls + '">' + (r.points != null ? fmtPoints(r.points) : "—") + deltaHtml + "</td></tr>";
       }
     });
     html += "</tbody></table>";
