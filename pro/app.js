@@ -1440,7 +1440,23 @@ function showPlaceholder() {
         '</div></div>';
     }
   }
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection;
+  // 履歴もお気に入りもない場合は注目選手を表示
+  let pickupSection = "";
+  const hist = (() => { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch(e) { return []; } })();
+  if (!hist.length && !favs.size) {
+    // 決定戦回数上位8名をピックアップ
+    const top = DATA.players
+      .map(x => ({ p: x, n: (x.records||[]).filter(r=>r.category==="playoff").length + (x.wrecords||[]).filter(r=>r.category==="playoff").length }))
+      .filter(x => x.n >= 3)
+      .sort((a, b) => b.n - a.n)
+      .slice(0, 8);
+    if (top.length) {
+      pickupSection = '<div class="recent-section"><div class="recent-head">★ 決定戦常連選手</div><div class="recent-list">' +
+        top.map(({ p, n }) => '<button class="recent-btn" data-id="' + p.id + '" title="決定戦' + n + '回">' + p.name + '</button>').join('') +
+        '</div></div>';
+    }
+  }
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + pickupSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
