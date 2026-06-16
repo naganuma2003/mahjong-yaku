@@ -1122,6 +1122,35 @@ function renderDetail(p) {
     html += stat(allRecs.length, "総出場期数");
     html += stat(totalPlayoffs, "決定戦進出");
     html += "</div>";
+    // 団体別在籍タイムライン
+    const allYears = allRecs.map(r => termToYear(r.orgId||p.org, r.term)).filter(y => y > 1000);
+    const wYears = (p.wrecords||[]).map(r => wTermToYear(p.wleague||{}, r.term)).filter(y => y > 1000);
+    const minYrG = Math.min(...allYears, ...wYears, 2100);
+    const maxYrG = Math.max(...allYears, ...wYears, 1900);
+    if (minYrG < maxYrG) {
+      const gW = 560, gH = orgIds.length * 14 + 20, gPadL = 50, gPadR = 8, gPadT = 16;
+      const gxFn = yr => gPadL + (yr - minYrG) / (maxYrG - minYrG) * (gW - gPadL - gPadR);
+      const ORG_COLORS = { saikouisen: '#c0392b', renmei: '#2c5fa8', kyokai: '#3a8c4f', rmu: '#7d5ba6', mu: '#c77f1a' };
+      let gSvg = '<svg viewBox="0 0 ' + gW + ' ' + gH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + gH + 'px;margin:4px 0">';
+      // 年軸
+      for (let yr = Math.ceil(minYrG / 5) * 5; yr <= maxYrG; yr += 5) {
+        const gx = gxFn(yr).toFixed(1);
+        gSvg += '<line x1="' + gx + '" y1="' + (gPadT - 4) + '" x2="' + gx + '" y2="' + gH + '" stroke="#e2e5ea" stroke-width="0.5"/>';
+        gSvg += '<text x="' + gx + '" y="' + (gPadT - 2) + '" text-anchor="middle" font-size="7" fill="#8a93a2">' + yr + '</text>';
+      }
+      orgIds.forEach((oid2, oi) => {
+        const gy = gPadT + oi * 14 + 2;
+        const org2 = ORGS[oid2] || {};
+        const orgYears = allRecs.filter(r => (r.orgId||p.org) === oid2).map(r => termToYear(oid2, r.term)).filter(y => y > 1000);
+        if (!orgYears.length) return;
+        const oMin = Math.min(...orgYears), oMax = Math.max(...orgYears);
+        const col = ORG_COLORS[oid2] || '#8a93a2';
+        gSvg += '<rect x="' + gxFn(oMin).toFixed(1) + '" y="' + gy + '" width="' + Math.max(4, gxFn(oMax) - gxFn(oMin)).toFixed(1) + '" height="8" rx="2" fill="' + col + '" opacity="0.75"/>';
+        gSvg += '<text x="' + Math.max(2, gxFn(oMin) - 2) + '" y="' + (gy + 7) + '" text-anchor="end" font-size="8" fill="' + col + '">' + (org2.shortName || oid2) + '</text>';
+      });
+      gSvg += '</svg>';
+      html += gSvg;
+    }
   }
 
   orgIds.forEach((oid, idx) => {
