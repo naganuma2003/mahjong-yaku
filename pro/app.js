@@ -599,6 +599,7 @@ function renderList() {
     const params = new URLSearchParams();
     if (state.query) params.set("q", state.query);
     if (state.org !== "all") params.set("org", state.org);
+    if (state.sort !== "name") params.set("sort", state.sort);
     const qs = params.toString();
     const newUrl = location.pathname + (qs ? "?" + qs : "");
     if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
@@ -2038,6 +2039,14 @@ showPlaceholder();
   if (org && (org === "all" || DATA.organizations.find(o => o.id === org))) {
     state.org = org;
     renderOrgFilter();
+    renderList();
+  }
+  // ?sort=ソートキー でソートを初期化
+  const sort = params.get("sort");
+  const validSorts = ["name","recent","debut","records","tier","playoff","pts","avgpts","avgrank","totalpts","career","titles"];
+  if (sort && validSorts.includes(sort)) {
+    state.sort = sort;
+    document.getElementById("sortSelect").value = sort;
     renderList();
   }
   // ?p=選手ID で選手を直接選択
