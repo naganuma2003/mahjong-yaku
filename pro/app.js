@@ -379,8 +379,11 @@ function renderList() {
     // 最新のティアを取得
     const latestRec = (p.records || []).filter(r => !r.ongoing)
       .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
-    const tierBadge = latestRec
-      ? '<span class="ptier tier-badge ' + tierClass(latestRec.tier) + '">' + latestRec.tier + '</span>'
+    const latestTier = latestRec
+      ? ((latestRec.tier === "後期" || latestRec.tier === "前期") ? (latestRec.result || latestRec.tier) : latestRec.tier)
+      : null;
+    const tierBadge = latestTier
+      ? '<span class="ptier tier-badge ' + tierClass(latestTier) + '">' + latestTier + '</span>'
       : "";
     // M関係ロールラベル（成績なし選手のみ）
     let roleLabel = "";
