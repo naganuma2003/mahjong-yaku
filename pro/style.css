@@ -267,6 +267,10 @@ body {
 
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
 .cat-icon { font-size: 11px; margin-right: 3px; font-weight: 700; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; font-size: 11px; color: var(--muted); }
+.chart-legend-item { display: inline-flex; align-items: center; gap: 3px; }
+.chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.chart-legend-ring { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--muted); display: inline-block; opacity: 0.6; }
 .tier-breakdown { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 4px; }
 .tb-item { display: inline-flex; align-items: center; gap: 3px; }
 .tb-tier { font-size: 10px !important; padding: 1px 5px !important; }

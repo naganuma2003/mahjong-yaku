@@ -952,7 +952,12 @@ function chartSvg(recs, orgId) {
   });
 
   svg += '</svg><div class="chart-tip"></div>';
-  return '<div class="chart">' + svg + '</div>';
+  const usedKeys = [...new Set(pts.map(d => tierKey(d.tier)))].filter(k => TC[k]);
+  const legend = usedKeys.map(k => '<span class="chart-legend-item"><span class="chart-legend-dot" style="background:' + TC[k] + '"></span>' + k + 'リーグ</span>').join('');
+  const hasPlayoff = pts.some(d => d.playoff);
+  const legendHtml = (legend || hasPlayoff)
+    ? '<div class="chart-legend">' + legend + (hasPlayoff ? '<span class="chart-legend-item"><span class="chart-legend-ring"></span>決定戦</span>' : '') + '</div>' : '';
+  return '<div class="chart">' + svg + legendHtml + '</div>';
 }
 
 // 女流リーグ用折れ線グラフ（wleague設定を使用）
