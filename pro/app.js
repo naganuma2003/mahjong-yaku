@@ -500,6 +500,15 @@ function renderDetail(p) {
       : Infinity;
     const topFirstYearStr = topFirstYear < Infinity ? topFirstYear + "年" : "-";
 
+    // 最長連続出場
+    const sortedTerms = groupRecs.map(r => r.term).sort((a, b) => a - b);
+    let maxStreak = 1, curStreak = 1;
+    for (let i = 1; i < sortedTerms.length; i++) {
+      if (sortedTerms[i] === sortedTerms[i - 1] + 1) { curStreak++; maxStreak = Math.max(maxStreak, curStreak); }
+      else curStreak = 1;
+    }
+    const streakStr = sortedTerms.length > 1 && maxStreak >= 3 ? maxStreak + "期" : null;
+
     if (isMultiOrg) {
       html += '<div class="org-section' + (idx === 0 ? " org-section-first" : "") + '">';
       html += '<div class="org-section-head">';
@@ -511,6 +520,7 @@ function renderDetail(p) {
       html += stat(topTier, "最高到達");
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
+      if (streakStr) html += stat(streakStr, "最長連続");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
@@ -523,6 +533,7 @@ function renderDetail(p) {
       html += stat(topTier, "最高到達");
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
+      if (streakStr) html += stat(streakStr, "最長連続");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
