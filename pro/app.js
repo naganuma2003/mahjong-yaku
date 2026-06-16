@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16s 誕生日セクション・ptバー・インサイト強化（連続プラス・ポジティブ率）
+// v2026-06-16t 類似成績選手セクション追加・インサイト強化・誕生日セクション
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1279,6 +1279,39 @@ function renderDetail(p) {
     }
     if (insightParts.length) {
       html += '<div class="career-insight">' + insightParts.join('。') + '。</div>';
+    }
+  }
+
+  // 類似成績選手（同org・通算ptが近い選手）
+  {
+    const myTotalRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+    const myTotal = myTotalRecs.length >= 3 ? myTotalRecs.reduce((s, r) => s + r.points, 0) : null;
+    const myAvg = myTotalRecs.length >= 3 ? myTotal / myTotalRecs.length : null;
+    if (myTotal !== null && myAvg !== null) {
+      const similar = DATA.players
+        .filter(x => x.id !== p.id)
+        .map(x => {
+          const xRecs = (x.records || []).concat(x.wrecords || []).filter(r => !r.ongoing && r.points != null);
+          if (xRecs.length < 3) return null;
+          const xTotal = xRecs.reduce((s, r) => s + r.points, 0);
+          const xAvg = xTotal / xRecs.length;
+          const diff = Math.abs(xTotal - myTotal) / (Math.abs(myTotal) || 100) + Math.abs(xAvg - myAvg) / (Math.abs(myAvg) || 10);
+          return { x, diff };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.diff - b.diff)
+        .slice(0, 5)
+        .map(d => d.x);
+      if (similar.length >= 3) {
+        html += '<div class="recent-section"><div class="recent-head">📊 類似成績の選手</div><div class="recent-list">';
+        similar.forEach(q => {
+          const qLat = (q.records || []).filter(r => !r.ongoing).sort((a, b) => termToYear(b.orgId||q.org,b.term)-termToYear(a.orgId||q.org,a.term))[0];
+          const qT = qLat ? ((qLat.tier==="後期"||qLat.tier==="前期")?(qLat.result||qLat.tier):qLat.tier) : null;
+          const qBadge = qT ? '<span class="tier-badge '+tierClass(qT)+'" style="font-size:9px;padding:1px 3px;margin-left:2px">'+qT+'</span>' : '';
+          html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + qBadge + '</button>';
+        });
+        html += '</div></div>';
+      }
     }
   }
 
