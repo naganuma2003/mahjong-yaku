@@ -545,6 +545,20 @@ function renderDetail(p) {
 
     html += chartSvg(groupRecs, oid);
 
+    // ティア別集計
+    const tierCounts = {};
+    groupRecs.forEach(r => {
+      const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+      tierCounts[t] = (tierCounts[t] || 0) + 1;
+    });
+    const tierOrder = (league.tiers || []).concat(
+      Object.keys(tierCounts).filter(t => !(league.tiers || []).includes(t))
+    );
+    const tierBreakdown = tierOrder.filter(t => tierCounts[t]).map(t =>
+      '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + tierCounts[t] + '</span></span>'
+    ).join("");
+    if (tierBreakdown) html += '<div class="tier-breakdown">' + tierBreakdown + '</div>';
+
     const termsSorted = groupRecs.slice().sort((a, b) => a.term - b.term);
     const displayItems = [];
     for (let i = 0; i < termsSorted.length; i++) {

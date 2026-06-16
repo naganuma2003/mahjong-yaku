@@ -228,6 +228,10 @@ body {
 
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
 .cat-icon { font-size: 11px; margin-right: 3px; font-weight: 700; }
+.tier-breakdown { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 4px; }
+.tb-item { display: inline-flex; align-items: center; gap: 3px; }
+.tb-tier { font-size: 10px !important; padding: 1px 5px !important; }
+.tb-cnt { font-size: 11px; color: var(--muted); }
 .half { font-size: 9px; color: var(--muted); margin-left: 3px; vertical-align: middle; }
 .cat-up { color: #2e7d32; }
 .cat-dn { color: #1565c0; }
