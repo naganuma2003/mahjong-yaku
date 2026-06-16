@@ -2456,6 +2456,30 @@ function showPlaceholder() {
         birthdaySection += '<button class="recent-btn" data-id="' + bp.id + '" title="' + age + '歳">' + bp.name + '<span style="font-size:10px;color:var(--muted);margin-left:4px">' + age + '歳</span></button>';
       });
       birthdaySection += '</div></div>';
+    } else {
+      // 直近7日以内に誕生日の選手（今日は除く）
+      const upcomingBd = DATA.players.filter(p => {
+        if (!p.profile || !p.profile.birth) return false;
+        const parts = p.profile.birth.split("-");
+        if (parts.length < 3) return false;
+        const thisYear = now.getFullYear();
+        let bdDate = new Date(thisYear, parseInt(parts[1]) - 1, parseInt(parts[2]));
+        if (bdDate <= now) bdDate = new Date(thisYear + 1, parseInt(parts[1]) - 1, parseInt(parts[2]));
+        const diffDays = Math.ceil((bdDate - now) / 86400000);
+        return diffDays > 0 && diffDays <= 7;
+      }).slice(0, 6);
+      if (upcomingBd.length) {
+        birthdaySection = '<div class="recent-section"><div class="recent-head">🎂 近日誕生日（7日以内）</div><div class="recent-list">';
+        upcomingBd.forEach(bp => {
+          const parts = bp.profile.birth.split("-");
+          const thisYear = now.getFullYear();
+          let bdDate = new Date(thisYear, parseInt(parts[1]) - 1, parseInt(parts[2]));
+          if (bdDate <= now) bdDate = new Date(thisYear + 1, parseInt(parts[1]) - 1, parseInt(parts[2]));
+          const diffDays = Math.ceil((bdDate - now) / 86400000);
+          birthdaySection += '<button class="recent-btn" data-id="' + bp.id + '" title="あと' + diffDays + '日">' + bp.name + '<span style="font-size:10px;color:var(--muted);margin-left:4px">あと' + diffDays + '日</span></button>';
+        });
+        birthdaySection += '</div></div>';
+      }
     }
   }
   // 今日のピックアップ（日付ベースのシード選択）
