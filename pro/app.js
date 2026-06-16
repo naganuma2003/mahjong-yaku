@@ -193,7 +193,14 @@ function filteredPlayers() {
       const titles = (p.profile && p.profile.titles) ? p.profile.titles.join("") : "";
       if (titles.includes(q)) return true;
       const nick = (p.profile && p.profile.nickname) ? normalize(p.profile.nickname) : "";
-      return nick.includes(q);
+      if (nick.includes(q)) return true;
+      // 団体名検索（「連盟」「協会」「最高位」等）
+      const orgIds = playerOrgIds(p);
+      return orgIds.some(oid => {
+        const org = ORGS[oid] || {};
+        return (org.name || "").includes(q) || (org.shortName || "").includes(q) ||
+               ((org.league || {}).name || "").includes(q);
+      }) || ((p.wleague || {}).name || "").includes(q);
     })
     .sort((a, b) => {
       // 検索クエリがある場合は名前の前方一致を優先
