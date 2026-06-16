@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16o URLパラメータにフィルター状態を保存・復元対応
+// v2026-06-16p URLフィルター保存・印刷ボタン・印刷CSS改善
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -898,6 +898,7 @@ function renderDetail(p) {
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>' +
     '<button class="copy-link-btn" id="copyStatsBtn" onclick="copyPlayerStats()" title="成績をテキストコピー">📄</button>' +
     '<a class="x-share-btn" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(p.name + ' - 麻雀プロ検索') + '&url=' + encodeURIComponent(location.origin + location.pathname + '?p=' + encodeURIComponent(p.id)) + '" target="_blank" rel="noopener" title="Xでシェア">𝕏</a>' +
+    '<button class="copy-link-btn" onclick="window.print()" title="印刷・PDF保存">🖨</button>' +
     (p.sourceUrl ? '<a class="x-share-btn" href="' + p.sourceUrl + '" target="_blank" rel="noopener" title="公式データソース">公式</a>' : '');
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';

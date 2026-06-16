@@ -12,10 +12,13 @@
 }
 
 @media print {
-  .sidebar, .app-header, .detail-nav, .fav-toggle-btn, .copy-link-btn, .x-share-btn, .back-to-list { display: none !important; }
+  .sidebar, .app-header, .detail-nav, .fav-toggle-btn, .copy-link-btn, .x-share-btn, .back-to-list, .player-nav, .recent-section, .career-insight, .help-panel, .help-btn { display: none !important; }
   .layout { display: block; }
-  .detail { padding: 0; box-shadow: none; border: none; }
-  .chart svg { max-height: 200px; }
+  .detail { padding: 0; box-shadow: none; border: none; overflow: visible; max-height: none; }
+  .chart svg { max-height: 180px; }
+  body { background: white; color: black; }
+  .timeline tr.best-rec { background: #efffee !important; }
+  a { text-decoration: none; color: inherit; }
 }
 @media (prefers-color-scheme: dark) {
   :root {
