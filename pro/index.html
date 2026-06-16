@@ -27,16 +27,20 @@
       <input class="search" id="search" type="search" placeholder="名前・タイトル・団体で検索…">
       <input class="year-input" id="yearFilter" type="number" placeholder="年" min="1976" max="2030">
       <select class="sort-select" id="sortSelect">
-        <option value="name">名前順</option>
-        <option value="records">データ数順</option>
-        <option value="recent">最近活動順</option>
-        <option value="debut">デビュー年順</option>
-        <option value="pts">今期pt順</option>
-        <option value="avgpts">平均pt順</option>
-        <option value="totalpts">通算pt順</option>
-        <option value="playoff">決定戦回数順</option>
-        <option value="tier">最高ティア順</option>
-        <option value="career">活動年数順</option>
+        <optgroup label="基本">
+          <option value="name">名前順</option>
+          <option value="recent">最近活動順</option>
+          <option value="debut">デビュー年順</option>
+          <option value="records">データ数順</option>
+        </optgroup>
+        <optgroup label="成績">
+          <option value="tier">最高ティア順</option>
+          <option value="playoff">決定戦回数順</option>
+          <option value="pts">今期pt順</option>
+          <option value="avgpts">平均pt順</option>
+          <option value="totalpts">通算pt順</option>
+          <option value="career">活動年数順</option>
+        </optgroup>
       </select>
     </div>
     <div class="count-row">
