@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16b AND検索・デビュー年代フィルター・最高ティアバッジ・キャリアインサイト追加
+// v2026-06-16c 累積ptグラフ・昇級率・前後ナビ・スワイプ・ランキング番号・デビュー年代フィルター追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
