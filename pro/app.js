@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -182,6 +182,7 @@ function filteredPlayers() {
     .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
     .filter(p => !state.favOnly || (favs && favs.has(p.id)))
     .filter(p => !state.playoff || (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff"))
+    .filter(p => !state.ongoingOnly || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing))
     .filter(p => {
       if (!state.year) return true;
       const yr = parseInt(state.year, 10);
@@ -303,6 +304,12 @@ function renderOrgFilter() {
   poBtn.onclick = () => { state.playoff = !state.playoff; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(poBtn);
 
+  const onBtn = document.createElement("button");
+  onBtn.className = "org-btn ongoing-filter-btn" + (state.ongoingOnly ? " active" : "");
+  onBtn.textContent = "今期出場中";
+  onBtn.onclick = () => { state.ongoingOnly = !state.ongoingOnly; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(onBtn);
+
   // M関係セクション
   const mlabel = document.createElement("span");
   mlabel.className = "filter-section-label";
@@ -361,7 +368,7 @@ function renderOrgFilter() {
 
   // モバイル用フィルタートグルボタンのラベルを更新
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.playoff, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly]
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -378,7 +385,7 @@ function renderOrgFilter() {
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, playoff:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false });
+        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false });
       document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };

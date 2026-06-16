@@ -205,6 +205,8 @@ body {
 .fav-btn.active { background: #c89000 !important; color: #fff !important; }
 .playoff-btn { border-color: #9b6e00 !important; color: #9b6e00 !important; }
 .playoff-btn.active { background: #9b6e00 !important; color: #fff !important; }
+.ongoing-filter-btn { border-color: #856404 !important; color: #856404 !important; }
+.ongoing-filter-btn.active { background: #856404 !important; color: #fff !important; }
 .p-fav { color: #c89000; font-size: 11px; margin-left: 2px; }
 .detail-head h2 { margin: 0; font-size: 22px; }
 .detail-head .league-name { color: var(--accent); font-weight: 600; }
