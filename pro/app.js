@@ -161,6 +161,7 @@ function playerTeamStatus(name, team) {
 function filteredPlayers() {
   const q = normalize(state.query);
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
+  const favs = state.favOnly ? getFavs() : null;
 
   return DATA.players
     .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
@@ -177,7 +178,7 @@ function filteredPlayers() {
     })
     .filter(p => !state.topLeague || isTopLeague(p))
     .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
-    .filter(p => !state.favOnly || getFavs().has(p.id))
+    .filter(p => !state.favOnly || (favs && favs.has(p.id)))
     .filter(p => {
       if (!state.year) return true;
       const yr = parseInt(state.year, 10);
@@ -377,6 +378,7 @@ function renderOrgFilter() {
 }
 
 function renderList() {
+  const _favs = getFavs(); // キャッシュ（localStorage読み込みを1回に）
   const list = filteredPlayers();
   const total = DATA.players.length;
   el.playerCount.textContent = list.length < total
@@ -424,7 +426,7 @@ function renderList() {
       else if (MANALYST.has(pn))  roleLabel = '<span class="prole role-analyst">解説</span>';
       else if (MREPORTER.has(pn)) roleLabel = '<span class="prole role-reporter">リポーター</span>';
     }
-    const favStar = getFavs().has(p.id) ? '<span class="p-fav">★</span>' : "";
+    const favStar = _favs.has(p.id) ? '<span class="p-fav">★</span>' : "";
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
       '<span class="pright">' +
