@@ -2336,6 +2336,17 @@ el.search.addEventListener("keydown", e => {
     renderDetail(p);
     el.search.blur();
   }
+  if (e.key === "Escape") {
+    if (el.search.value) {
+      el.search.value = "";
+      state.query = "";
+      hideSearchHist();
+      renderList();
+      e.stopPropagation();
+    } else {
+      el.search.blur();
+    }
+  }
 });
 // ソート設定をlocalStorageに保存・復元
 (function() {
