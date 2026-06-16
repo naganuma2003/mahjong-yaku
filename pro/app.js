@@ -527,7 +527,8 @@ function chartSvg(recs, orgId) {
 
   const pts = recs
     .filter(r => tiers.includes(r.tier))
-    .map(r => ({ year: termToYear(orgId, r.term), tier: r.tier, rank: r.rank || null }))
+    .map(r => ({ year: termToYear(orgId, r.term), tier: r.tier, rank: r.rank || null,
+                 points: r.points, result: r.result }))
     .sort((a, b) => a.year - b.year);
   if (pts.length < 2) return "";
 
@@ -597,8 +598,11 @@ function chartSvg(recs, orgId) {
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
     const c = TC[tierKey(d.tier)] || '#8a93a2';
+    const tip = d.year + '年 ' + d.tier + (d.rank ? ' ' + d.rank + '位' : '') +
+                (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
+                (d.result ? ' ' + d.result : '');
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
-           '" r="3" fill="' + c + '"/>';
+           '" r="4" fill="' + c + '"><title>' + tip + '</title></circle>';
   });
 
   svg += '</svg>';
@@ -761,5 +765,10 @@ function renderWleagueSection(p) {
 // --- 起動 -------------------------------------------------------------
 el.search.addEventListener("input", e => { state.query = e.target.value; renderList(); });
 el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; renderList(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement !== el.search) {
+    e.preventDefault(); el.search.focus(); el.search.select();
+  }
+});
 renderOrgFilter();
 renderList();
