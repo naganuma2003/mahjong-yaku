@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, query: "", year: "", selectedId: null, sort: "name" };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name" };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -289,15 +289,13 @@ function renderOrgFilter() {
   el.orgFilter.appendChild(reporter);
 
   // Mチームセクション（折りたたみ）
-  const teamOpen = !!state.mteam;
+  const teamOpen = state.teamOpen || !!state.mteam;
   const tlabel = document.createElement("button");
   tlabel.className = "filter-section-label filter-section-toggle";
   tlabel.textContent = (teamOpen ? "▲" : "▼") + " Mチーム";
   tlabel.onclick = () => {
-    tlabel.dataset.open = teamOpen ? "" : "1";
-    const wrap = document.getElementById("teamFilterWrap");
-    if (wrap) wrap.style.display = teamOpen ? "none" : "flex";
-    tlabel.textContent = (teamOpen ? "▼" : "▲") + " Mチーム";
+    state.teamOpen = !state.teamOpen;
+    renderOrgFilter();
   };
   el.orgFilter.appendChild(tlabel);
 
