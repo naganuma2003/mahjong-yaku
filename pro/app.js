@@ -1847,7 +1847,16 @@ function showPlaceholder() {
       ongoingSection += '</div>';
     }
   }
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection + dailySection + pickupSection + ongoingSection;
+  // 全体統計ミニサマリー
+  const totalCount = DATA.players.length;
+  const ongoingCount = DATA.players.filter(p => (p.records||[]).some(r=>r.ongoing)||(p.wrecords||[]).some(r=>r.ongoing)).length;
+  const titleCount = DATA.players.filter(p => p.profile && p.profile.titles && p.profile.titles.length).length;
+  const statBar = '<div class="db-stats">' +
+    '<span>選手数: <strong>' + totalCount + '</strong></span>' +
+    '<span>今期出場: <strong>' + ongoingCount + '</strong></span>' +
+    '<span>タイトル保有: <strong>' + titleCount + '</strong></span>' +
+    '</div>';
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + dailySection + pickupSection + ongoingSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
