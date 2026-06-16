@@ -20,7 +20,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -183,7 +183,7 @@ function filteredPlayers() {
   const favsKey = state.favOnly ? [...getFavs()].sort().join(",") : "";
   const stateKey = JSON.stringify([state.org, state.mleagueC, state.mleagueF, state.mtourn,
     state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst,
-    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.query, state.sort, favsKey]);
+    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.query, state.sort, favsKey]);
   if (_filteredStateKey === stateKey && _filteredCache) return _filteredCache;
   _filteredStateKey = stateKey;
   // スペース区切りでAND検索（各語を個別にnormalize）
@@ -225,6 +225,7 @@ function filteredPlayers() {
         .filter(y => y > 1000);
       return yrs.some(y => y >= RECENT_CUTOFF) || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
     })
+    .filter(p => !state.hasTitle || (p.profile && p.profile.titles && p.profile.titles.length > 0))
     .filter(p => {
       if (!state.debutDecade) return true;
       const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
@@ -497,6 +498,12 @@ function renderOrgFilter() {
   raBtn.onclick = () => { state.recentActive = !state.recentActive; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(raBtn);
 
+  const htBtn = document.createElement("button");
+  htBtn.className = "org-btn" + (state.hasTitle ? " active" : "");
+  htBtn.textContent = "タイトル保有"; htBtn.title = "雀王・最高位・鳳凰位などのタイトルを持つ選手";
+  htBtn.onclick = () => { state.hasTitle = !state.hasTitle; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(htBtn);
+
   // デビュー年代フィルター
   const decLabel = document.createElement("span");
   decLabel.className = "filter-section-label";
@@ -518,7 +525,7 @@ function renderOrgFilter() {
   });
 
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive]
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive, state.hasTitle]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -535,7 +542,7 @@ function renderOrgFilter() {
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false, debutDecade:null, positivePts:false, recentActive:false });
+        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false, debutDecade:null, positivePts:false, recentActive:false, hasTitle:false });
       document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };
@@ -579,6 +586,7 @@ function renderList() {
   if (state.debutDecade) filterTags.push((state.debutDecade % 100) + "年代デビュー");
   if (state.positivePts) filterTags.push("通算プラス");
   if (state.recentActive) filterTags.push("直近5年");
+  if (state.hasTitle) filterTags.push("タイトル保有");
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
   // フィルター状態をタイトルに反映（選手詳細非表示時）
