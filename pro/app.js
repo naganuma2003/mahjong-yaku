@@ -817,12 +817,18 @@ function renderDetail(p) {
     const tip = chart.querySelector(".chart-tip");
     chart.querySelectorAll("circle[data-tip]").forEach(c => {
       function showTip() {
-        tip.textContent = c.dataset.tip;
+        // data-tip形式: "2024年 A1(後期) 3位 +123.4pt ★決定戦" → 整形して表示
+        const raw = c.dataset.tip || "";
+        const parts = raw.split(" ").filter(Boolean);
+        tip.innerHTML = parts.map((s, i) => i === 0 ? '<strong>' + s + '</strong>' : s).join(' ');
         tip.style.display = "block";
         const rect = chart.getBoundingClientRect();
         const cr = c.getBoundingClientRect();
-        tip.style.left = (cr.left - rect.left + cr.width / 2) + "px";
-        tip.style.top  = (cr.top  - rect.top) + "px";
+        let left = cr.left - rect.left + cr.width / 2;
+        const tipW = 160;
+        if (left + tipW > rect.width) left = Math.max(0, rect.width - tipW);
+        tip.style.left = left + "px";
+        tip.style.top  = (cr.top  - rect.top - 4) + "px";
       }
       c.addEventListener("mouseenter", showTip);
       c.addEventListener("mouseleave", () => { tip.style.display = "none"; });
