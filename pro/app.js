@@ -348,7 +348,8 @@ function renderOrgFilter() {
 
   const favBtn = document.createElement("button");
   favBtn.className = "org-btn fav-btn" + (state.favOnly ? " active" : "");
-  favBtn.textContent = "☆ お気に入り"; favBtn.title = "お気に入り登録した選手のみ表示";
+  const favCount = getFavs().size;
+  favBtn.textContent = "☆ お気に入り" + (favCount ? " (" + favCount + ")" : ""); favBtn.title = "お気に入り登録した選手のみ表示";
   favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(favBtn);
 
