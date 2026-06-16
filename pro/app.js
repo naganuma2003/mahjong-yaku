@@ -1909,6 +1909,54 @@ function renderWleagueSection(p) {
 
   html += wchartSvg(wrecords, wl);
 
+  // 女流累積ptスパークライン
+  const wCumData = wrecords.slice().filter(r => !r.ongoing && r.points != null)
+    .sort((a, b) => wTermToYear(wl, a.term) - wTermToYear(wl, b.term));
+  if (wCumData.length >= 5) {
+    let wCumSum = 0;
+    const wCumPts = wCumData.map(r => { wCumSum += r.points; return { yr: wTermToYear(wl, r.term), v: wCumSum }; });
+    const wMinV = Math.min(0, ...wCumPts.map(d => d.v));
+    const wMaxV = Math.max(0, ...wCumPts.map(d => d.v));
+    const wVRange = wMaxV - wMinV || 1;
+    const wMinYr = wCumPts[0].yr, wMaxYr = wCumPts[wCumPts.length - 1].yr;
+    const wYrRange = wMaxYr - wMinYr || 1;
+    const cW = 600, cH = 50, cPadL = 40, cPadR = 8, cPadT = 8, cPadB = 12;
+    const wcxFn = yr => cPadL + (yr - wMinYr) / wYrRange * (cW - cPadL - cPadR);
+    const wcyFn = v => cPadT + (1 - (v - wMinV) / wVRange) * (cH - cPadT - cPadB);
+    const wZero = wcyFn(0).toFixed(1);
+    let wcSvg = '<svg viewBox="0 0 ' + cW + ' ' + cH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:50px">';
+    wcSvg += '<line x1="' + cPadL + '" y1="' + wZero + '" x2="' + (cW - cPadR) + '" y2="' + wZero + '" stroke="#e2e5ea" stroke-dasharray="3 2"/>';
+    const wPath = wCumPts.map((d, i) => (i === 0 ? 'M' : 'L') + wcxFn(d.yr).toFixed(1) + ' ' + wcyFn(d.v).toFixed(1)).join(' ');
+    const wLastV = wCumPts[wCumPts.length - 1].v;
+    const wLineColor = wLastV >= 0 ? '#2a7a3a' : '#c0392b';
+    wcSvg += '<path d="' + wPath + '" fill="none" stroke="' + wLineColor + '" stroke-width="1.5"/>';
+    const wLastX = wcxFn(wCumPts[wCumPts.length - 1].yr).toFixed(1);
+    const wLastY = wcyFn(wLastV).toFixed(1);
+    wcSvg += '<circle cx="' + wLastX + '" cy="' + wLastY + '" r="3" fill="' + wLineColor + '"/>';
+    wcSvg += '<text x="4" y="' + (parseFloat(wLastY) + 4) + '" font-size="9" fill="' + wLineColor + '">' + (wLastV >= 0 ? '+' : '') + wLastV.toFixed(1) + '</text>';
+    wcSvg += '<text x="' + wcxFn(wMinYr).toFixed(1) + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + wMinYr + '</text>';
+    wcSvg += '<text x="' + wLastX + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + wMaxYr + '</text>';
+    wcSvg += '<text x="4" y="10" font-size="8" fill="#8a93a2">通算pt推移</text>';
+    wcSvg += '</svg>';
+    // 期別ptバー
+    const bW = 600, bH = 36, bPadL = 40, bPadR = 8;
+    const wBPts = wCumData.map(r => r.points);
+    const wBMax = Math.max(...wBPts.map(Math.abs), 1);
+    const barW = Math.max(1, (bW - bPadL - bPadR) / wCumData.length - 1);
+    let wbSvg = '<svg viewBox="0 0 ' + bW + ' ' + bH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + bH + 'px">';
+    wbSvg += '<line x1="' + bPadL + '" y1="' + (bH / 2) + '" x2="' + (bW - bPadR) + '" y2="' + (bH / 2) + '" stroke="#e2e5ea"/>';
+    wCumData.forEach((r, i) => {
+      const bx = (bPadL + i * (barW + 1)).toFixed(1);
+      const bh2 = Math.abs(r.points / wBMax) * (bH / 2 - 4);
+      const by = r.points >= 0 ? (bH / 2 - bh2).toFixed(1) : (bH / 2).toFixed(1);
+      const col = r.points >= 0 ? '#2a7a3a' : '#c0392b';
+      wbSvg += '<rect x="' + bx + '" y="' + by + '" width="' + barW.toFixed(1) + '" height="' + bh2.toFixed(1) + '" fill="' + col + '" opacity="0.7"/>';
+    });
+    wbSvg += '<text x="4" y="' + (bH / 2 + 4) + '" font-size="8" fill="#8a93a2">期別pt</text>';
+    wbSvg += '</svg>';
+    html += '<div class="cum-chart">' + wcSvg + wbSvg + '</div>';
+  }
+
   // 女流ティア別集計（スタックドバー）
   const wTierCounts = {};
   wrecords.forEach(r => { wTierCounts[r.tier] = (wTierCounts[r.tier] || 0) + 1; });
