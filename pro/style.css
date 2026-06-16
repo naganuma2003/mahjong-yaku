@@ -276,6 +276,13 @@ body {
 }
 .profile-links a:hover { background: #2c5fa8; color: #fff; }
 
+/* 閲覧履歴 */
+.recent-section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }
+.recent-head { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; letter-spacing: .05em; }
+.recent-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.recent-btn { background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 12px; cursor: pointer; font-family: inherit; color: var(--text); }
+.recent-btn:hover { border-color: var(--accent); color: var(--accent); }
+
 /* チームメイト */
 .teammates-section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }
 .teammates-head { font-size: 13px; color: var(--muted); margin-bottom: 8px; }

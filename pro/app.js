@@ -587,7 +587,16 @@ function renderDetail(p) {
     html += renderWleagueSection(p);
   }
 
+  html += renderRecentHistory();
+  addToHistory(p);
+
   el.detail.innerHTML = html;
+  el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mate = DATA.players.find(x => x.id === btn.dataset.id);
+      if (mate) { state.selectedId = mate.id; renderList(); scrollToSelected(); renderDetail(mate); }
+    });
+  });
   el.detail.querySelectorAll(".chart").forEach(chart => {
     const tip = chart.querySelector(".chart-tip");
     chart.querySelectorAll("circle[data-tip]").forEach(c => {
@@ -939,6 +948,38 @@ function renderWleagueSection(p) {
   html += '</tbody></table>';
   html += '</div>';
   return html;
+}
+
+// --- 閲覧履歴 ---------------------------------------------------------
+const HISTORY_KEY = "mj_recent";
+const HISTORY_MAX = 8;
+
+function addToHistory(p) {
+  try {
+    let hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    hist = hist.filter(id => id !== p.id);
+    hist.unshift(p.id);
+    if (hist.length > HISTORY_MAX) hist = hist.slice(0, HISTORY_MAX);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+  } catch (e) {}
+}
+
+function renderRecentHistory() {
+  try {
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    if (hist.length < 2) return "";
+    const players = hist
+      .map(id => DATA.players.find(x => x.id === id))
+      .filter(Boolean)
+      .filter(x => x.id !== state.selectedId);
+    if (!players.length) return "";
+    let html = '<div class="recent-section"><div class="recent-head">最近閲覧</div><div class="recent-list">';
+    players.forEach(q => {
+      html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>';
+    });
+    html += '</div></div>';
+    return html;
+  } catch (e) { return ""; }
 }
 
 // --- 起動 -------------------------------------------------------------
