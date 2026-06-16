@@ -2508,6 +2508,12 @@ document.addEventListener("keydown", e => {
       if (li) li.scrollIntoView({ block: "nearest" });
     }
   }
+  // dキーでダークモード切替
+  if (document.activeElement !== el.search && e.key === "d" && !e.ctrlKey && !e.metaKey) {
+    const btn = document.getElementById("darkToggle");
+    if (btn) btn.click();
+    return;
+  }
   // 数字キーで団体フィルター切替（1=最高位戦、2=連盟、3=協会、4=RMU、5=μ、0=全て）
   if (document.activeElement !== el.search && /^[0-5]$/.test(e.key)) {
     const orgMap = { "0": "all", "1": "saikouisen", "2": "renmei", "3": "kyokai", "4": "rmu", "5": "mu" };
