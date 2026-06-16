@@ -690,9 +690,12 @@ function renderDetail(p) {
   const debutYear = [...debutYears, ...wDebutYears].length ? Math.min(...debutYears, ...wDebutYears) : null;
   const currentYear = 2026;
   const careerYrs = debutYear ? currentYear - debutYear + 1 : null;
+  const filtList = filteredPlayers();
+  const listPos = filtList.findIndex(x => x.id === p.id);
+  const posLabel = listPos >= 0 ? '<span class="list-pos" title="現在の並び順">' + (listPos + 1) + '/' + filtList.length + '</span>' : "";
   let html = '<button class="back-to-list" onclick="document.querySelector(\'.sidebar\').scrollIntoView({behavior:\'smooth\'})">← 一覧に戻る</button>';
   const isFav = getFavs().has(p.id);
-  html += '<div class="detail-head"><h2>' + p.name + "</h2>" +
+  html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回">★決定戦×' + totalPlayoffs + '</span>' : '') +
