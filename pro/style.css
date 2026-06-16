@@ -216,6 +216,7 @@ body {
 .player-count { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .filter-chip { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 1px 7px; font-size: 10px; white-space: nowrap; cursor: pointer; font-family: inherit; }
 .filter-chip:hover { opacity: 0.8; }
+.filter-clear-all { background: #555; }
 .help-btn { background: none; border: 1px solid var(--border); border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; color: var(--muted); line-height: 1; padding: 0; }
 .help-btn:hover { border-color: var(--accent); color: var(--accent); }
 .help-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 5px; }

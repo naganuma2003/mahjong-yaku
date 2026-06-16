@@ -726,7 +726,8 @@ function renderList() {
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   if (filterTags.length) {
     const tagHtml = filterTags.map(f => '<button class="filter-chip" data-fkey="' + f.key + '" title="このフィルターを解除">× ' + f.label + '</button>').join('');
-    el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml;
+    const clearAll = filterTags.length >= 2 ? '<button class="filter-chip filter-clear-all" title="すべてのフィルターを解除">✕ 全解除</button>' : '';
+    el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml + clearAll;
   } else {
     el.playerCount.textContent = countText;
   }
@@ -750,6 +751,14 @@ function renderList() {
     if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
   }
   // フィルターチップのクリックで個別解除
+  const clearAllBtn = el.playerCount.querySelector(".filter-clear-all");
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener("click", () => {
+      Object.assign(state, {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null,mcast:false,manalyst:false,mreporter:false,ageMin:null,ageMax:null,minRec:null});
+      const yf = document.getElementById("yearFilter"); if (yf) yf.value = "";
+      renderOrgFilter(); resetAndRenderList();
+    });
+  }
   el.playerCount.querySelectorAll(".filter-chip[data-fkey]").forEach(chip => {
     chip.addEventListener("click", () => {
       const key = chip.dataset.fkey;
