@@ -1697,6 +1697,20 @@ document.addEventListener("keydown", e => {
     if (typeof copyPlayerLink === "function") copyPlayerLink();
     return;
   }
+  if ((e.key === "n" || e.key === "p") && document.activeElement !== el.search && state.selectedId) {
+    const items = filteredPlayers();
+    const curIdx = items.findIndex(x => x.id === state.selectedId);
+    const nextIdx = e.key === "n" ? curIdx + 1 : curIdx - 1;
+    if (nextIdx >= 0 && nextIdx < items.length) {
+      const np = items[nextIdx];
+      state.selectedId = np.id;
+      renderList();
+      scrollToSelected();
+      renderDetail(np);
+      el.detail.scrollTop = 0;
+    }
+    return;
+  }
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
