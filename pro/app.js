@@ -942,10 +942,14 @@ function renderWleagueSection(p) {
       const tierLabel = r.tier.length <= 2 ? "女流" + r.tier : r.tier;
       const wyr = wTermToYear(wl, r.term);
       const wyrHtml = wyr > 1000 ? '<span class="rec-year">' + wyr + '</span>' : '';
+      const wCatIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
+                     : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
+                     : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
+                     : "";
       html += '<tr>' +
         '<td class="term">第' + r.term + '期' + wyrHtml + '</td>' +
         '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + tierLabel + '</span></td>' +
-        '<td class="result-' + r.category + '">' + (r.result || "—") + rankHtml + '</td>' +
+        '<td class="result-' + r.category + '">' + wCatIcon + (r.result || "—") + rankHtml + '</td>' +
         '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + '</td>' +
         '</tr>';
     }
