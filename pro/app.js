@@ -258,6 +258,15 @@ function filteredPlayers() {
         };
         return avgPts(b) - avgPts(a);
       }
+      if (state.sort === "career") {
+        const careerYears = p => {
+          const years = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+            .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+            .filter(y => y > 1000);
+          return years.length > 1 ? Math.max(...years) - Math.min(...years) + 1 : (years.length ? 1 : 0);
+        };
+        return careerYears(b) - careerYears(a);
+      }
       if (state.sort === "tier") {
         const bestTierIdx = p => {
           let best = 9999;
