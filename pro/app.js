@@ -244,6 +244,13 @@ function filteredPlayers() {
         };
         return debutYear(a) - debutYear(b);
       }
+      if (state.sort === "pts") {
+        const ongoingPts = p => {
+          const r = (p.records || []).find(x => x.ongoing) || (p.wrecords || []).find(x => x.ongoing);
+          return r && r.points != null ? r.points : -Infinity;
+        };
+        return ongoingPts(b) - ongoingPts(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
 }
