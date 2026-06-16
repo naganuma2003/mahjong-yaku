@@ -41,6 +41,7 @@
   .title-badge { background: #2a2510; color: #d4b060; border-color: #4a3f10; }
   .p-ongoing { background: #2a2208; color: #d4a820; border-color: #8a6800; }
   .ongoing-badge { background: #2a2208; color: #d4a820; border-color: #8a6800; }
+  .playoff-badge { background: #2a2008; color: #d4a020; border-color: #8a6000; }
   .p-pts.pos { color: #5cb87a; }
   .p-pts.neg { color: #e05c50; }
   mark.hl { background: #4a4010; color: #f0d060; }
@@ -233,6 +234,7 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 /* 移籍歴あり */
 .transfer-badge { background: #f3e5f5; color: #7b1fa2; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
 .ongoing-badge { background: #fff3cd; color: #856404; border: 1px solid #ffc107; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+.playoff-badge { background: #fff8e1; color: #9b6e00; border: 1px solid #f9a825; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 .role-badge { border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
 .role-cast     { background: #fce4ec; color: #c62828; }
 .role-analyst  { background: #e3f2fd; color: #1565c0; }

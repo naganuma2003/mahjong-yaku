@@ -547,6 +547,7 @@ function renderDetail(p) {
   const isFav = getFavs().has(p.id);
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
+    (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回">★決定戦×' + totalPlayoffs + '</span>' : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
   if (isMultiOrg) {
