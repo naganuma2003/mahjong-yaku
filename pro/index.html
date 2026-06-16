@@ -32,7 +32,16 @@
         <option value="recent">最近活動順</option>
       </select>
     </div>
-    <div class="player-count" id="playerCount"></div>
+    <div class="count-row">
+  <div class="player-count" id="playerCount"></div>
+  <button class="help-btn" id="helpBtn" title="キーボードショートカット">?</button>
+</div>
+<div class="help-panel" id="helpPanel" style="display:none">
+  <div><kbd>/</kbd> 検索にフォーカス</div>
+  <div><kbd>↑</kbd><kbd>↓</kbd> 選手を選択</div>
+  <div><kbd>Enter</kbd> 先頭の選手を開く</div>
+  <div><kbd>Esc</kbd> 選択解除</div>
+</div>
     <ul class="player-list" id="playerList"></ul>
   </aside>
   <main class="detail" id="detail">
@@ -43,6 +52,10 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+document.getElementById('helpBtn').addEventListener('click', function() {
+  var p = document.getElementById('helpPanel');
+  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+});
 function copyPlayerLink() {
   navigator.clipboard.writeText(location.href).then(function() {
     const btn = document.querySelector('.copy-link-btn');

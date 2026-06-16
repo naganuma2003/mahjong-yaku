@@ -117,7 +117,12 @@ body {
   cursor: pointer;
   color: var(--muted);
 }
-.player-count { font-size: 12px; color: var(--muted); margin: 8px 2px; }
+.count-row { display: flex; align-items: center; justify-content: space-between; margin: 6px 2px; }
+.player-count { font-size: 12px; color: var(--muted); }
+.help-btn { background: none; border: 1px solid var(--border); border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; color: var(--muted); line-height: 1; padding: 0; }
+.help-btn:hover { border-color: var(--accent); color: var(--accent); }
+.help-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 5px; }
+.help-panel kbd { background: #fff; border: 1px solid #ccc; border-radius: 4px; padding: 1px 5px; font-size: 11px; font-family: monospace; color: var(--text); margin-right: 4px; }
 
 .player-list {
   list-style: none;
