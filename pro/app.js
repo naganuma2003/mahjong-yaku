@@ -1067,7 +1067,12 @@ function wchartSvg(wrecords, wleague) {
   });
 
   svg += '</svg><div class="chart-tip"></div>';
-  return '<div class="chart">' + svg + '</div>';
+  const wUsedKeys = [...new Set(pts.map(d => tierKey(d.tier)))].filter(k => TC[k]);
+  const wLegend = wUsedKeys.map(k => '<span class="chart-legend-item"><span class="chart-legend-dot" style="background:' + TC[k] + '"></span>' + k + 'リーグ</span>').join('');
+  const wHasPlayoff = pts.some(d => d.playoff);
+  const wLegendHtml = (wLegend || wHasPlayoff)
+    ? '<div class="chart-legend">' + wLegend + (wHasPlayoff ? '<span class="chart-legend-item"><span class="chart-legend-ring"></span>決定戦</span>' : '') + '</div>' : '';
+  return '<div class="chart">' + svg + wLegendHtml + '</div>';
 }
 
 // 女流リーグ表示セクション（renderDetail内で呼ぶ）
