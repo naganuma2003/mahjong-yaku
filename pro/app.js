@@ -5,6 +5,17 @@ const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
 const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
+const TOPLEAGUE_COUNT = DATA.players.filter(p => {
+  if (!p.records || !p.records.length) return false;
+  return p.records.some(r => {
+    const oid = r.orgId || p.org;
+    const org = ORGS[oid];
+    if (!org) return false;
+    const topTier = ((org.league || {}).tiers || [])[0];
+    const tier = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+    return tier === topTier;
+  });
+}).length;
 
 const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
 
@@ -338,7 +349,7 @@ function renderOrgFilter() {
 
   const tb = document.createElement("button");
   tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
-  tb.textContent = "最高リーグ"; tb.title = "各団体の最高位リーグに在籍経験あり";
+  tb.textContent = "最高リーグ (" + TOPLEAGUE_COUNT + ")"; tb.title = "各団体の最高位リーグに在籍経験あり";
   tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(tb);
 
