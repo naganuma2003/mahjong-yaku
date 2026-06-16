@@ -1165,7 +1165,12 @@ function renderDetail(p) {
     })).slice(0, 6);
     if (peers.length >= 2) {
       html += '<div class="recent-section"><div class="recent-head">' + pDebutYear + '年 同期（' + (ORGS[sameDebutOrg] || {}).shortName + '）</div><div class="recent-list">';
-      peers.forEach(q => { html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>'; });
+      peers.forEach(q => {
+        const qLat = (q.records || []).filter(r => !r.ongoing).sort((a,b) => termToYear(b.orgId||q.org,b.term)-termToYear(a.orgId||q.org,a.term))[0];
+        const qT = qLat ? ((qLat.tier==="後期"||qLat.tier==="前期")?(qLat.result||qLat.tier):qLat.tier) : null;
+        const qBadge = qT ? '<span class="tier-badge '+tierClass(qT)+'" style="font-size:9px;padding:1px 3px;margin-left:2px">'+qT+'</span>' : '';
+        html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + qBadge + '</button>';
+      });
       html += '</div></div>';
     }
   }
@@ -1192,7 +1197,12 @@ function renderDetail(p) {
         })).slice(0, 8);
         if (sameToppers.length >= 2) {
           html += '<div class="recent-section"><div class="recent-head">' + (myOrg.shortName || "") + ' ' + myBestTier + ' 経験者</div><div class="recent-list">';
-          sameToppers.forEach(q => { html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>'; });
+          sameToppers.forEach(q => {
+            const qLat = (q.records||[]).filter(r=>!r.ongoing).sort((a,b)=>termToYear(b.orgId||q.org,b.term)-termToYear(a.orgId||q.org,a.term))[0];
+            const qT = qLat ? ((qLat.tier==="後期"||qLat.tier==="前期")?(qLat.result||qLat.tier):qLat.tier) : null;
+            const qBadge = qT ? '<span class="tier-badge '+tierClass(qT)+'" style="font-size:9px;padding:1px 3px;margin-left:2px">'+qT+'</span>' : '';
+            html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + qBadge + '</button>';
+          });
           html += '</div></div>';
         }
       }
