@@ -54,7 +54,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -217,7 +217,7 @@ function filteredPlayers() {
   const favsKey = state.favOnly ? [...getFavs()].sort().join(",") : "";
   const stateKey = JSON.stringify([state.org, state.mleagueC, state.mleagueF, state.mtourn,
     state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst,
-    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.query, state.sort, favsKey]);
+    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.ageMin, state.ageMax, state.query, state.sort, favsKey]);
   if (_filteredStateKey === stateKey && _filteredCache) return _filteredCache;
   _filteredStateKey = stateKey;
   // スペース区切りでAND検索（各語を個別にnormalize）
@@ -260,6 +260,15 @@ function filteredPlayers() {
       return yrs.some(y => y >= RECENT_CUTOFF) || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
     })
     .filter(p => !state.hasTitle || (p.profile && p.profile.titles && p.profile.titles.length > 0))
+    .filter(p => {
+      if (state.ageMin == null && state.ageMax == null) return true;
+      if (!p.profile || !p.profile.birth) return false;
+      const bd = p.profile.birth.split("-");
+      if (bd.length < 1) return false;
+      const now = new Date();
+      const age = now.getFullYear() - parseInt(bd[0]) - (now < new Date(parseInt(bd[0]), parseInt(bd[1]||1) - 1, parseInt(bd[2]||1)) ? 1 : 0);
+      return (state.ageMin == null || age >= state.ageMin) && (state.ageMax == null || age <= state.ageMax);
+    })
     .filter(p => {
       if (!state.debutDecade) return true;
       const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
@@ -567,6 +576,34 @@ function renderOrgFilter() {
     decWrap.appendChild(db);
   });
 
+  // 年齢フィルター
+  const ageLabel = document.createElement("div");
+  ageLabel.className = "filter-section-label";
+  ageLabel.textContent = "現在の年齢";
+  el.orgFilter.appendChild(ageLabel);
+  const ageWrap = document.createElement("div");
+  ageWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;width:100%";
+  el.orgFilter.appendChild(ageWrap);
+  const ageBrackets = [
+    { label: "20代", min: 20, max: 29 },
+    { label: "30代", min: 30, max: 39 },
+    { label: "40代", min: 40, max: 49 },
+    { label: "50代+", min: 50, max: 999 },
+  ];
+  ageBrackets.forEach(bracket => {
+    const ab = document.createElement("button");
+    const isActive = state.ageMin === bracket.min && state.ageMax === bracket.max;
+    ab.className = "org-btn" + (isActive ? " active" : "");
+    ab.textContent = bracket.label;
+    ab.title = bracket.min + "〜" + (bracket.max === 999 ? "" : bracket.max) + "歳（生年月日登録選手のみ）";
+    ab.onclick = () => {
+      if (isActive) { state.ageMin = null; state.ageMax = null; }
+      else { state.ageMin = bracket.min; state.ageMax = bracket.max; }
+      renderOrgFilter(); resetAndRenderList();
+    };
+    ageWrap.appendChild(ab);
+  });
+
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
     state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive, state.hasTitle]
     .filter(Boolean).length;
@@ -633,6 +670,7 @@ function renderList() {
   if (state.positivePts) filterTags.push({label: "通算プラス", key: "positivePts", val: false});
   if (state.recentActive) filterTags.push({label: "直近5年", key: "recentActive", val: false});
   if (state.hasTitle) filterTags.push({label: "タイトル保有", key: "hasTitle", val: false});
+  if (state.ageMin != null) filterTags.push({label: state.ageMin + (state.ageMax === 999 ? "歳以上" : "〜" + state.ageMax + "歳"), key: "ageMin", val: null});
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   if (filterTags.length) {
     const tagHtml = filterTags.map(f => '<button class="filter-chip" data-fkey="' + f.key + '" title="このフィルターを解除">× ' + f.label + '</button>').join('');
@@ -663,7 +701,8 @@ function renderList() {
   el.playerCount.querySelectorAll(".filter-chip[data-fkey]").forEach(chip => {
     chip.addEventListener("click", () => {
       const key = chip.dataset.fkey;
-      const defaults = {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null,mcast:false,manalyst:false,mreporter:false};
+      const defaults = {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null,mcast:false,manalyst:false,mreporter:false,ageMin:null,ageMax:null};
+      if (key === "ageMin") { state.ageMin = null; state.ageMax = null; renderOrgFilter(); resetAndRenderList(); return; }
       if (key in defaults) {
         state[key] = defaults[key];
         if (key === "year") document.getElementById("yearFilter").value = "";
