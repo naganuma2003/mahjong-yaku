@@ -957,7 +957,9 @@ function renderWleagueSection(p) {
   const tiers = wl.tiers || [];
   const topTier = wrecords
     .map(r => r.tier)
-    .sort((a, b) => tiers.indexOf(a) - tiers.indexOf(b))[0] || "-";
+    .filter(t => tiers.includes(t))
+    .sort((a, b) => tiers.indexOf(a) - tiers.indexOf(b))[0] ||
+    wrecords.map(r => r.tier)[0] || "-";
 
   let html = '<div class="wleague-section">';
   html += '<div class="wleague-head"><span class="wleague-name">' +
