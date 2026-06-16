@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16l 詳細ビューに前後ナビゲーション・リストコンテキストバッジ
+// v2026-06-16m プロフィールにデビュー時年齢・前後ナビ・コンテキストバッジ
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1436,7 +1436,17 @@ function renderProfile(p) {
   }
   if (pf.hometown) html += profileRow("出身", pf.hometown);
   if (pf.education) html += profileRow("学歴", pf.education);
-  if (pf.proYear) html += profileRow("プロ入会", pf.proYear + "年");
+  if (pf.proYear) {
+    const debutYsAll = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term))).filter(y => y > 1000);
+    const debutYr = debutYsAll.length ? Math.min(...debutYsAll) : null;
+    let proYearStr = pf.proYear + "年";
+    if (pf.birth && pf.birth.split("-").length === 3) {
+      const birthYr = parseInt(pf.birth.split("-")[0]);
+      const ageAtDebut = (debutYr || pf.proYear) - birthYr;
+      if (ageAtDebut > 10 && ageAtDebut < 70) proYearStr += ' <span style="color:var(--muted);font-size:12px">（' + ageAtDebut + '歳でデビュー）</span>';
+    }
+    html += profileRow("プロ入会", proYearStr);
+  }
   if (pf.org) html += profileRow("所属団体", pf.org);
   if (pf.team) html += profileRow("Mリーグ", pf.team);
   if (pf.titles && pf.titles.length) {
