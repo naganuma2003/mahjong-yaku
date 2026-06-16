@@ -179,7 +179,10 @@ function playerTeamStatus(name, team) {
 function resetAndRenderList() { state.showAll = false; renderList(); }
 
 function filteredPlayers() {
-  const q = normalize(state.query);
+  // スペース区切りでAND検索（各語を個別にnormalize）
+  const rawTerms = state.query.trim().split(/\s+|　+/).filter(Boolean);
+  const qTerms = rawTerms.map(normalize).filter(Boolean);
+  const q = qTerms.join(""); // 後方互換: ハイライト用の連結クエリ
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   const favs = state.favOnly ? getFavs() : null;
 
@@ -218,26 +221,27 @@ function filteredPlayers() {
              (p.wrecords || []).some(r => wTermToYear(p.wleague || {}, r.term) === yr);
     })
     .filter(p => {
-      if (!q) return true;
-      if (normalize(p.name).includes(q)) return true;
+      if (!qTerms.length) return true;
+      const pName = normalize(p.name);
       const titles = (p.profile && p.profile.titles) ? p.profile.titles.join("") : "";
-      if (titles.includes(q)) return true;
       const nick = (p.profile && p.profile.nickname) ? normalize(p.profile.nickname) : "";
-      if (nick.includes(q)) return true;
-      // 団体名検索（「連盟」「協会」「最高位」等）
       const orgIds = playerOrgIds(p);
-      return orgIds.some(oid => {
+      const orgText = orgIds.map(oid => {
         const org = ORGS[oid] || {};
-        return (org.name || "").includes(q) || (org.shortName || "").includes(q) ||
-               ((org.league || {}).name || "").includes(q);
-      }) || ((p.wleague || {}).name || "").includes(q);
+        return (org.name || "") + (org.shortName || "") + ((org.league || {}).name || "");
+      }).join("") + ((p.wleague || {}).name || "");
+      // 全語がいずれかのフィールドにマッチ（AND）
+      return qTerms.every(term =>
+        pName.includes(term) || titles.includes(term) || nick.includes(term) || orgText.includes(term)
+      );
     })
     .sort((a, b) => {
-      // 検索クエリがある場合は名前の前方一致を優先
-      if (q) {
+      // 検索クエリがある場合は名前の前方一致を優先（最初の語で判定）
+      if (qTerms.length) {
+        const firstTerm = qTerms[0];
         const an = normalize(a.name), bn = normalize(b.name);
-        const aStart = an.startsWith(q) ? 0 : 1;
-        const bStart = bn.startsWith(q) ? 0 : 1;
+        const aStart = an.startsWith(firstTerm) ? 0 : 1;
+        const bStart = bn.startsWith(firstTerm) ? 0 : 1;
         if (aStart !== bStart) return aStart - bStart;
       }
       // チーム絞り込み中は現役メンバーを先頭に
@@ -508,7 +512,7 @@ function highlightName(name, q) {
 function renderList() {
   const _favs = getFavs(); // キャッシュ（localStorage読み込みを1回に）
   const list = filteredPlayers();
-  const _q = normalize(state.query);
+  const _q = state.query.trim().split(/\s+|　+/).filter(Boolean).map(normalize).filter(Boolean)[0] || "";
   const total = DATA.players.length;
   const filterTags = [];
   if (state.org !== "all") { const o = ORGS[state.org]; if (o) filterTags.push(o.shortName); }
