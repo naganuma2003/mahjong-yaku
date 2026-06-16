@@ -363,8 +363,10 @@ function renderList() {
   el.playerList.innerHTML = "";
   if (!list.length) {
     const li = document.createElement("li");
-    li.style.cssText = "color:var(--muted);font-size:13px;justify-content:center;cursor:default";
-    li.textContent = "該当する選手がいません";
+    li.style.cssText = "color:var(--muted);font-size:13px;justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.6";
+    li.textContent = state.favOnly
+      ? "お気に入りがまだありません。選手詳細の ☆ ボタンで追加できます"
+      : "該当する選手がいません";
     el.playerList.appendChild(li);
     return;
   }
