@@ -997,7 +997,25 @@ function renderDetail(p) {
   const ptRankLabel = ptRank ? '<span class="list-pos" title="5期以上出場選手中の通算pt順位（' + _totalPtsRanking.length + '人中）">通算pt ' + ptRank + '位</span>' : '';
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel + ptRankLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
-    (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
+    (isOngoing ? (() => {
+      // 今期の団体内ランキング
+      const ongoingRec = allRecs.find(r => r.ongoing && r.points != null);
+      if (ongoingRec) {
+        const oid = ongoingRec.orgId || p.org;
+        const orgName2 = (ORGS[oid] || {}).shortName || oid;
+        const tier = ongoingRec.tier;
+        const sameOrg = DATA.players.filter(op => op.id !== p.id && (op.records||[]).some(r => r.ongoing && (r.orgId||op.org) === oid && r.tier === tier && r.points != null));
+        const myPts = ongoingRec.points;
+        const rank = sameOrg.filter(op => {
+          const rec = (op.records||[]).find(r => r.ongoing && (r.orgId||op.org) === oid && r.tier === tier);
+          return rec && rec.points > myPts;
+        }).length + 1;
+        const total = sameOrg.length + 1;
+        return '<span class="ongoing-badge" title="今期' + orgName2 + ' ' + tier + ' ' + rank + '/' + total + '位">' +
+          '開催中 <span style="font-size:9px">' + rank + '/' + total + '位</span></span>';
+      }
+      return '<span class="ongoing-badge">開催中</span>';
+    })() : '') +
     (totalPlayoffs > 0 ? (() => { const pr = playoffRank(p.id); const prStr = pr && pr <= 20 ? ' 全体' + pr + '位' : ''; return '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回: ' + playoffYears.join('、') + '年' + prStr + '">★決定戦×' + totalPlayoffs + (pr && pr <= 20 ? '<span style="font-size:9px;margin-left:2px">全体' + pr + '位</span>' : '') + '</span>'; })() : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>' +
