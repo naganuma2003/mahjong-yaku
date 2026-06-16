@@ -191,6 +191,15 @@ function filteredPlayers() {
         return (b.records.length + (b.wrecords ? b.wrecords.length : 0)) -
                (a.records.length + (a.wrecords ? a.wrecords.length : 0));
       }
+      if (state.sort === "recent") {
+        const latestYear = p => {
+          const years = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+            .concat((p.wrecords || []).map(r => r.term))
+            .filter(y => y > 1000);
+          return years.length ? Math.max(...years) : 0;
+        };
+        return latestYear(b) - latestYear(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
 }
