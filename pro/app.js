@@ -463,7 +463,8 @@ function renderDetail(p) {
   const url = "?p=" + encodeURIComponent(p.id);
   if (location.search !== url) history.pushState({ playerId: p.id }, "", url);
   document.title = p.name + " - 麻雀プロ検索";
-  const allRecs = (p.records || []).slice().sort((a, b) => b.term - a.term);
+  const allRecs = (p.records || []).slice().sort((a, b) =>
+    termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term) || b.term - a.term);
 
   // 団体ごとにグループ分け
   const orgGroups = {};
