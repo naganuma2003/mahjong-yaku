@@ -651,12 +651,12 @@ function renderList() {
     // 昇降級トレンドアイコン（直近3期）
     let trendIcon = "";
     {
-      const trendRecs = (p.records || []).concat(p.wrecords || [])
-        .filter(r => !r.ongoing && (r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff"))
-        .sort((a, b) => {
-          const ya = r => termToYear(r.orgId || p.org, r.term);
-          return ya(b) - ya(a);
-        })
+      const pRecs = (p.records || []).map(r => ({ r, yr: termToYear(r.orgId || p.org, r.term) }));
+      const wRecs = (p.wrecords || []).map(r => ({ r, yr: wTermToYear(p.wleague || {}, r.term) }));
+      const trendRecs = [...pRecs, ...wRecs]
+        .filter(({ r }) => !r.ongoing && (r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff"))
+        .sort((a, b) => b.yr - a.yr)
+        .map(({ r }) => r)
         .slice(0, 3);
       if (trendRecs.length >= 2) {
         const arrows = trendRecs.map(r => {
