@@ -884,7 +884,8 @@ function renderDetail(p) {
         // data-tip形式: "2024年 A1(後期) 3位 +123.4pt ★決定戦" → 整形して表示
         const raw = c.dataset.tip || "";
         const parts = raw.split(" ").filter(Boolean);
-        tip.innerHTML = parts.map((s, i) => i === 0 ? '<strong>' + s + '</strong>' : s).join(' ');
+        tip.innerHTML = parts.map((s, i) => i === 0 ? '<strong>' + s + '</strong>' : s).join(' ') +
+          '<span style="display:block;font-size:10px;opacity:0.7;margin-top:2px">クリックで同年絞り込み</span>';
         tip.style.display = "block";
         const rect = chart.getBoundingClientRect();
         const cr = c.getBoundingClientRect();
