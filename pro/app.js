@@ -602,7 +602,12 @@ function renderList() {
   if (state.recentActive) filterTags.push("直近5年");
   if (state.hasTitle) filterTags.push("タイトル保有");
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
-  el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
+  if (filterTags.length) {
+    const tagHtml = filterTags.map(t => '<span class="filter-chip">' + t + '</span>').join('');
+    el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml;
+  } else {
+    el.playerCount.textContent = countText;
+  }
   // フィルター状態をタイトル・URLに反映（選手詳細非表示時）
   if (!state.selectedId) {
     document.title = filterTags.length ? filterTags.join("・") + " - 麻雀プロ検索" : "麻雀プロ検索";
