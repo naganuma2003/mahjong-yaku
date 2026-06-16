@@ -768,6 +768,10 @@ function renderDetail(p) {
 
   const totalPlayoffs = allRecs.filter(r => r.category === "playoff").length +
     (p.wrecords || []).filter(r => r.category === "playoff").length;
+  const playoffYears = allRecs.filter(r => r.category === "playoff")
+    .map(r => termToYear(r.orgId || p.org, r.term)).filter(y => y > 1000)
+    .concat((p.wrecords || []).filter(r => r.category === "playoff").map(r => wTermToYear(p.wleague || {}, r.term)).filter(y => y > 1000))
+    .sort((a, b) => a - b);
 
   // Mリーグチーム情報
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
@@ -793,7 +797,7 @@ function renderDetail(p) {
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
-    (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回">★決定戦×' + totalPlayoffs + '</span>' : '') +
+    (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回: ' + playoffYears.join('、') + '年">★決定戦×' + totalPlayoffs + '</span>' : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>' +
     '<button class="copy-link-btn" id="copyStatsBtn" onclick="copyPlayerStats()" title="成績をテキストコピー">📄</button>' +
