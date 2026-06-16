@@ -408,7 +408,8 @@ function renderOrgFilter() {
   opts.forEach(o => {
     const b = document.createElement("button");
     b.className = "org-btn" + (state.org === o.id ? " active" : "");
-    b.textContent = o.shortName || o.name;
+    const cnt = o.id === "all" ? DATA.players.length : DATA.players.filter(p => playerOrgIds(p).includes(o.id)).length;
+    b.innerHTML = (o.shortName || o.name) + (o.id !== "all" ? '<span class="org-cnt">' + cnt + '</span>' : '');
     b.onclick = () => { state.org = o.id; renderOrgFilter(); resetAndRenderList(); };
     el.orgFilter.appendChild(b);
   });
