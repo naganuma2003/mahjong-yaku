@@ -683,6 +683,7 @@ function renderList() {
     const favStar = _favs.has(p.id) ? '<span class="p-fav">★</span>' : "";
     // ホバーtitleに要約情報
     const titleParts = [];
+    if (p.profile && p.profile.nickname) titleParts.push('"' + p.profile.nickname + '"');
     if (latestTier) titleParts.push("直近: " + latestTier);
     const debutYr = (() => { const ys = (p.records||[]).map(r=>termToYear(r.orgId||p.org,r.term)).concat((p.wrecords||[]).map(r=>wTermToYear(p.wleague||{},r.term))).filter(y=>y>1000); return ys.length ? Math.min(...ys) : null; })();
     if (debutYr) titleParts.push(debutYr + "年〜");
