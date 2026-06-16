@@ -1320,6 +1320,37 @@ function renderDetail(p) {
       });
       bSvg += '<text x="4" y="' + (bH / 2 + 4) + '" font-size="8" fill="#8a93a2">期別pt</text>';
       bSvg += '</svg>';
+      // ティア推移ライン（リーグ内ランク）
+      const tierList = (league.tiers || []);
+      if (tierList.length >= 2) {
+        const tierData = groupRecs.slice().sort((a, b) => termToYear(oid, a.term) - termToYear(oid, b.term))
+          .map(r => {
+            const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+            const idx = tierList.indexOf(t);
+            return idx >= 0 ? { yr: termToYear(oid, r.term), idx, t, ongoing: r.ongoing } : null;
+          }).filter(Boolean);
+        if (tierData.length >= 3) {
+          const tW = 600, tH = 28, tPadL = 40, tPadR = 8, tPadT = 4, tPadB = 4;
+          const minYr2 = tierData[0].yr, maxYr2 = tierData[tierData.length - 1].yr;
+          const yrRange2 = maxYr2 - minYr2 || 1;
+          const txFn = yr => tPadL + (yr - minYr2) / yrRange2 * (tW - tPadL - tPadR);
+          const tyFn = idx => tPadT + idx / (tierList.length - 1) * (tH - tPadT - tPadB);
+          const TC2t = { A: '#c0392b', B: '#2c5fa8', C: '#3a8c4f', D: '#7d5ba6', E: '#c77f1a' };
+          let tSvg = '<svg viewBox="0 0 ' + tW + ' ' + tH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + tH + 'px">';
+          const path2 = tierData.filter(d => !d.ongoing).map((d, i) => (i === 0 ? 'M' : 'L') + txFn(d.yr).toFixed(1) + ' ' + tyFn(d.idx).toFixed(1)).join(' ');
+          tSvg += '<path d="' + path2 + '" fill="none" stroke="#8a93a2" stroke-width="1" stroke-dasharray="2 1" opacity="0.5"/>';
+          tierData.filter(d => !d.ongoing).forEach(d => {
+            const col = TC2t[d.t[0]] || '#8a93a2';
+            tSvg += '<circle cx="' + txFn(d.yr).toFixed(1) + '" cy="' + tyFn(d.idx).toFixed(1) + '" r="3" fill="' + col + '" opacity="0.85"><title>' + d.yr + '年: ' + d.t + '</title></circle>';
+          });
+          tSvg += '<text x="4" y="' + (tH / 2 + 3) + '" font-size="8" fill="#8a93a2">ティア</text>';
+          // Y軸ラベル（最高と最低）
+          tSvg += '<text x="' + tPadL + '" y="' + (tPadT + 7) + '" font-size="7" fill="' + (TC2t[tierList[0][0]] || '#8a93a2') + '">' + tierList[0] + '</text>';
+          tSvg += '<text x="' + tPadL + '" y="' + (tH - 1) + '" font-size="7" fill="' + (TC2t[tierList[tierList.length-1][0]] || '#8a93a2') + '">' + tierList[tierList.length-1] + '</text>';
+          tSvg += '</svg>';
+          cSvg = cSvg + tSvg; // 累積チャートの後に追加
+        }
+      }
       html += '<div class="cum-chart">' + cSvg + bSvg + '</div>';
     }
 
