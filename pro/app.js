@@ -415,9 +415,20 @@ function renderList() {
   const list = filteredPlayers();
   const _q = normalize(state.query);
   const total = DATA.players.length;
-  el.playerCount.textContent = list.length < total
-    ? list.length + " / " + total + " 名"
-    : total + " 名";
+  const filterTags = [];
+  if (state.org !== "all") { const o = ORGS[state.org]; if (o) filterTags.push(o.shortName); }
+  if (state.mleagueC) filterTags.push("Mリーグ現役");
+  if (state.mleagueF) filterTags.push("Mリーグ元");
+  if (state.mtourn)   filterTags.push("Mトーナメント");
+  if (state.mteam)    { const t = MLEAGUE_TEAMS.find(x => x.id === state.mteam); if (t) filterTags.push(t.short); }
+  if (state.topLeague) filterTags.push("最高リーグ");
+  if (state.wleague)   filterTags.push("女流あり");
+  if (state.playoff)   filterTags.push("決定戦経験");
+  if (state.ongoingOnly) filterTags.push("今期出場中");
+  if (state.favOnly)   filterTags.push("お気に入り");
+  if (state.year)      filterTags.push(state.year + "年");
+  const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
+  el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
   el.playerList.innerHTML = "";
   if (!list.length) {
     const li = document.createElement("li");
