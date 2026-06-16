@@ -100,10 +100,13 @@ const el = {
 };
 
 // --- ユーティリティ ---------------------------------------------------
+const TIER_MAP = { "μ": "A", "μ2": "B", "ツアー": "C" };
 function tierClass(tier) {
-  const c = (tier || "").charAt(0).toUpperCase();
+  const t = TIER_MAP[tier] || tier || "";
+  const c = t.charAt(0).toUpperCase();
   return ["A", "B", "C", "D", "E", "F"].includes(c) ? "tier-" + c : "tier-other";
 }
+function tierKey(tier) { return (TIER_MAP[tier] || tier || "").charAt(0); }
 
 function fmtPoints(p) {
   if (p === null || p === undefined) return "";
@@ -495,7 +498,7 @@ function chartSvg(recs, orgId) {
   tiers.slice(showMin, showMax + 1).forEach((tier, i) => {
     const top = yFn(numBands - i).toFixed(1);
     const bot = yFn(numBands - i - 1).toFixed(1);
-    const c = TC[tier.charAt(0)] || '#8a93a2';
+    const c = TC[tierKey(tier)] || '#8a93a2';
     svg += '<rect x="' + padL + '" y="' + top + '" width="' + (W - padL - padR) +
            '" height="' + (parseFloat(bot) - parseFloat(top)).toFixed(1) +
            '" fill="' + c + '" fill-opacity="0.05"/>';
@@ -524,7 +527,7 @@ function chartSvg(recs, orgId) {
 
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
-    const c = TC[d.tier.charAt(0)] || '#8a93a2';
+    const c = TC[tierKey(d.tier)] || '#8a93a2';
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
            '" r="3" fill="' + c + '"/>';
   });
@@ -579,7 +582,7 @@ function wchartSvg(wrecords, wleague) {
   tiers.slice(showMin, showMax + 1).forEach((tier, i) => {
     const top = yFn(numBands - i).toFixed(1);
     const bot = yFn(numBands - i - 1).toFixed(1);
-    const c = TC[tier.charAt(0)] || '#8a93a2';
+    const c = TC[tierKey(tier)] || '#8a93a2';
     svg += '<rect x="' + padL + '" y="' + top + '" width="' + (W - padL - padR) +
            '" height="' + (parseFloat(bot) - parseFloat(top)).toFixed(1) +
            '" fill="' + c + '" fill-opacity="0.05"/>';
@@ -609,7 +612,7 @@ function wchartSvg(wrecords, wleague) {
 
   pts.forEach(d => {
     const v = toV(d.tier, d.rank);
-    const c = TC[d.tier.charAt(0)] || '#d08090';
+    const c = TC[tierKey(d.tier)] || '#d08090';
     svg += '<circle cx="' + xFn(d.year).toFixed(1) + '" cy="' + yFn(v).toFixed(1) +
            '" r="3" fill="' + c + '"/>';
   });
