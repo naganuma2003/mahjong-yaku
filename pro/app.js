@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16t 類似成績選手セクション追加・インサイト強化・誕生日セクション
+// v2026-06-16u 決定戦全体ランキング表示・類似成績選手・インサイト強化
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -24,6 +24,18 @@ const _totalPtsRanking = DATA.players
   .sort((a,b)=>b.total-a.total);
 function totalPtsRank(id) {
   const idx = _totalPtsRanking.findIndex(x => x.id === id);
+  return idx >= 0 ? idx + 1 : null;
+}
+// 決定戦進出回数ランキング（2回以上）
+const _playoffRanking = DATA.players
+  .map(p => {
+    const n = (p.records||[]).filter(r=>r.category==="playoff").length + (p.wrecords||[]).filter(r=>r.category==="playoff").length;
+    return n >= 2 ? { id: p.id, n } : null;
+  })
+  .filter(Boolean)
+  .sort((a,b)=>b.n-a.n);
+function playoffRank(id) {
+  const idx = _playoffRanking.findIndex(x => x.id === id);
   return idx >= 0 ? idx + 1 : null;
 }
 const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
@@ -893,7 +905,7 @@ function renderDetail(p) {
   html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel + ptRankLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
-    (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回: ' + playoffYears.join('、') + '年">★決定戦×' + totalPlayoffs + '</span>' : '') +
+    (totalPlayoffs > 0 ? (() => { const pr = playoffRank(p.id); const prStr = pr && pr <= 20 ? ' 全体' + pr + '位' : ''; return '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回: ' + playoffYears.join('、') + '年' + prStr + '">★決定戦×' + totalPlayoffs + (pr && pr <= 20 ? '<span style="font-size:9px;margin-left:2px">全体' + pr + '位</span>' : '') + '</span>'; })() : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>' +
     '<button class="copy-link-btn" id="copyStatsBtn" onclick="copyPlayerStats()" title="成績をテキストコピー">📄</button>' +
