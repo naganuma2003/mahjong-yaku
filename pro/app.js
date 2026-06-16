@@ -283,6 +283,21 @@ function renderOrgFilter() {
     };
     el.orgFilter.appendChild(b);
   });
+
+  // フィルタークリアボタン
+  const anyActive = state.org !== "all" || state.mleagueC || state.mleagueF || state.mtourn ||
+    state.topLeague || state.mcast || state.manalyst || state.mreporter || state.mteam;
+  if (anyActive) {
+    const clr = document.createElement("button");
+    clr.className = "org-btn clear-btn";
+    clr.textContent = "✕ フィルタークリア";
+    clr.onclick = () => {
+      Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
+        topLeague:false, mcast:false, manalyst:false, mreporter:false, mteam:null });
+      renderOrgFilter(); renderList();
+    };
+    el.orgFilter.appendChild(clr);
+  }
 }
 
 function renderList() {
