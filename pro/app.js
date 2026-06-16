@@ -1373,7 +1373,7 @@ function showPlaceholder() {
   const recent = renderRecentHistory();
   const favs = getFavs();
   let favSection = "";
-  if (favs.size > 0 && !recent) {
+  if (favs.size > 0) {
     const favPlayers = [...favs].map(id => DATA.players.find(x => x.id === id)).filter(Boolean).slice(0, 8);
     if (favPlayers.length) {
       favSection = '<div class="recent-section"><div class="recent-head">★ お気に入り</div><div class="recent-list">' +
