@@ -2496,11 +2496,30 @@ function showPlaceholder() {
     '<span title="タイトルホルダー">称号保有: <strong>' + titleCount + '</strong></span>' +
     '<span title="2期以上出場・通算ポイントがプラスの選手">通算プラス: <strong>' + posCount2 + '</strong></span>' +
     '</div>';
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + orgTopSection + birthdaySection + dailySection + pickupSection + ongoingSection;
+  // クイック検索タグ（タイトル・フィルター）
+  const quickTags = [
+    { label: "雀王", type: "q" }, { label: "最高位", type: "q" }, { label: "鳳凰位", type: "q" }, { label: "十段位", type: "q" },
+    { label: "今期出場中", type: "ongoing" }, { label: "通算プラス", type: "pos" }, { label: "タイトル保有", type: "titled" },
+  ];
+  const quickSection = '<div class="recent-section"><div class="recent-head">🔍 クイック検索</div><div class="recent-list">' +
+    quickTags.map(t => '<button class="recent-btn quick-tag" data-qt="' + t.type + '" data-ql="' + t.label + '">' + t.label + '</button>').join('') +
+    '</div></div>';
+
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + orgTopSection + birthdaySection + dailySection + pickupSection + ongoingSection + quickSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
       if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+    });
+  });
+  el.detail.querySelectorAll(".quick-tag[data-qt]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const qt = btn.dataset.qt, ql = btn.dataset.ql;
+      if (qt === "q") { state.query = ql; el.search.value = ql; }
+      else if (qt === "ongoing") { state.ongoingOnly = true; renderOrgFilter(); }
+      else if (qt === "pos") { state.positivePts = true; renderOrgFilter(); }
+      else if (qt === "titled") { state.hasTitle = true; renderOrgFilter(); }
+      resetAndRenderList();
     });
   });
 }
