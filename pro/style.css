@@ -41,6 +41,8 @@
   .title-badge { background: #2a2510; color: #d4b060; border-color: #4a3f10; }
   .p-ongoing { background: #2a2208; color: #d4a820; border-color: #8a6800; }
   .ongoing-badge { background: #2a2208; color: #d4a820; border-color: #8a6800; }
+  .p-pts.pos { color: #5cb87a; }
+  .p-pts.neg { color: #e05c50; }
   input, select { background: var(--panel); color: var(--text); border-color: var(--border); }
 }
 
@@ -183,6 +185,9 @@ body {
 .player-list .ptier { font-size: 10px; padding: 1px 5px; min-width: 22px; }
 .player-list .prole { font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
 .player-list .p-ongoing { font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 700; background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+.p-pts { font-size: 11px; font-weight: 700; margin-left: 3px; }
+.p-pts.pos { color: #2a7a3a; }
+.p-pts.neg { color: #c0392b; }
 
 /* --- 詳細 --- */
 .detail {

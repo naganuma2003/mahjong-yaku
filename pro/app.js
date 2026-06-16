@@ -430,8 +430,16 @@ function renderList() {
       else if (status === "former") teamBadge = '<span class="pteam pteam-former">元</span>';
     }
     // 今期出場中
-    const hasOngoing = (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
+    const ongoingRec = (p.records || []).find(r => r.ongoing) || (p.wrecords || []).find(r => r.ongoing);
+    const hasOngoing = !!ongoingRec;
     const ongoingBadge = hasOngoing ? '<span class="p-ongoing">今期</span>' : "";
+    // 今期のポイント（ongoingフィルターON時のみ表示）
+    let ongoingPts = "";
+    if (state.ongoingOnly && ongoingRec && ongoingRec.points != null) {
+      const pts = ongoingRec.points;
+      const sign = pts >= 0 ? "+" : "";
+      ongoingPts = '<span class="p-pts' + (pts >= 0 ? " pos" : " neg") + '">' + sign + pts.toFixed(1) + '</span>';
+    }
     // 最新のティアを取得
     const latestRec = (p.records || []).filter(r => !r.ongoing)
       .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
@@ -455,7 +463,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + roleLabel + teamBadge + favStar +
+      ongoingBadge + tierBadge + roleLabel + teamBadge + ongoingPts + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
