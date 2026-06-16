@@ -20,7 +20,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -201,6 +201,15 @@ function filteredPlayers() {
     .filter(p => !state.favOnly || (favs && favs.has(p.id)))
     .filter(p => !state.playoff || (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff"))
     .filter(p => !state.ongoingOnly || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing))
+    .filter(p => {
+      if (!state.debutDecade) return true;
+      const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+        .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+        .filter(y => y > 1000);
+      if (!yrs.length) return false;
+      const debut = Math.min(...yrs);
+      return Math.floor(debut / 10) * 10 === state.debutDecade;
+    })
     .filter(p => {
       if (!state.year) return true;
       const yr = parseInt(state.year, 10);
@@ -442,8 +451,28 @@ function renderOrgFilter() {
   });
 
   // モバイル用フィルタートグルボタンのラベルを更新
+  // デビュー年代フィルター
+  const decLabel = document.createElement("span");
+  decLabel.className = "filter-section-label";
+  decLabel.textContent = "デビュー年代";
+  el.orgFilter.appendChild(decLabel);
+  const decWrap = document.createElement("div");
+  decWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;width:100%";
+  el.orgFilter.appendChild(decWrap);
+  [1970, 1980, 1990, 2000, 2010, 2020].forEach(dec => {
+    const db = document.createElement("button");
+    db.className = "org-btn" + (state.debutDecade === dec ? " active" : "");
+    db.textContent = (dec % 100) + "年代";
+    db.title = dec + "〜" + (dec + 9) + "年デビュー";
+    db.onclick = () => {
+      state.debutDecade = state.debutDecade === dec ? null : dec;
+      renderOrgFilter(); resetAndRenderList();
+    };
+    decWrap.appendChild(db);
+  });
+
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly]
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -460,7 +489,7 @@ function renderOrgFilter() {
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false });
+        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false, debutDecade:null });
       document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };
@@ -493,6 +522,7 @@ function renderList() {
   if (state.ongoingOnly) filterTags.push("今期出場中");
   if (state.favOnly)   filterTags.push("お気に入り");
   if (state.year)      filterTags.push(state.year + "年");
+  if (state.debutDecade) filterTags.push((state.debutDecade % 100) + "年代デビュー");
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
   // フィルター状態をタイトルに反映（選手詳細非表示時）
