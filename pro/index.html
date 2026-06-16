@@ -45,6 +45,7 @@
     </div>
     <div class="count-row">
   <div class="player-count" id="playerCount"></div>
+  <button class="help-btn" id="rankingBtn" title="今期ランキング：今期出場中＋今期pt順" onclick="quickRanking()">📊</button>
   <button class="help-btn" id="copyListBtn" title="一覧をコピー" onclick="copyPlayerList()">📋</button>
   <button class="help-btn" id="randomBtn" title="ランダムに選手を表示" onclick="openRandomPlayer()">🎲</button>
   <button class="help-btn" id="helpBtn" title="キーボードショートカット">?</button>
@@ -57,7 +58,7 @@
   <div><kbd>?</kbd> このパネルを開閉</div>
   <div><kbd>f</kbd> お気に入りに追加/削除 / <kbd>r</kbd> ランダム選手を表示</div>
   <div style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px">☆ ボタンで選手をお気に入り登録、フィルターで絞り込み</div>
-  <div>🎲 ランダム選手を表示 / 📋 現在の一覧をコピー</div>
+  <div>📊 今期ランキング表示 / 🎲 ランダム選手 / 📋 一覧コピー</div>
 </div>
     <ul class="player-list" id="playerList"></ul>
   </aside>
@@ -84,6 +85,13 @@ function copyPlayerLink() {
   navigator.clipboard.writeText(url).then(function() {
     if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '🔗'; }, 1500); }
   });
+}
+function quickRanking() {
+  state.ongoingOnly = true;
+  state.sort = 'pts';
+  document.getElementById('sortSelect').value = 'pts';
+  renderOrgFilter();
+  renderList();
 }
 function copyPlayerList() {
   const list = filteredPlayers();
