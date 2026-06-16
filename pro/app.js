@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16d 平均順位・最高得点期ハイライト追加
+// v2026-06-16e 平均順位・最高得点期ハイライト・直近3期トレンド追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -633,11 +633,29 @@ function renderList() {
         }
       }
     }
-    // 昇降級トレンドアイコン
+    // 昇降級トレンドアイコン（直近3期）
     let trendIcon = "";
-    if (latestRec) {
-      if (latestRec.category === "promotion") trendIcon = '<span class="p-trend trend-up" title="昇級">↑</span>';
-      else if (latestRec.category === "demotion") trendIcon = '<span class="p-trend trend-dn" title="降級">↓</span>';
+    {
+      const trendRecs = (p.records || []).concat(p.wrecords || [])
+        .filter(r => !r.ongoing && (r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff"))
+        .sort((a, b) => {
+          const ya = r => termToYear(r.orgId || p.org, r.term);
+          return ya(b) - ya(a);
+        })
+        .slice(0, 3);
+      if (trendRecs.length >= 2) {
+        const arrows = trendRecs.map(r => {
+          if (r.category === "promotion") return '<span class="trend-up">↑</span>';
+          if (r.category === "demotion")  return '<span class="trend-dn">↓</span>';
+          if (r.category === "playoff")   return '<span class="trend-po">★</span>';
+          return '<span class="trend-st">—</span>';
+        }).reverse().join("");
+        trendIcon = '<span class="p-trend" title="直近3期の昇降級">' + arrows + '</span>';
+      } else if (trendRecs.length === 1) {
+        const r = trendRecs[0];
+        if (r.category === "promotion") trendIcon = '<span class="p-trend trend-up" title="昇級">↑</span>';
+        else if (r.category === "demotion") trendIcon = '<span class="p-trend trend-dn" title="降級">↓</span>';
+      }
     }
     // M関係ロールラベル（成績なし選手のみ）
     let roleLabel = "";
