@@ -1033,6 +1033,31 @@ document.addEventListener("keydown", e => {
 renderOrgFilter();
 renderList();
 
+// 初期プレースホルダー（閲覧履歴があれば表示）
+(function() {
+  try {
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    if (hist.length) {
+      const players = hist.map(id => DATA.players.find(x => x.id === id)).filter(Boolean);
+      if (players.length) {
+        let html = '<div class="placeholder"><div style="margin-bottom:12px;color:var(--muted);font-size:13px">最近閲覧した選手</div>';
+        html += '<div class="recent-list" style="justify-content:center">';
+        players.forEach(q => {
+          html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>';
+        });
+        html += '</div><div style="margin-top:20px;font-size:13px;color:var(--muted)">または ← 選手を選択してください</div></div>';
+        el.detail.innerHTML = html;
+        el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const p = DATA.players.find(x => x.id === btn.dataset.id);
+            if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+          });
+        });
+      }
+    }
+  } catch (e) {}
+})();
+
 // URLパラメータで選手を直接選択（シェアリンク対応）
 (function() {
   const params = new URLSearchParams(location.search);
