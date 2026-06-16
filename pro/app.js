@@ -465,6 +465,10 @@ function renderDetail(p) {
     const yearRange = yearMin
       ? (yearMin === yearMax ? yearMin + "年" : yearMin + "〜" + yearMax + "年")
       : "-";
+    const latestCompleted = groupRecs
+      .filter(r => !r.ongoing && r.points != null)
+      .sort((a, b) => termToYear(oid, b.term) - termToYear(oid, a.term))[0];
+    const latestPtsStr = latestCompleted ? fmtPoints(latestCompleted.points) + "pt" : null;
     const topTierName = (league.tiers || [])[0];
     const topFirstYear = topTierName
       ? groupRecs
@@ -487,6 +491,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       html += stat(groupChamps, "優勝");
+      if (latestPtsStr) html += stat(latestPtsStr, "直近ポイント");
       html += stat(yearRange, "活動期間");
       html += "</div>";
     } else {
@@ -497,6 +502,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       html += stat(groupChamps, "優勝");
+      if (latestPtsStr) html += stat(latestPtsStr, "直近ポイント");
       html += stat(yearRange, "活動期間");
       html += "</div>";
     }
