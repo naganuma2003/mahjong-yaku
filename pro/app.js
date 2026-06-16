@@ -1814,7 +1814,11 @@ function renderRecentHistory() {
     if (!players.length) return "";
     let html = '<div class="recent-section"><div class="recent-head">最近閲覧</div><div class="recent-list">';
     players.forEach(q => {
-      html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>';
+      const qLatest = (q.records || []).filter(r => !r.ongoing)
+        .sort((a, b) => termToYear(b.orgId || q.org, b.term) - termToYear(a.orgId || q.org, a.term))[0];
+      const qTier = qLatest ? ((qLatest.tier === "後期" || qLatest.tier === "前期") ? (qLatest.result || qLatest.tier) : qLatest.tier) : null;
+      const badge = qTier ? ' <span class="tier-badge ' + tierClass(qTier) + '" style="font-size:9px;padding:1px 3px">' + qTier + '</span>' : '';
+      html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + badge + '</button>';
     });
     html += '</div></div>';
     return html;
