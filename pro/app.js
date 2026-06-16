@@ -636,6 +636,9 @@ function renderList() {
       const sign = pts >= 0 ? "+" : "";
       ongoingPts = '<span class="p-pts' + (pts >= 0 ? " pos" : " neg") + '">' + sign + pts.toFixed(1) + '</span>';
     }
+    const titlesBadge = state.sort === "titles" && p.profile && p.profile.titles && p.profile.titles.length
+      ? '<span class="p-titles-cnt" title="' + p.profile.titles.join('、') + '">🏆' + p.profile.titles.length + '</span>'
+      : "";
     // 最新のティアを取得
     const latestRec = (p.records || []).filter(r => !r.ongoing)
       .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
@@ -715,7 +718,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + bestTierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + favStar +
+      ongoingBadge + tierBadge + bestTierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + titlesBadge + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
