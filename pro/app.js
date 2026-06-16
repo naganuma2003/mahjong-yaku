@@ -1045,6 +1045,8 @@ function renderDetail(p) {
     const bestPtsStr = bestPts != null && bestPts > -Infinity ? fmtPoints(bestPts) + "pt" : null;
     const totalPts = recsWithPts.length >= 2 ? recsWithPts.reduce((s, r) => s + r.points, 0) : null;
     const totalPtsStr = totalPts != null ? fmtPoints(totalPts) + "pt" : null;
+    const ptRankHere = totalPtsRank(p.id);
+    const totalPtsTitle = totalPts != null && ptRankHere ? '全選手中通算pt ' + ptRankHere + '位（5期以上出場選手中）' : null;
     const recsWithRank = groupRecs.filter(r => !r.ongoing && r.rank != null);
     const avgRank = recsWithRank.length >= 3
       ? (recsWithRank.reduce((s, r) => s + r.rank, 0) / recsWithRank.length)
@@ -1100,9 +1102,9 @@ function renderDetail(p) {
       if (streakStr) html += stat(streakStr, "最長連続");
       if (promoStreakStr) html += stat(promoStreakStr, "連続記録");
       if (promoRateStr) html += stat(promoRateStr, "昇級率");
-      if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
+      if (totalPtsStr) html += stat(totalPtsStr, "通算pt", totalPtsTitle);
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
-      if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
+      if (avgPtsStr) html += stat(avgPtsStr, "平均pt", avgPtsPct != null ? '全選手中上位' + (100 - avgPtsPct) + '%（5期以上出場選手中）' : null);
       if (avgRankStr) html += stat(avgRankStr, "平均順位");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
@@ -1117,9 +1119,9 @@ function renderDetail(p) {
       if (streakStr) html += stat(streakStr, "最長連続");
       if (promoStreakStr) html += stat(promoStreakStr, "連続記録");
       if (promoRateStr) html += stat(promoRateStr, "昇級率");
-      if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
+      if (totalPtsStr) html += stat(totalPtsStr, "通算pt", totalPtsTitle);
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
-      if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
+      if (avgPtsStr) html += stat(avgPtsStr, "平均pt", avgPtsPct != null ? '全選手中上位' + (100 - avgPtsPct) + '%（5期以上出場選手中）' : null);
       if (avgRankStr) html += stat(avgRankStr, "平均順位");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
@@ -1563,10 +1565,11 @@ function renderDetail(p) {
   };
 }
 
-function stat(num, lbl) {
+function stat(num, lbl, title) {
   const numStr = String(num);
   const cls = numStr.length > 6 ? " sm" : "";
-  return '<div class="stat"><div class="num' + cls + '">' + numStr +
+  const tt = title ? ' title="' + title.replace(/"/g, '&quot;') + '"' : '';
+  return '<div class="stat"' + tt + '><div class="num' + cls + '">' + numStr +
          '</div><div class="lbl">' + lbl + "</div></div>";
 }
 
