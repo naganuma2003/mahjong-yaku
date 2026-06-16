@@ -1800,12 +1800,13 @@ function showPlaceholder() {
         const sorted = ongoingByOrg[oid].slice().sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity)).slice(0, 8);
         ongoingSection += '<div style="font-size:10px;color:var(--muted);margin:4px 0 2px">' + (org.shortName || oid) + '</div>';
         ongoingSection += '<div class="recent-list">';
-        sorted.forEach(({ p, points, tier }) => {
+        sorted.forEach(({ p, points, tier }, ri) => {
           const ptsStr = points != null ? (points >= 0 ? '+' : '') + points.toFixed(1) + 'pt' : '';
           const ptsCls = points != null ? (points >= 0 ? 'style="color:#2a7a3a"' : 'style="color:#c0392b"') : '';
           const tierBadge = tier ? '<span class="tier-badge ' + tierClass(tier) + '" style="font-size:9px;padding:1px 3px;margin-left:2px">' + tier + '</span>' : '';
           const ptsSpan = ptsStr ? ' <span ' + ptsCls + ' style="font-size:10px">' + ptsStr + '</span>' : '';
-          ongoingSection += '<button class="recent-btn" data-id="' + p.id + '">' + p.name + tierBadge + ptsSpan + '</button>';
+          const rankNum = points != null ? '<span style="font-size:9px;color:var(--muted);margin-right:2px">' + (ri + 1) + '.</span>' : '';
+          ongoingSection += '<button class="recent-btn" data-id="' + p.id + '">' + rankNum + p.name + tierBadge + ptsSpan + '</button>';
         });
         ongoingSection += '</div>';
       });
