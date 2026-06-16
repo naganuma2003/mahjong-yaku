@@ -1215,7 +1215,13 @@ function renderRecentHistory() {
 }
 
 // --- 起動 -------------------------------------------------------------
-el.search.addEventListener("input", e => { state.query = e.target.value; state.showAll = false; renderList(); });
+let _searchTimer = null;
+el.search.addEventListener("input", e => {
+  state.query = e.target.value;
+  state.showAll = false;
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(renderList, 80);
+});
 document.getElementById("yearFilter").addEventListener("input", e => { state.year = e.target.value; renderList(); });
 el.search.addEventListener("keydown", e => {
   if (e.key === "Enter") {
