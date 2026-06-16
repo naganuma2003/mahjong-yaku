@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16 女流リーグ成績追加
+// v2026-06-16b AND検索・デビュー年代フィルター・最高ティアバッジ・キャリアインサイト追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -933,15 +933,14 @@ function renderDetail(p) {
   const insightRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
   if (insightRecs.length >= 3) {
     const insightParts = [];
-    const recentRecs = insightRecs.slice().sort((a, b) => {
-      const ya = termToYear(a.orgId || p.org, a.term);
-      const yb = termToYear(b.orgId || p.org, b.term);
-      return yb - ya;
-    }).slice(0, 3);
+    const recYear = r => r.orgId || (p.records||[]).includes(r)
+      ? termToYear(r.orgId || p.org, r.term)
+      : wTermToYear(p.wleague || {}, r.term);
+    const recentRecs = insightRecs.slice().sort((a, b) => recYear(b) - recYear(a)).slice(0, 3);
     const recentAvg = recentRecs.reduce((s, r) => s + r.points, 0) / recentRecs.length;
     const allAvg = insightRecs.reduce((s, r) => s + r.points, 0) / insightRecs.length;
     const bestRec = insightRecs.reduce((best, r) => r.points > best.points ? r : best);
-    const bestYear = termToYear(bestRec.orgId || p.org, bestRec.term);
+    const bestYear = recYear(bestRec);
     if (bestYear > 1000) insightParts.push("キャリアハイは" + bestYear + "年の" + fmtPoints(bestRec.points) + "pt");
     if (insightRecs.length >= 5) {
       const trend = recentAvg - allAvg;
