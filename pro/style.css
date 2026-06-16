@@ -59,6 +59,45 @@
   input, select { background: var(--panel); color: var(--text); border-color: var(--border); }
 }
 
+/* 強制ダークモード（ボタンで切替） */
+html.force-dark {
+  --bg: #12151a; --panel: #1c2030; --border: #2e3444; --text: #e2e6ef; --muted: #6b7585;
+  --accent: #e05c50; --tier-a: #e05c50; --tier-b: #5b8fe8; --tier-c: #5cb87a; --tier-d: #a07dd6;
+}
+html.force-dark .player-list li { background: var(--panel); }
+html.force-dark .player-list li.selected { background: #252b3b; }
+html.force-dark .player-list li:hover { background: #222736; }
+html.force-dark .help-panel, html.force-dark .stat, html.force-dark .profile-section { background: #1a1f2e; }
+html.force-dark .org-btn { background: var(--panel); }
+html.force-dark .org-btn.active { filter: brightness(1.15); }
+html.force-dark .timeline th { background: #1a1f2e; }
+html.force-dark .timeline tr:nth-child(even) { background: #1e2436; }
+html.force-dark .teammate-btn { background: var(--panel); border-color: var(--border); }
+html.force-dark .recent-btn { background: var(--panel); }
+html.force-dark input, html.force-dark select { background: var(--panel); color: var(--text); border-color: var(--border); }
+html.force-dark .p-pts.pos { color: #5cb87a; }
+html.force-dark .p-pts.neg { color: #e05c50; }
+html.force-dark mark.hl { background: #4a4010; color: #f0d060; }
+/* 強制ライトモード */
+@media (prefers-color-scheme: dark) {
+  html.force-light {
+    --bg: #f5f6f8; --panel: #ffffff; --border: #e2e5ea; --text: #1f2733; --muted: #8a93a2;
+    --accent: #c0392b; --tier-a: #c0392b; --tier-b: #2c5fa8; --tier-c: #3a8c4f; --tier-d: #7d5ba6;
+  }
+  html.force-light .player-list li { background: white; }
+  html.force-light .player-list li.selected { background: #fff5f4; }
+  html.force-light .player-list li:hover { background: #fafafa; }
+  html.force-light .stat, html.force-light .profile-section, html.force-light .help-panel { background: #f5f6f8; }
+  html.force-light .timeline th { background: #f5f6f8; }
+  html.force-light .timeline tr:nth-child(even) { background: #fafbfc; }
+  html.force-light input, html.force-light select { background: white; color: #1f2733; border-color: #e2e5ea; }
+  html.force-light .p-pts.pos { color: #2a7a3a; }
+  html.force-light .p-pts.neg { color: #c0392b; }
+}
+
+.dark-toggle-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 14px; cursor: pointer; color: var(--muted); margin-left: auto; }
+.dark-toggle-btn:hover { border-color: var(--accent); }
+
 * { box-sizing: border-box; }
 
 body {
@@ -74,7 +113,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .app-header h1 { margin: 0; font-size: 20px; }
-.header-top { margin-bottom: 6px; }
+.header-top { margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
 .back-link { font-size: 12px; color: var(--muted); text-decoration: none; }
 .back-link:hover { color: var(--accent); }
 .subtitle { margin: 2px 0 0; color: var(--muted); font-size: 13px; }

@@ -14,6 +14,7 @@
 <div class="app-header">
   <div class="header-top">
     <a href="../" class="back-link">← ホーム</a>
+    <button id="darkToggle" class="dark-toggle-btn" title="ダーク/ライトモード切替" onclick="toggleDark()">🌙</button>
   </div>
   <h1>麻雀プロ検索</h1>
   <p class="subtitle">最高位戦・連盟・協会・RMU・麻将連合のリーグ成績年表</p>
@@ -180,6 +181,20 @@ function stepYear(delta) {
   state.year = String(next);
   renderList();
 }
+function toggleDark() {
+  const root = document.documentElement;
+  const isDark = root.classList.toggle('force-dark');
+  root.classList.toggle('force-light', !isDark);
+  document.getElementById('darkToggle').textContent = isDark ? '☀️' : '🌙';
+  try { localStorage.setItem('mj_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+}
+(function() {
+  try {
+    const saved = localStorage.getItem('mj_theme');
+    if (saved === 'dark') { document.documentElement.classList.add('force-dark'); document.getElementById('darkToggle').textContent = '☀️'; }
+    else if (saved === 'light') { document.documentElement.classList.add('force-light'); }
+  } catch(e) {}
+})();
 function toggleFilter() {
   const filter = document.getElementById('orgFilter');
   const open = filter.classList.contains('open');
