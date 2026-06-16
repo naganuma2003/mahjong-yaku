@@ -1105,6 +1105,25 @@ function renderDetail(p) {
   if (window.innerWidth <= 760) {
     el.detail.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+  // タッチスワイプで前後ナビゲーション（モバイル）
+  let _swipeStartX = null;
+  el.detail.ontouchstart = e => { _swipeStartX = e.touches[0].clientX; };
+  el.detail.ontouchend = e => {
+    if (_swipeStartX === null) return;
+    const dx = e.changedTouches[0].clientX - _swipeStartX;
+    _swipeStartX = null;
+    if (Math.abs(dx) < 60) return;
+    const items = filteredPlayers();
+    const curIdx = items.findIndex(x => x.id === state.selectedId);
+    const nextIdx = dx < 0 ? curIdx + 1 : curIdx - 1;
+    if (nextIdx >= 0 && nextIdx < items.length) {
+      const np = items[nextIdx];
+      state.selectedId = np.id;
+      renderList();
+      scrollToSelected();
+      renderDetail(np);
+    }
+  };
 }
 
 function stat(num, lbl) {
