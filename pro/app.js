@@ -877,6 +877,30 @@ function renderDetail(p) {
     html += renderWleagueSection(p);
   }
 
+  // キャリアインサイト（自動生成テキスト）
+  const insightRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+  if (insightRecs.length >= 3) {
+    const insightParts = [];
+    const recentRecs = insightRecs.slice().sort((a, b) => {
+      const ya = termToYear(a.orgId || p.org, a.term);
+      const yb = termToYear(b.orgId || p.org, b.term);
+      return yb - ya;
+    }).slice(0, 3);
+    const recentAvg = recentRecs.reduce((s, r) => s + r.points, 0) / recentRecs.length;
+    const allAvg = insightRecs.reduce((s, r) => s + r.points, 0) / insightRecs.length;
+    const bestRec = insightRecs.reduce((best, r) => r.points > best.points ? r : best);
+    const bestYear = termToYear(bestRec.orgId || p.org, bestRec.term);
+    if (bestYear > 1000) insightParts.push("キャリアハイは" + bestYear + "年の" + fmtPoints(bestRec.points) + "pt");
+    if (insightRecs.length >= 5) {
+      const trend = recentAvg - allAvg;
+      if (trend > 20) insightParts.push("直近3期は平均比+" + Math.round(trend) + "ptと好調");
+      else if (trend < -20) insightParts.push("直近3期は平均比" + Math.round(trend) + "ptと苦戦");
+    }
+    if (insightParts.length) {
+      html += '<div class="career-insight">' + insightParts.join('。') + '。</div>';
+    }
+  }
+
   // 同期デビュー選手セクション
   const pDebutYears = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).filter(y => y > 1000);
   if (pDebutYears.length) {
