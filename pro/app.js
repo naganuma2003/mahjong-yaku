@@ -585,25 +585,25 @@ function renderList() {
   const list = filteredPlayers();
   const _qTerms = state.query.trim().split(/\s+|　+/).filter(Boolean).map(normalize).filter(Boolean);
   const total = DATA.players.length;
-  const filterTags = [];
-  if (state.org !== "all") { const o = ORGS[state.org]; if (o) filterTags.push(o.shortName); }
-  if (state.mleagueC) filterTags.push("Mリーグ現役");
-  if (state.mleagueF) filterTags.push("Mリーグ元");
-  if (state.mtourn)   filterTags.push("Mトーナメント");
-  if (state.mteam)    { const t = MLEAGUE_TEAMS.find(x => x.id === state.mteam); if (t) filterTags.push(t.short); }
-  if (state.topLeague) filterTags.push("最高リーグ");
-  if (state.wleague)   filterTags.push("女流あり");
-  if (state.playoff)   filterTags.push("決定戦経験");
-  if (state.ongoingOnly) filterTags.push("今期出場中");
-  if (state.favOnly)   filterTags.push("お気に入り");
-  if (state.year)      filterTags.push(state.year + "年");
-  if (state.debutDecade) filterTags.push((state.debutDecade % 100) + "年代デビュー");
-  if (state.positivePts) filterTags.push("通算プラス");
-  if (state.recentActive) filterTags.push("直近5年");
-  if (state.hasTitle) filterTags.push("タイトル保有");
+  const filterTags = []; // {label, key, val}
+  if (state.org !== "all") { const o = ORGS[state.org]; if (o) filterTags.push({label: o.shortName, key: "org", val: "all"}); }
+  if (state.mleagueC) filterTags.push({label: "Mリーグ現役", key: "mleagueC", val: false});
+  if (state.mleagueF) filterTags.push({label: "Mリーグ元", key: "mleagueF", val: false});
+  if (state.mtourn)   filterTags.push({label: "Mトーナメント", key: "mtourn", val: false});
+  if (state.mteam)    { const t = MLEAGUE_TEAMS.find(x => x.id === state.mteam); if (t) filterTags.push({label: t.short, key: "mteam", val: null}); }
+  if (state.topLeague) filterTags.push({label: "最高リーグ", key: "topLeague", val: false});
+  if (state.wleague)   filterTags.push({label: "女流あり", key: "wleague", val: false});
+  if (state.playoff)   filterTags.push({label: "決定戦経験", key: "playoff", val: false});
+  if (state.ongoingOnly) filterTags.push({label: "今期出場中", key: "ongoingOnly", val: false});
+  if (state.favOnly)   filterTags.push({label: "お気に入り", key: "favOnly", val: false});
+  if (state.year)      filterTags.push({label: state.year + "年", key: "year", val: ""});
+  if (state.debutDecade) filterTags.push({label: (state.debutDecade % 100) + "年代デビュー", key: "debutDecade", val: null});
+  if (state.positivePts) filterTags.push({label: "通算プラス", key: "positivePts", val: false});
+  if (state.recentActive) filterTags.push({label: "直近5年", key: "recentActive", val: false});
+  if (state.hasTitle) filterTags.push({label: "タイトル保有", key: "hasTitle", val: false});
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   if (filterTags.length) {
-    const tagHtml = filterTags.map(t => '<span class="filter-chip">' + t + '</span>').join('');
+    const tagHtml = filterTags.map(f => '<button class="filter-chip" data-fkey="' + f.key + '" title="このフィルターを解除">× ' + f.label + '</button>').join('');
     el.playerCount.innerHTML = '<span class="count-text">' + countText + '</span>' + tagHtml;
   } else {
     el.playerCount.textContent = countText;
@@ -619,6 +619,19 @@ function renderList() {
     const newUrl = location.pathname + (qs ? "?" + qs : "");
     if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
   }
+  // フィルターチップのクリックで個別解除
+  el.playerCount.querySelectorAll(".filter-chip[data-fkey]").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const key = chip.dataset.fkey;
+      const defaults = {org:"all",mleagueC:false,mleagueF:false,mtourn:false,topLeague:false,wleague:false,playoff:false,ongoingOnly:false,favOnly:false,year:"",debutDecade:null,positivePts:false,recentActive:false,hasTitle:false,mteam:null};
+      if (key in defaults) {
+        state[key] = defaults[key];
+        if (key === "year") document.getElementById("yearFilter").value = "";
+        renderOrgFilter();
+        resetAndRenderList();
+      }
+    });
+  });
   el.playerList.innerHTML = "";
   if (!list.length) {
     const li = document.createElement("li");
