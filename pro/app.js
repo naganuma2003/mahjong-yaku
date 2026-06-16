@@ -2172,9 +2172,45 @@ function renderRecentHistory() {
 
 // --- 起動 -------------------------------------------------------------
 let _searchTimer = null;
+// 検索履歴
+const SEARCH_HIST_KEY = "mj_search_hist";
+function getSearchHist() { try { return JSON.parse(localStorage.getItem(SEARCH_HIST_KEY) || "[]"); } catch(e) { return []; } }
+function addSearchHist(q) {
+  if (!q || q.length < 2) return;
+  try {
+    let hist = getSearchHist().filter(x => x !== q);
+    hist.unshift(q);
+    localStorage.setItem(SEARCH_HIST_KEY, JSON.stringify(hist.slice(0, 8)));
+  } catch(e) {}
+}
+let _searchHistDiv = null;
+function showSearchHist() {
+  const hist = getSearchHist();
+  if (!hist.length) return;
+  if (!_searchHistDiv) {
+    _searchHistDiv = document.createElement("div");
+    _searchHistDiv.className = "search-hist";
+    el.search.parentNode.insertBefore(_searchHistDiv, el.search.nextSibling);
+  }
+  _searchHistDiv.innerHTML = hist.map(q => '<button class="search-hist-btn" data-q="' + q.replace(/"/g, '&quot;') + '">' + q + '</button>').join('');
+  _searchHistDiv.style.display = "flex";
+  _searchHistDiv.querySelectorAll(".search-hist-btn").forEach(btn => {
+    btn.addEventListener("mousedown", e => {
+      e.preventDefault();
+      el.search.value = btn.dataset.q;
+      state.query = btn.dataset.q;
+      hideSearchHist();
+      renderList();
+    });
+  });
+}
+function hideSearchHist() { if (_searchHistDiv) _searchHistDiv.style.display = "none"; }
+el.search.addEventListener("focus", () => { if (!el.search.value) showSearchHist(); });
+el.search.addEventListener("blur", () => setTimeout(hideSearchHist, 200));
 el.search.addEventListener("input", e => {
   state.query = e.target.value;
   state.showAll = false;
+  if (e.target.value) hideSearchHist(); else showSearchHist();
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(() => {
     renderList();
@@ -2193,6 +2229,7 @@ el.search.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     const items = filteredPlayers();
     if (!items.length) return;
+    addSearchHist(state.query.trim());
     const p = items[0];
     state.selectedId = p.id;
     renderList();
