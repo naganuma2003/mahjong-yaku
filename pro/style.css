@@ -11,6 +11,12 @@
   --tier-d: #7d5ba6;
 }
 
+@media print {
+  .sidebar, .app-header, .detail-nav, .fav-toggle-btn, .copy-link-btn, .x-share-btn, .back-to-list { display: none !important; }
+  .layout { display: block; }
+  .detail { padding: 0; box-shadow: none; border: none; }
+  .chart svg { max-height: 200px; }
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #12151a;
