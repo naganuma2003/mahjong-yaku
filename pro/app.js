@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16g 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中・テーブル折りたたみ追加
+// v2026-06-16h 平均順位・最高得点期ハイライト・直近3期トレンド・今期出場中・テーブル折りたたみ・直近5年フィルター追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -20,7 +20,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -183,7 +183,7 @@ function filteredPlayers() {
   const favsKey = state.favOnly ? [...getFavs()].sort().join(",") : "";
   const stateKey = JSON.stringify([state.org, state.mleagueC, state.mleagueF, state.mtourn,
     state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst,
-    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.query, state.sort, favsKey]);
+    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.query, state.sort, favsKey]);
   if (_filteredStateKey === stateKey && _filteredCache) return _filteredCache;
   _filteredStateKey = stateKey;
   // スペース区切りでAND検索（各語を個別にnormalize）
@@ -216,6 +216,14 @@ function filteredPlayers() {
       const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
       if (recs.length < 2) return false;
       return recs.reduce((s, r) => s + r.points, 0) > 0;
+    })
+    .filter(p => {
+      if (!state.recentActive) return true;
+      const RECENT_CUTOFF = 2026 - 5;
+      const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+        .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+        .filter(y => y > 1000);
+      return yrs.some(y => y >= RECENT_CUTOFF) || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
     })
     .filter(p => {
       if (!state.debutDecade) return true;
@@ -483,6 +491,12 @@ function renderOrgFilter() {
   ppBtn.onclick = () => { state.positivePts = !state.positivePts; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(ppBtn);
 
+  const raBtn = document.createElement("button");
+  raBtn.className = "org-btn" + (state.recentActive ? " active" : "");
+  raBtn.textContent = "直近5年"; raBtn.title = "2022年以降にリーグ出場がある選手";
+  raBtn.onclick = () => { state.recentActive = !state.recentActive; renderOrgFilter(); resetAndRenderList(); };
+  el.orgFilter.appendChild(raBtn);
+
   // デビュー年代フィルター
   const decLabel = document.createElement("span");
   decLabel.className = "filter-section-label";
@@ -504,7 +518,7 @@ function renderOrgFilter() {
   });
 
   const activeCount = [state.org !== "all", state.mleagueC, state.mleagueF, state.mtourn,
-    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts]
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst, state.mreporter, !!state.mteam, !!state.year, state.favOnly, !!state.debutDecade, state.positivePts, state.recentActive]
     .filter(Boolean).length;
   const toggleBtn = document.getElementById("filterToggle");
   if (toggleBtn) {
@@ -521,7 +535,7 @@ function renderOrgFilter() {
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false, debutDecade:null, positivePts:false });
+        topLeague:false, wleague:false, playoff:false, ongoingOnly:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"", favOnly:false, debutDecade:null, positivePts:false, recentActive:false });
       document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };
@@ -564,6 +578,7 @@ function renderList() {
   if (state.year)      filterTags.push(state.year + "年");
   if (state.debutDecade) filterTags.push((state.debutDecade % 100) + "年代デビュー");
   if (state.positivePts) filterTags.push("通算プラス");
+  if (state.recentActive) filterTags.push("直近5年");
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
   // フィルター状態をタイトルに反映（選手詳細非表示時）
