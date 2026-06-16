@@ -37,21 +37,10 @@
 function toggleFilter() {
   const btn = document.getElementById('filterToggle');
   const filter = document.getElementById('orgFilter');
-  const open = filter.style.display !== 'none';
-  filter.style.display = open ? 'none' : '';
+  const open = filter.classList.contains('open');
+  filter.classList.toggle('open', !open);
   btn.textContent = open ? '▼ 絞り込みを表示' : '▲ 絞り込みを隠す';
 }
-// PC では常に表示
-function initFilterToggle() {
-  if (window.innerWidth > 760) {
-    document.getElementById('filterToggle').style.display = 'none';
-    document.getElementById('orgFilter').style.display = '';
-  } else {
-    document.getElementById('orgFilter').style.display = 'none';
-  }
-}
-window.addEventListener('resize', initFilterToggle);
-document.addEventListener('DOMContentLoaded', initFilterToggle);
 </script>
 </body>
 </html>
