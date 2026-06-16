@@ -288,11 +288,23 @@ function renderOrgFilter() {
   reporter.onclick = () => { state.mreporter = !state.mreporter; renderOrgFilter(); renderList(); };
   el.orgFilter.appendChild(reporter);
 
-  // Mチームセクション
-  const tlabel = document.createElement("span");
-  tlabel.className = "filter-section-label";
-  tlabel.textContent = "Mチーム";
+  // Mチームセクション（折りたたみ）
+  const teamOpen = !!state.mteam;
+  const tlabel = document.createElement("button");
+  tlabel.className = "filter-section-label filter-section-toggle";
+  tlabel.textContent = (teamOpen ? "▲" : "▼") + " Mチーム";
+  tlabel.onclick = () => {
+    tlabel.dataset.open = teamOpen ? "" : "1";
+    const wrap = document.getElementById("teamFilterWrap");
+    if (wrap) wrap.style.display = teamOpen ? "none" : "flex";
+    tlabel.textContent = (teamOpen ? "▼" : "▲") + " Mチーム";
+  };
   el.orgFilter.appendChild(tlabel);
+
+  const teamWrap = document.createElement("div");
+  teamWrap.id = "teamFilterWrap";
+  teamWrap.style.cssText = "display:" + (teamOpen ? "flex" : "none") + ";flex-wrap:wrap;gap:6px;width:100%";
+  el.orgFilter.appendChild(teamWrap);
 
   MLEAGUE_TEAMS.forEach(t => {
     const b = document.createElement("button");
@@ -307,7 +319,7 @@ function renderOrgFilter() {
       renderOrgFilter();
       renderList();
     };
-    el.orgFilter.appendChild(b);
+    teamWrap.appendChild(b);
   });
 
   // フィルタークリアボタン
