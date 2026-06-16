@@ -1336,7 +1336,7 @@ function renderWleagueSection(p) {
         ? ' <span class="rank">' + r.rank + '位</span>' : "";
       const tierLabel = r.tier.length <= 2 ? "女流" + r.tier : r.tier;
       const wyr = wTermToYear(wl, r.term);
-      const wyrHtml = wyr > 1000 ? '<span class="rec-year">' + wyr + '</span>' : '';
+      const wyrHtml = wyr > 1000 ? '<span class="rec-year yr-link" data-yr="' + wyr + '" title="' + wyr + '年で絞り込む">' + wyr + '</span>' : '';
       const wCatIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
                      : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
                      : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
