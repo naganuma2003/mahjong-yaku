@@ -888,11 +888,26 @@ function chartSvg(recs, orgId) {
   });
 
   if (pts.length >= 2) {
-    const path = pts.map((d, i) => {
-      const v = toV(d.tier, d.rank);
-      return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
-    }).join(' ');
-    svg += '<path d="' + path + '" fill="none" stroke="#555" stroke-width="1.5"/>';
+    // 連続区間は実線、ギャップ（年が2以上離れた区間）は点線
+    let solidPath = '', dashPaths = [];
+    for (let i = 0; i < pts.length; i++) {
+      const v = toV(pts[i].tier, pts[i].rank);
+      const cx = xFn(pts[i].year).toFixed(1), cy = yFn(v).toFixed(1);
+      if (i === 0) { solidPath = 'M' + cx + ' ' + cy; continue; }
+      const gap = pts[i].year - pts[i - 1].year > 2;
+      if (gap) {
+        const pv = toV(pts[i - 1].tier, pts[i - 1].rank);
+        const px = xFn(pts[i - 1].year).toFixed(1), py = yFn(pv).toFixed(1);
+        dashPaths.push('M' + px + ' ' + py + ' L' + cx + ' ' + cy);
+        solidPath += ' M' + cx + ' ' + cy;
+      } else {
+        solidPath += ' L' + cx + ' ' + cy;
+      }
+    }
+    svg += '<path d="' + solidPath + '" fill="none" stroke="#555" stroke-width="1.5"/>';
+    dashPaths.forEach(d => {
+      svg += '<path d="' + d + '" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="4 3"/>';
+    });
   }
 
   pts.forEach(d => {
@@ -986,11 +1001,25 @@ function wchartSvg(wrecords, wleague) {
   });
 
   if (pts.length >= 2) {
-    const path = pts.map((d, i) => {
-      const v = toV(d.tier, d.rank);
-      return (i ? 'L' : 'M') + xFn(d.year).toFixed(1) + ' ' + yFn(v).toFixed(1);
-    }).join(' ');
-    svg += '<path d="' + path + '" fill="none" stroke="#d08090" stroke-width="1.5"/>';
+    let solidPath = '', dashPaths = [];
+    for (let i = 0; i < pts.length; i++) {
+      const v = toV(pts[i].tier, pts[i].rank);
+      const cx = xFn(pts[i].year).toFixed(1), cy = yFn(v).toFixed(1);
+      if (i === 0) { solidPath = 'M' + cx + ' ' + cy; continue; }
+      const gap = pts[i].year - pts[i - 1].year > 2;
+      if (gap) {
+        const pv = toV(pts[i - 1].tier, pts[i - 1].rank);
+        const px = xFn(pts[i - 1].year).toFixed(1), py = yFn(pv).toFixed(1);
+        dashPaths.push('M' + px + ' ' + py + ' L' + cx + ' ' + cy);
+        solidPath += ' M' + cx + ' ' + cy;
+      } else {
+        solidPath += ' L' + cx + ' ' + cy;
+      }
+    }
+    svg += '<path d="' + solidPath + '" fill="none" stroke="#d08090" stroke-width="1.5"/>';
+    dashPaths.forEach(d => {
+      svg += '<path d="' + d + '" fill="none" stroke="#e0a0b0" stroke-width="1" stroke-dasharray="4 3"/>';
+    });
   }
 
   pts.forEach(d => {
