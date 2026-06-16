@@ -387,7 +387,8 @@ function renderDetail(p) {
   });
   const isMultiOrg = orgIds.length > 1;
 
-  const totalPlayoffs = allRecs.filter(r => r.category === "playoff" || r.category === "champion").length;
+  const totalPlayoffs = allRecs.filter(r => r.category === "playoff").length;
+  const totalChamps   = allRecs.filter(r => r.category === "champion").length;
 
   // Mリーグチーム情報
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
@@ -418,7 +419,8 @@ function renderDetail(p) {
   if (isMultiOrg) {
     html += '<div class="summary">';
     html += stat(allRecs.length, "総出場期数");
-    html += stat(totalPlayoffs, "決定戦/優勝");
+    html += stat(totalPlayoffs, "決定戦進出");
+    html += stat(totalChamps, "優勝");
     html += "</div>";
   }
 
@@ -426,7 +428,8 @@ function renderDetail(p) {
     const org = ORGS[oid] || {};
     const league = org.league || {};
     const groupRecs = orgGroups[oid].slice().sort((a, b) => b.term - a.term);
-    const groupPlayoffs = groupRecs.filter(r => r.category === "playoff" || r.category === "champion").length;
+    const groupPlayoffs = groupRecs.filter(r => r.category === "playoff").length;
+    const groupChamps   = groupRecs.filter(r => r.category === "champion").length;
     const topTier = groupRecs
       .map(r => r.tier)
       .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] || "-";
@@ -447,7 +450,8 @@ function renderDetail(p) {
       html += '<div class="summary summary-sm">';
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
-      html += stat(groupPlayoffs, "決定戦/優勝");
+      html += stat(groupPlayoffs, "決定戦進出");
+      html += stat(groupChamps, "優勝");
       html += stat(yearRange, "活動期間");
       html += "</div>";
     } else {
@@ -455,7 +459,8 @@ function renderDetail(p) {
       html += '<div class="summary">';
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
-      html += stat(groupPlayoffs, "決定戦/優勝");
+      html += stat(groupPlayoffs, "決定戦進出");
+      html += stat(groupChamps, "優勝");
       html += stat(yearRange, "活動期間");
       html += "</div>";
     }
@@ -811,8 +816,12 @@ function renderWleagueSection(p) {
         : Math.min(...wYears) + "〜" + Math.max(...wYears) + "年")
     : "-";
   html += '<div class="summary">';
+  const wPlayoffs = wrecords.filter(r => r.category === "playoff").length;
+  const wChamps   = wrecords.filter(r => r.category === "champion").length;
   html += stat(wrecords.length, "出場期数");
   html += stat(topTier, "最高到達");
+  html += stat(wPlayoffs, "決定戦進出");
+  html += stat(wChamps, "優勝");
   html += stat(wYearRange, "活動期間");
   html += '</div>';
 
