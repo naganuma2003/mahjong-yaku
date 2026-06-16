@@ -305,7 +305,10 @@ function renderOrgFilter() {
 
 function renderList() {
   const list = filteredPlayers();
-  el.playerCount.textContent = list.length + " 名";
+  const total = DATA.players.length;
+  el.playerCount.textContent = list.length < total
+    ? list.length + " / " + total + " 名"
+    : total + " 名";
   el.playerList.innerHTML = "";
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   list.forEach(p => {
@@ -361,7 +364,8 @@ function renderDetail(p) {
   // Mリーグチーム情報
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
 
-  let html = '<div class="detail-head"><h2>' + p.name + "</h2>";
+  let html = '<div class="detail-head"><h2>' + p.name + "</h2>" +
+    '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';
   } else {

@@ -34,6 +34,12 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+function copyPlayerLink() {
+  navigator.clipboard.writeText(location.href).then(function() {
+    const btn = document.querySelector('.copy-link-btn');
+    if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '🔗'; }, 1500); }
+  });
+}
 function toggleFilter() {
   const btn = document.getElementById('filterToggle');
   const filter = document.getElementById('orgFilter');

@@ -142,6 +142,8 @@ body {
 .placeholder { color: var(--muted); text-align: center; padding: 60px 0; }
 
 .detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.copy-link-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; font-size: 14px; cursor: pointer; color: var(--muted); line-height: 1.4; }
+.copy-link-btn:hover { border-color: var(--accent); color: var(--accent); }
 .detail-head h2 { margin: 0; font-size: 22px; }
 .detail-head .league-name { color: var(--accent); font-weight: 600; }
 .detail-head .org-name { color: var(--muted); font-size: 13px; }
