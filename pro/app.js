@@ -533,10 +533,14 @@ function renderDetail(p) {
         const resultText = (r.result || "") + rankHtml + halfHtml || "—";
         const yr = termToYear(r.orgId || oid, r.term);
         const yrHtml = yr > 1000 ? '<span class="rec-year">' + yr + '</span>' : '';
+        const catIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
+                      : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
+                      : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
+                      : "";
         html += "<tr" + rowCls + ">" +
           '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
           '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
-          '<td class="result-' + r.category + '">' + resultText + "</td>" +
+          '<td class="result-' + r.category + '">' + catIcon + resultText + "</td>" +
           '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td></tr>";
       }
     });

@@ -225,6 +225,10 @@ body {
 .timeline tr.gap-row td.term { font-weight: 400; }
 
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
+.cat-icon { font-size: 11px; margin-right: 3px; font-weight: 700; }
+.cat-up { color: #2e7d32; }
+.cat-dn { color: #1565c0; }
+.cat-po { color: #b8860b; }
 .result-demotion { color: var(--tier-b); font-weight: 600; }
 .result-champion { color: #b8860b; font-weight: 700; }
 .result-stay { color: var(--text); }
