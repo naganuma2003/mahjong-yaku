@@ -2598,6 +2598,25 @@ el.sortSelect.addEventListener("change", e => {
   try { localStorage.setItem("mj_sort", state.sort); } catch(e) {}
   renderList();
 });
+// タッチスワイプで前後の選手に移動（モバイル向け）
+{
+  let _touchStartX = 0, _touchStartY = 0;
+  el.detail.addEventListener("touchstart", e => {
+    _touchStartX = e.touches[0].clientX;
+    _touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  el.detail.addEventListener("touchend", e => {
+    if (!state.selectedId) return;
+    const dx = e.changedTouches[0].clientX - _touchStartX;
+    const dy = e.changedTouches[0].clientY - _touchStartY;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.8) return;
+    const list = filteredPlayers();
+    const idx = list.findIndex(x => x.id === state.selectedId);
+    if (idx < 0) return;
+    const target = dx < 0 ? list[idx + 1] : list[idx - 1];
+    if (target) { state.selectedId = target.id; renderList(); scrollToSelected(); renderDetail(target); }
+  }, { passive: true });
+}
 document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== el.search) {
     e.preventDefault(); el.search.focus(); el.search.select();
