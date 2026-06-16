@@ -1163,10 +1163,25 @@ function renderDetail(p) {
       cSvg += '<text x="' + lastX + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + maxYr + '</text>';
       cSvg += '<text x="4" y="10" font-size="8" fill="#8a93a2">通算pt推移</text>';
       cSvg += '</svg>';
+      // 累積チャートに最高・最低ポイント期のマーカー追加
+      const peakCum = cumPts.reduce((m, d) => d.v > m.v ? d : m, cumPts[0]);
+      const troughCum = cumPts.reduce((m, d) => d.v < m.v ? d : m, cumPts[0]);
+      if (peakCum.v > 0) {
+        const px = cxFn(peakCum.yr).toFixed(1), py = cyFn(peakCum.v).toFixed(1);
+        cSvg = cSvg.replace('</svg>', '<circle cx="' + px + '" cy="' + py + '" r="2.5" fill="#2a7a3a" opacity="0.6"/>' +
+          '<text x="' + px + '" y="' + (parseFloat(py) - 3) + '" text-anchor="middle" font-size="7" fill="#2a7a3a">' + peakCum.yr + '</text></svg>');
+      }
+      if (troughCum.v < 0) {
+        const tx = cxFn(troughCum.yr).toFixed(1), ty = cyFn(troughCum.v).toFixed(1);
+        cSvg = cSvg.replace('</svg>', '<circle cx="' + tx + '" cy="' + ty + '" r="2.5" fill="#c0392b" opacity="0.6"/>' +
+          '<text x="' + tx + '" y="' + (parseFloat(ty) + 9) + '" text-anchor="middle" font-size="7" fill="#c0392b">' + troughCum.yr + '</text></svg>');
+      }
       // per-season棒グラフ（バー形式で各期ptを正負表示）
       const bW = 600, bH = 36, bPadL = 40, bPadR = 8, bPadT = 4, bPadB = 4;
       const bPts = cumulativeData.map(r => r.points);
       const bMax = Math.max(...bPts.map(Math.abs), 1);
+      const bestPtIdx = bPts.indexOf(Math.max(...bPts));
+      const worstPtIdx = bPts.indexOf(Math.min(...bPts));
       const zeroY = (bH / 2).toFixed(1);
       const barW = Math.max(1, (bW - bPadL - bPadR) / cumulativeData.length - 1);
       let bSvg = '<svg viewBox="0 0 ' + bW + ' ' + bH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + bH + 'px">';
@@ -1176,8 +1191,14 @@ function renderDetail(p) {
         const pct = r.points / bMax;
         const barH2 = Math.abs(pct) * (bH / 2 - bPadT);
         const by = r.points >= 0 ? (bH / 2 - barH2).toFixed(1) : zeroY;
+        const isBest = i === bestPtIdx && r.points > 0;
+        const isWorst = i === worstPtIdx && r.points < 0;
         const col = r.points >= 0 ? '#2a7a3a' : '#c0392b';
-        bSvg += '<rect x="' + bx + '" y="' + by + '" width="' + barW.toFixed(1) + '" height="' + barH2.toFixed(1) + '" fill="' + col + '" opacity="0.7"/>';
+        const yr = termToYear(oid, r.term);
+        bSvg += '<rect x="' + bx + '" y="' + by + '" width="' + barW.toFixed(1) + '" height="' + barH2.toFixed(1) + '" fill="' + col + '" opacity="' + (isBest || isWorst ? '1' : '0.7') + '" stroke="' + (isBest || isWorst ? '#fff' : 'none') + '" stroke-width="' + (isBest || isWorst ? '0.5' : '0') + '"><title>' + yr + '年: ' + (r.points >= 0 ? '+' : '') + r.points.toFixed(1) + 'pt</title></rect>';
+        if (isBest || isWorst) {
+          bSvg += '<text x="' + (parseFloat(bx) + barW / 2) + '" y="' + (isBest ? parseFloat(by) - 1 : parseFloat(by) + parseFloat(barH2.toFixed(1)) + 7) + '" text-anchor="middle" font-size="6" fill="' + col + '">' + yr + '</text>';
+        }
       });
       bSvg += '<text x="4" y="' + (bH / 2 + 4) + '" font-size="8" fill="#8a93a2">期別pt</text>';
       bSvg += '</svg>';
