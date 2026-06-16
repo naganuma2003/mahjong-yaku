@@ -427,6 +427,18 @@ function filteredPlayers() {
         const titleCount = p => (p.profile && p.profile.titles) ? p.profile.titles.length : 0;
         return titleCount(b) - titleCount(a);
       }
+      if (state.sort === "recentavg") {
+        const recentAvg = p => {
+          const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null)
+            .sort((a, b2) => {
+              const ya = termToYear(a.orgId || p.org, a.term) || wTermToYear(p.wleague || {}, a.term);
+              const yb = termToYear(b2.orgId || p.org, b2.term) || wTermToYear(p.wleague || {}, b2.term);
+              return yb - ya;
+            }).slice(0, 5);
+          return recs.length >= 2 ? recs.reduce((s, r) => s + r.points, 0) / recs.length : -Infinity;
+        };
+        return recentAvg(b) - recentAvg(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
   _filteredCache = result;
@@ -768,7 +780,7 @@ function renderList() {
   const selectedIdx = state.selectedId ? list.findIndex(p => p.id === state.selectedId) : -1;
   const capEnd = state.showAll ? list.length : Math.max(LIST_CAP, selectedIdx + 1);
   const visibleList = list.length > capEnd ? list.slice(0, capEnd) : list;
-  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier", "titles"].includes(state.sort);
+  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier", "titles", "recentavg"].includes(state.sort);
   visibleList.forEach((p, listIdx) => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
@@ -796,7 +808,7 @@ function renderList() {
       : "";
     // ソート順に応じたコンテキストバッジ
     let contextBadge = "";
-    if (state.sort === "totalpts" || state.sort === "avgpts" || state.sort === "avgrank" || state.sort === "debut" || state.sort === "career" || state.sort === "records" || state.sort === "name") {
+    if (state.sort === "totalpts" || state.sort === "avgpts" || state.sort === "avgrank" || state.sort === "debut" || state.sort === "career" || state.sort === "records" || state.sort === "name" || state.sort === "recentavg") {
       const allRecs2 = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
       if (state.sort === "totalpts" && allRecs2.length >= 2) {
         const tot = allRecs2.reduce((s, r) => s + r.points, 0);
@@ -836,6 +848,15 @@ function renderList() {
       } else if (state.sort === "records") {
         const cnt = (p.records || []).length + (p.wrecords || []).length;
         if (cnt) contextBadge = '<span class="p-ctx neu">' + cnt + '期</span>';
+      } else if (state.sort === "recentavg" && allRecs2.length >= 2) {
+        const recent5 = allRecs2.slice().sort((a, b) => {
+          const ya = termToYear(a.orgId || p.org, a.term) || wTermToYear(p.wleague || {}, a.term);
+          const yb = termToYear(b.orgId || p.org, b.term) || wTermToYear(p.wleague || {}, b.term);
+          return yb - ya;
+        }).slice(0, 5);
+        const r5avg = recent5.reduce((s, r) => s + r.points, 0) / recent5.length;
+        const sign = r5avg >= 0 ? "+" : "";
+        contextBadge = '<span class="p-ctx' + (r5avg >= 0 ? " pos" : " neg") + '" title="直近' + recent5.length + '期平均">' + sign + r5avg.toFixed(1) + '</span>';
       }
     }
     // 最新のティアを取得
