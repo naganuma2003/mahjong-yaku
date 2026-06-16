@@ -350,6 +350,10 @@ function renderOrgFilter() {
   mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(mt);
 
+  const sep2 = document.createElement("span");
+  sep2.className = "filter-sep";
+  el.orgFilter.appendChild(sep2);
+
   const tb = document.createElement("button");
   tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
   tb.textContent = "最高リーグ (" + TOPLEAGUE_COUNT + ")"; tb.title = "各団体の最高位リーグに在籍経験あり";
