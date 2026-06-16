@@ -1283,6 +1283,12 @@ function chartSvg(recs, orgId) {
     }
     svg += '<circle cx="' + cx + '" cy="' + cy +
            '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
+    if (pts.length <= 10 && d.points != null) {
+      const lbl = fmtPoints(d.points);
+      const lblY = (parseFloat(cy) - 9).toFixed(1);
+      const lblColor = d.points >= 0 ? '#2a7a3a' : '#c0392b';
+      svg += '<text x="' + cx + '" y="' + lblY + '" text-anchor="middle" font-size="9" fill="' + lblColor + '" pointer-events="none">' + lbl + '</text>';
+    }
   });
 
   svg += '</svg><div class="chart-tip"></div>';
@@ -1398,6 +1404,12 @@ function wchartSvg(wrecords, wleague) {
     }
     svg += '<circle cx="' + cx + '" cy="' + cy +
            '" r="5" fill="' + c + '" data-tip="' + tip.replace(/"/g, '&quot;') + '" style="cursor:pointer"/>';
+    if (pts.length <= 10 && d.points != null) {
+      const lbl = fmtPoints(d.points);
+      const lblY = (parseFloat(cy) - 9).toFixed(1);
+      const lblColor = d.points >= 0 ? '#2a7a3a' : '#c0392b';
+      svg += '<text x="' + cx + '" y="' + lblY + '" text-anchor="middle" font-size="9" fill="' + lblColor + '" pointer-events="none">' + lbl + '</text>';
+    }
   });
 
   svg += '</svg><div class="chart-tip"></div>';
