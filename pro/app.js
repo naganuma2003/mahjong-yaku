@@ -1369,6 +1369,27 @@ function addToHistory(p) {
   } catch (e) {}
 }
 
+function showPlaceholder() {
+  const recent = renderRecentHistory();
+  const favs = getFavs();
+  let favSection = "";
+  if (favs.size > 0 && !recent) {
+    const favPlayers = [...favs].map(id => DATA.players.find(x => x.id === id)).filter(Boolean).slice(0, 8);
+    if (favPlayers.length) {
+      favSection = '<div class="recent-section"><div class="recent-head">★ お気に入り</div><div class="recent-list">' +
+        favPlayers.map(q => '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>').join('') +
+        '</div></div>';
+    }
+  }
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + recent + favSection;
+  el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const p = DATA.players.find(x => x.id === btn.dataset.id);
+      if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+    });
+  });
+}
+
 function renderRecentHistory() {
   try {
     const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
@@ -1452,7 +1473,7 @@ document.addEventListener("keydown", e => {
     history.replaceState(null, "", location.pathname);
     document.title = "麻雀プロ検索";
     renderList();
-    el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
+    showPlaceholder();
     return;
   }
   if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "PageDown" || e.key === "PageUp") {
@@ -1478,30 +1499,8 @@ document.addEventListener("keydown", e => {
 renderOrgFilter();
 renderList();
 
-// 初期プレースホルダー（閲覧履歴があれば表示）
-(function() {
-  try {
-    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    if (hist.length) {
-      const players = hist.map(id => DATA.players.find(x => x.id === id)).filter(Boolean);
-      if (players.length) {
-        let html = '<div class="placeholder"><div style="margin-bottom:12px;color:var(--muted);font-size:13px">最近閲覧した選手</div>';
-        html += '<div class="recent-list" style="justify-content:center">';
-        players.forEach(q => {
-          html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>';
-        });
-        html += '</div><div style="margin-top:20px;font-size:13px;color:var(--muted)">または ← 選手を選択してください</div></div>';
-        el.detail.innerHTML = html;
-        el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const p = DATA.players.find(x => x.id === btn.dataset.id);
-            if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
-          });
-        });
-      }
-    }
-  } catch (e) {}
-})();
+// 初期プレースホルダー（閲覧履歴・お気に入りがあれば表示）
+showPlaceholder();
 
 // URLパラメータで選手を直接選択（シェアリンク対応）
 (function() {
