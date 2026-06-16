@@ -186,7 +186,12 @@ function filteredPlayers() {
       return (p.records || []).some(r => termToYear(r.orgId || p.org, r.term) === yr) ||
              (p.wrecords || []).some(r => wTermToYear(p.wleague || {}, r.term) === yr);
     })
-    .filter(p => !q || normalize(p.name).includes(q))
+    .filter(p => {
+      if (!q) return true;
+      if (normalize(p.name).includes(q)) return true;
+      const titles = (p.profile && p.profile.titles) ? p.profile.titles.join("") : "";
+      return titles.includes(q);
+    })
     .sort((a, b) => {
       // チーム絞り込み中は現役メンバーを先頭に
       if (activeTeam) {
