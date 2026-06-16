@@ -190,7 +190,9 @@ function filteredPlayers() {
       if (!q) return true;
       if (normalize(p.name).includes(q)) return true;
       const titles = (p.profile && p.profile.titles) ? p.profile.titles.join("") : "";
-      return titles.includes(q);
+      if (titles.includes(q)) return true;
+      const nick = (p.profile && p.profile.nickname) ? normalize(p.profile.nickname) : "";
+      return nick.includes(q);
     })
     .sort((a, b) => {
       // チーム絞り込み中は現役メンバーを先頭に
