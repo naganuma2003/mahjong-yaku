@@ -5,6 +5,9 @@ const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
 const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
+const PLAYOFF_COUNT = DATA.players.filter(p =>
+  (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff")
+).length;
 const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   if (!p.records || !p.records.length) return false;
   return p.records.some(r => {
@@ -368,7 +371,7 @@ function renderOrgFilter() {
 
   const poBtn = document.createElement("button");
   poBtn.className = "org-btn playoff-btn" + (state.playoff ? " active" : "");
-  poBtn.textContent = "★ 決定戦経験"; poBtn.title = "決定戦（プレーオフ）進出経験あり";
+  poBtn.textContent = "★ 決定戦経験 (" + PLAYOFF_COUNT + ")"; poBtn.title = "決定戦（プレーオフ）進出経験あり";
   poBtn.onclick = () => { state.playoff = !state.playoff; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(poBtn);
 
