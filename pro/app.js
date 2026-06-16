@@ -971,6 +971,35 @@ function renderDetail(p) {
     }
   }
 
+  // 最高ティア経験仲間（同団体・同最高ティアの選手）
+  if (p.org && p.records && p.records.length) {
+    const myOrg = ORGS[p.org];
+    const myTiers = (myOrg && (myOrg.league || {}).tiers) || [];
+    if (myTiers.length) {
+      const myBestTierIdx = (() => {
+        let best = 9999;
+        (p.records || []).forEach(r => {
+          const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+          const i = myTiers.indexOf(t);
+          if (i >= 0 && i < best) best = i;
+        });
+        return best;
+      })();
+      if (myBestTierIdx < 9999 && myBestTierIdx <= 1) {
+        const myBestTier = myTiers[myBestTierIdx];
+        const sameToppers = DATA.players.filter(x => x.id !== p.id && (x.org === p.org || (x.records||[]).some(r => (r.orgId||x.org) === p.org)) && (x.records||[]).some(r => {
+          const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+          return t === myBestTier;
+        })).slice(0, 8);
+        if (sameToppers.length >= 2) {
+          html += '<div class="recent-section"><div class="recent-head">' + (myOrg.shortName || "") + ' ' + myBestTier + ' 経験者</div><div class="recent-list">';
+          sameToppers.forEach(q => { html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>'; });
+          html += '</div></div>';
+        }
+      }
+    }
+  }
+
   html += renderRecentHistory();
   addToHistory(p);
 
