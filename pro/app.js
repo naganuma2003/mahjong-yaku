@@ -971,13 +971,30 @@ function renderWleagueSection(p) {
     : "-";
   html += '<div class="summary">';
   const wPlayoffs = wrecords.filter(r => r.category === "playoff").length;
+  const wSortedTerms = wrecords.map(r => r.term).sort((a, b) => a - b);
+  let wMaxStreak = 1, wCurStreak = 1;
+  for (let i = 1; i < wSortedTerms.length; i++) {
+    if (wSortedTerms[i] === wSortedTerms[i - 1] + 1) { wCurStreak++; wMaxStreak = Math.max(wMaxStreak, wCurStreak); }
+    else wCurStreak = 1;
+  }
+  const wStreakStr = wSortedTerms.length > 1 && wMaxStreak >= 3 ? wMaxStreak + "期" : null;
   html += stat(wrecords.length, "出場期数");
   html += stat(topTier, "最高到達");
   html += stat(wPlayoffs, "決定戦進出");
+  if (wStreakStr) html += stat(wStreakStr, "最長連続");
   html += stat(wYearRange, "活動期間");
   html += '</div>';
 
   html += wchartSvg(wrecords, wl);
+
+  // 女流ティア別集計
+  const wTierCounts = {};
+  wrecords.forEach(r => { wTierCounts[r.tier] = (wTierCounts[r.tier] || 0) + 1; });
+  const wTierOrder = tiers.concat(Object.keys(wTierCounts).filter(t => !tiers.includes(t)));
+  const wTierBreakdown = wTierOrder.filter(t => wTierCounts[t]).map(t =>
+    '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + wTierCounts[t] + '</span></span>'
+  ).join("");
+  if (wTierBreakdown) html += '<div class="tier-breakdown">' + wTierBreakdown + '</div>';
 
   const termsSorted = wrecords.slice().sort((a, b) => a.term - b.term);
   const displayItems = [];
