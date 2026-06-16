@@ -779,6 +779,25 @@ el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; ren
 document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== el.search) {
     e.preventDefault(); el.search.focus(); el.search.select();
+    return;
+  }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    const items = filteredPlayers();
+    if (!items.length) return;
+    const curIdx = items.findIndex(p => p.id === state.selectedId);
+    const nextIdx = e.key === "ArrowDown"
+      ? Math.min(curIdx + 1, items.length - 1)
+      : Math.max(curIdx - 1, 0);
+    if (nextIdx !== curIdx) {
+      e.preventDefault();
+      const p = items[nextIdx];
+      state.selectedId = p.id;
+      renderList();
+      renderDetail(p);
+      // スクロール
+      const li = el.playerList.querySelector("li.selected");
+      if (li) li.scrollIntoView({ block: "nearest" });
+    }
   }
 });
 renderOrgFilter();
