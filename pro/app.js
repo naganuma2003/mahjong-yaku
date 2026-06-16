@@ -717,6 +717,22 @@ function renderDetail(p) {
     html += renderWleagueSection(p);
   }
 
+  // 同期デビュー選手セクション
+  const pDebutYears = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).filter(y => y > 1000);
+  if (pDebutYears.length) {
+    const pDebutYear = Math.min(...pDebutYears);
+    const sameDebutOrg = (p.records || [])[0] && (p.records.find(r => termToYear(r.orgId||p.org,r.term) === pDebutYear) || {}).orgId || p.org;
+    const peers = DATA.players.filter(x => x.id !== p.id && (x.records||[]).some(r => {
+      const yr = termToYear(r.orgId||x.org, r.term);
+      return yr === pDebutYear && (r.orgId||x.org) === sameDebutOrg;
+    })).slice(0, 6);
+    if (peers.length >= 2) {
+      html += '<div class="recent-section"><div class="recent-head">' + pDebutYear + '年 同期（' + (ORGS[sameDebutOrg] || {}).shortName + '）</div><div class="recent-list">';
+      peers.forEach(q => { html += '<button class="recent-btn" data-id="' + q.id + '">' + q.name + '</button>'; });
+      html += '</div></div>';
+    }
+  }
+
   html += renderRecentHistory();
   addToHistory(p);
 
