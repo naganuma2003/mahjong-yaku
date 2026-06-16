@@ -580,6 +580,21 @@ function renderList() {
     const tierBadge = latestTier
       ? '<span class="ptier tier-badge ' + tierClass(latestTier) + '">' + latestTier + '</span>'
       : "";
+    // 最高到達ティア（最新と異なる場合のみ表示）
+    let bestTierBadge = "";
+    {
+      const orgForTiers = ORGS[latestRec ? (latestRec.orgId || p.org) : p.org] || {};
+      const tiers = (orgForTiers.league || {}).tiers || [];
+      if (tiers.length && latestTier) {
+        const normTier = t => (t === "後期" || t === "前期") ? null : t;
+        const tierIdx = t => { const i = tiers.indexOf(t); return i >= 0 ? i : 9999; };
+        const allTiers = (p.records || []).map(r => normTier((r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier)).filter(Boolean);
+        const bestTier = allTiers.sort((a, b) => tierIdx(a) - tierIdx(b))[0];
+        if (bestTier && bestTier !== latestTier && tierIdx(bestTier) < tierIdx(latestTier)) {
+          bestTierBadge = '<span class="ptier tier-badge best-tier ' + tierClass(bestTier) + '" title="最高到達: ' + bestTier + '">▲' + bestTier + '</span>';
+        }
+      }
+    }
     // 昇降級トレンドアイコン
     let trendIcon = "";
     if (latestRec) {
@@ -613,7 +628,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + favStar +
+      ongoingBadge + tierBadge + bestTierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
