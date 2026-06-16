@@ -423,11 +423,13 @@ hr.section-divider {
   .back-to-list {
     display: block;
     background: none;
-    border: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
-    padding: 0 0 12px;
+    padding: 3px 8px;
     font-family: inherit;
   }
+  .detail-nav { margin-bottom: 12px; }
 }
