@@ -382,7 +382,9 @@ function renderDetail(p) {
   // Mリーグチーム情報
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
 
+  const isOngoing = allRecs.some(r => r.ongoing);
   let html = '<div class="detail-head"><h2>' + p.name + "</h2>" +
+    (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';
@@ -500,6 +502,9 @@ function renderDetail(p) {
   }
 
   el.detail.innerHTML = html;
+  if (window.innerWidth <= 760) {
+    el.detail.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function stat(num, lbl) {
