@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16q 期別ptバーチャート追加・URLフィルター保存・印刷ボタン
+// v2026-06-16r 本日誕生日選手セクション・期別ptバー・URLフィルター保存
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1964,6 +1964,24 @@ function showPlaceholder() {
         '</div></div>';
     }
   }
+  // 今日が誕生日の選手
+  let birthdaySection = "";
+  {
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const todayMMDD = mm + "-" + dd;
+    const bdPlayers = DATA.players.filter(p => p.profile && p.profile.birth && p.profile.birth.endsWith(todayMMDD));
+    if (bdPlayers.length) {
+      birthdaySection = '<div class="recent-section"><div class="recent-head">🎂 本日お誕生日</div><div class="recent-list">';
+      bdPlayers.forEach(bp => {
+        const yr = parseInt(bp.profile.birth.split("-")[0]);
+        const age = now.getFullYear() - yr;
+        birthdaySection += '<button class="recent-btn" data-id="' + bp.id + '" title="' + age + '歳">' + bp.name + '<span style="font-size:10px;color:var(--muted);margin-left:4px">' + age + '歳</span></button>';
+      });
+      birthdaySection += '</div></div>';
+    }
+  }
   // 今日のピックアップ（日付ベースのシード選択）
   let dailySection = "";
   const todayKey = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -2026,7 +2044,7 @@ function showPlaceholder() {
     '<span>今期出場: <strong>' + ongoingCount + '</strong></span>' +
     '<span>タイトル保有: <strong>' + titleCount + '</strong></span>' +
     '</div>';
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + dailySection + pickupSection + ongoingSection;
+  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + birthdaySection + dailySection + pickupSection + ongoingSection;
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
