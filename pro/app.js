@@ -363,6 +363,8 @@ function renderDetail(p) {
   });
   html += "</div>";
 
+  html += renderProfile(p);
+
   if (isMultiOrg) {
     html += '<div class="summary">';
     html += stat(allRecs.length, "総出場期数");
@@ -460,6 +462,37 @@ function renderDetail(p) {
 function stat(num, lbl) {
   return '<div class="stat"><div class="num">' + num +
          '</div><div class="lbl">' + lbl + "</div></div>";
+}
+
+function renderProfile(p) {
+  const pf = p.profile;
+  if (!pf) return "";
+  let html = '<div class="profile-card">';
+  if (pf.nickname) html += '<div class="profile-nickname">' + pf.nickname + '</div>';
+
+  html += '<div class="profile-grid">';
+  if (pf.birth) html += profileRow("生年月日", pf.birth);
+  if (pf.hometown) html += profileRow("出身", pf.hometown);
+  if (pf.education) html += profileRow("学歴", pf.education);
+  if (pf.proYear) html += profileRow("プロ入会", pf.proYear + "年");
+  if (pf.org) html += profileRow("所属団体", pf.org);
+  if (pf.team) html += profileRow("Mリーグ", pf.team);
+  if (pf.titles && pf.titles.length) html += profileRow("主要タイトル", pf.titles.join("、"));
+  if (pf.jantama) html += profileRow("雀魂", pf.jantama);
+  html += '</div>';
+
+  const links = [];
+  if (pf.x_url) links.push('<a href="' + pf.x_url + '" target="_blank" rel="noopener">𝕏</a>');
+  if (pf.youtube_url) links.push('<a href="' + pf.youtube_url + '" target="_blank" rel="noopener">YouTube</a>');
+  if (pf.instagram_url) links.push('<a href="' + pf.instagram_url + '" target="_blank" rel="noopener">Instagram</a>');
+  if (links.length) html += '<div class="profile-links">' + links.join(' ') + '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function profileRow(label, value) {
+  return '<div class="profile-label">' + label + '</div><div class="profile-value">' + value + '</div>';
 }
 
 // 期 → 西暦変換（団体別）
