@@ -801,9 +801,15 @@ function chartSvg(recs, orgId) {
   if (!tiers.length) return "";
 
   const pts = recs
-    .filter(r => tiers.includes(r.tier) && !r.ongoing)
-    .map(r => ({ year: termToYear(orgId, r.term), tier: r.tier, rank: r.rank || null,
-                 points: r.points, result: r.result, playoff: r.category === "playoff" }))
+    .filter(r => !r.ongoing)
+    .map(r => {
+      const isHalf = r.tier === "後期" || r.tier === "前期";
+      const tier = isHalf ? (r.result || r.tier) : r.tier;
+      return { year: termToYear(r.orgId || orgId, r.term), tier, rank: r.rank || null,
+               points: r.points, result: isHalf ? r.tier : r.result,
+               playoff: r.category === "playoff", half: isHalf };
+    })
+    .filter(d => tiers.includes(d.tier))
     .sort((a, b) => a.year - b.year);
   if (!pts.length) return "";
 
@@ -876,9 +882,10 @@ function chartSvg(recs, orgId) {
     const v = toV(d.tier, d.rank);
     const c = TC[tierKey(d.tier)] || '#8a93a2';
     const cx = xFn(d.year).toFixed(1), cy = yFn(v).toFixed(1);
-    const tip = d.year + '年 ' + d.tier + (d.rank ? ' ' + d.rank + '位' : '') +
+    const tip = d.year + '年 ' + d.tier + (d.half ? '(' + d.result + ')' : '') +
+                (d.rank ? ' ' + d.rank + '位' : '') +
                 (d.points != null ? ' ' + fmtPoints(d.points) + 'pt' : '') +
-                (d.result ? ' ' + d.result : '') +
+                (!d.half && d.result ? ' ' + d.result : '') +
                 (d.playoff ? ' ★決定戦' : '');
     if (d.playoff) {
       // 決定戦進出は外周リング付きで強調
