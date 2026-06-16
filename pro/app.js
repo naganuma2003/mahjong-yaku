@@ -593,9 +593,15 @@ function renderList() {
   if (state.hasTitle) filterTags.push("タイトル保有");
   const countText = list.length < total ? list.length + " / " + total + " 名" : total + " 名";
   el.playerCount.textContent = filterTags.length ? countText + " ・ " + filterTags.join("・") : countText;
-  // フィルター状態をタイトルに反映（選手詳細非表示時）
+  // フィルター状態をタイトル・URLに反映（選手詳細非表示時）
   if (!state.selectedId) {
     document.title = filterTags.length ? filterTags.join("・") + " - 麻雀プロ検索" : "麻雀プロ検索";
+    const params = new URLSearchParams();
+    if (state.query) params.set("q", state.query);
+    if (state.org !== "all") params.set("org", state.org);
+    const qs = params.toString();
+    const newUrl = location.pathname + (qs ? "?" + qs : "");
+    if (location.href !== location.origin + newUrl) history.replaceState(null, "", newUrl);
   }
   el.playerList.innerHTML = "";
   if (!list.length) {
