@@ -1145,6 +1145,16 @@ document.addEventListener("keydown", e => {
     if (panel) panel.style.display = panel.style.display === "none" ? "flex" : "none";
     return;
   }
+  if (e.key === "f" && document.activeElement !== el.search && state.selectedId) {
+    const p = DATA.players.find(x => x.id === state.selectedId);
+    if (p) {
+      const nowFav = toggleFav(p.id);
+      const btn = document.getElementById("favToggleBtn");
+      if (btn) { btn.textContent = nowFav ? "★" : "☆"; btn.classList.toggle("active", nowFav); }
+      renderList();
+    }
+    return;
+  }
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
