@@ -517,18 +517,26 @@ function renderOrgFilter() {
   }
 }
 
-function highlightName(name, q) {
-  if (!q) return name;
+function highlightName(name, terms) {
+  if (!terms || !terms.length) return name;
+  const termList = Array.isArray(terms) ? terms : [terms];
+  if (!termList.length) return name;
+  // 各語を順に適用（最初にマッチした語をハイライト）
   const norm = normalize(name);
-  const idx = norm.indexOf(q);
-  if (idx < 0) return name;
-  return name.slice(0, idx) + '<mark class="hl">' + name.slice(idx, idx + q.length) + '</mark>' + name.slice(idx + q.length);
+  for (const q of termList) {
+    if (!q) continue;
+    const idx = norm.indexOf(q);
+    if (idx >= 0) {
+      return name.slice(0, idx) + '<mark class="hl">' + name.slice(idx, idx + q.length) + '</mark>' + name.slice(idx + q.length);
+    }
+  }
+  return name;
 }
 
 function renderList() {
   const _favs = getFavs(); // キャッシュ（localStorage読み込みを1回に）
   const list = filteredPlayers();
-  const _q = state.query.trim().split(/\s+|　+/).filter(Boolean).map(normalize).filter(Boolean)[0] || "";
+  const _qTerms = state.query.trim().split(/\s+|　+/).filter(Boolean).map(normalize).filter(Boolean);
   const total = DATA.players.length;
   const filterTags = [];
   if (state.org !== "all") { const o = ORGS[state.org]; if (o) filterTags.push(o.shortName); }
@@ -644,7 +652,7 @@ function renderList() {
     if (titleParts.length) li.title = titleParts.join(" / ");
     const rankNum = showRank ? '<span class="list-rank">' + (listIdx + 1) + '</span>' : "";
     li.innerHTML =
-      rankNum + '<span class="pname">' + highlightName(p.name, _q) + "</span>" +
+      rankNum + '<span class="pname">' + highlightName(p.name, _qTerms) + "</span>" +
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
