@@ -196,6 +196,13 @@ function filteredPlayers() {
       return nick.includes(q);
     })
     .sort((a, b) => {
+      // 検索クエリがある場合は名前の前方一致を優先
+      if (q) {
+        const an = normalize(a.name), bn = normalize(b.name);
+        const aStart = an.startsWith(q) ? 0 : 1;
+        const bStart = bn.startsWith(q) ? 0 : 1;
+        if (aStart !== bStart) return aStart - bStart;
+      }
       // チーム絞り込み中は現役メンバーを先頭に
       if (activeTeam) {
         const sa = playerTeamStatus(normalize(a.name), activeTeam);
