@@ -1315,13 +1315,14 @@ document.addEventListener("keydown", e => {
     el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
     return;
   }
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "PageDown" || e.key === "PageUp") {
     const items = filteredPlayers();
     if (!items.length) return;
     const curIdx = items.findIndex(p => p.id === state.selectedId);
-    const nextIdx = e.key === "ArrowDown"
-      ? Math.min(curIdx + 1, items.length - 1)
-      : Math.max(curIdx - 1, 0);
+    const step = (e.key === "PageDown" || e.key === "PageUp") ? 10 : 1;
+    const nextIdx = (e.key === "ArrowDown" || e.key === "PageDown")
+      ? Math.min(curIdx + step, items.length - 1)
+      : Math.max(curIdx - step, 0);
     if (nextIdx !== curIdx) {
       e.preventDefault();
       const p = items[nextIdx];
