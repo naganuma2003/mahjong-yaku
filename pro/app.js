@@ -1868,7 +1868,17 @@ el.search.addEventListener("input", e => {
   state.query = e.target.value;
   state.showAll = false;
   clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(renderList, 80);
+  _searchTimer = setTimeout(() => {
+    renderList();
+    // 絞り込み結果が1人だけなら自動で詳細を開く
+    const items = filteredPlayers();
+    if (items.length === 1 && state.query.trim().length >= 2) {
+      const p = items[0];
+      state.selectedId = p.id;
+      renderList();
+      renderDetail(p);
+    }
+  }, 80);
 });
 document.getElementById("yearFilter").addEventListener("input", e => { state.year = e.target.value; renderList(); });
 el.search.addEventListener("keydown", e => {
