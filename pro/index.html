@@ -58,6 +58,7 @@
   <button class="help-btn" id="rankingBtn" title="今期ランキング：今期出場中＋今期pt順" onclick="quickRanking()">📊</button>
   <button class="help-btn" id="copyListBtn" title="一覧をコピー" onclick="copyPlayerList()">📋</button>
   <button class="help-btn" id="randomBtn" title="ランダムに選手を表示" onclick="openRandomPlayer()">🎲</button>
+  <button class="help-btn" id="shareFilterBtn" title="現在の絞り込み状態をURLでシェア" onclick="shareFilterUrl()">🔗</button>
   <button class="help-btn" id="helpBtn" title="キーボードショートカット">?</button>
 </div>
 <div class="help-panel" id="helpPanel" style="display:none">
@@ -167,6 +168,17 @@ function copyPlayerStats() {
   lines.push(location.origin + location.pathname + "?p=" + encodeURIComponent(pid));
   navigator.clipboard.writeText(lines.join("\n")).then(function() {
     if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📄"; }, 1500); }
+  });
+}
+function shareFilterUrl() {
+  const btn = document.getElementById('shareFilterBtn');
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url }).catch(function(){});
+    return;
+  }
+  navigator.clipboard.writeText(url).then(function() {
+    if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '🔗'; }, 1500); }
   });
 }
 function clearYear() {
