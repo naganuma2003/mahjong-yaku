@@ -805,7 +805,7 @@ function renderDetail(p) {
 
     // 昇級率
     const promotions = groupRecs.filter(r => r.category === "promotion").length;
-    const completedRecs = groupRecs.filter(r => !r.ongoing && r.category !== "other" || r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff");
+    const completedRecs = groupRecs.filter(r => !r.ongoing && (r.category === "promotion" || r.category === "demotion" || r.category === "stay" || r.category === "playoff"));
     const promoRateStr = completedRecs.length >= 5
       ? Math.round(promotions / completedRecs.length * 100) + "%"
       : null;
