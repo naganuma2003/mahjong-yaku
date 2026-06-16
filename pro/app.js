@@ -328,12 +328,20 @@ function renderList() {
     const tierBadge = latestRec
       ? '<span class="ptier tier-badge ' + tierClass(latestRec.tier) + '">' + latestRec.tier + '</span>'
       : "";
+    // M関係ロールラベル（成績なし選手のみ）
+    let roleLabel = "";
+    if (!latestRec && !curOrg) {
+      const pn = normalize(p.name);
+      if (MCAST.has(pn))     roleLabel = '<span class="prole role-cast">実況</span>';
+      else if (MANALYST.has(pn))  roleLabel = '<span class="prole role-analyst">解説</span>';
+      else if (MREPORTER.has(pn)) roleLabel = '<span class="prole role-reporter">リポーター</span>';
+    }
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      tierBadge + teamBadge +
+      tierBadge + roleLabel + teamBadge +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);

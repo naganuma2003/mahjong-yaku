@@ -129,6 +129,7 @@ body {
 .player-list .porg { font-size: 11px; color: var(--muted); }
 .player-list .porg.transfer { color: #7b1fa2; font-weight: 600; }
 .player-list .ptier { font-size: 10px; padding: 1px 5px; min-width: 22px; }
+.player-list .prole { font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
 
 /* --- 詳細 --- */
 .detail {
