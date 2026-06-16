@@ -894,7 +894,7 @@ function chartSvg(recs, orgId) {
       const v = toV(pts[i].tier, pts[i].rank);
       const cx = xFn(pts[i].year).toFixed(1), cy = yFn(v).toFixed(1);
       if (i === 0) { solidPath = 'M' + cx + ' ' + cy; continue; }
-      const gap = pts[i].year - pts[i - 1].year > 2;
+      const gap = pts[i].year - pts[i - 1].year > 1;
       if (gap) {
         const pv = toV(pts[i - 1].tier, pts[i - 1].rank);
         const px = xFn(pts[i - 1].year).toFixed(1), py = yFn(pv).toFixed(1);
@@ -1006,7 +1006,7 @@ function wchartSvg(wrecords, wleague) {
       const v = toV(pts[i].tier, pts[i].rank);
       const cx = xFn(pts[i].year).toFixed(1), cy = yFn(v).toFixed(1);
       if (i === 0) { solidPath = 'M' + cx + ' ' + cy; continue; }
-      const gap = pts[i].year - pts[i - 1].year > 2;
+      const gap = pts[i].year - pts[i - 1].year > 1;
       if (gap) {
         const pv = toV(pts[i - 1].tier, pts[i - 1].rank);
         const px = xFn(pts[i - 1].year).toFixed(1), py = yFn(pv).toFixed(1);
