@@ -124,6 +124,28 @@ function openRandomPlayer() {
   scrollToSelected();
   renderDetail(p);
 }
+function copyPlayerStats() {
+  const pid = state.selectedId;
+  if (!pid) return;
+  const p = window.MJ_DATA.players.find(function(x) { return x.id === pid; });
+  if (!p) return;
+  const btn = document.getElementById("copyStatsBtn");
+  const allRecs = (p.records || []).concat(p.wrecords || []);
+  const ptsRecs = allRecs.filter(function(r) { return !r.ongoing && r.points != null; });
+  const totalPts = ptsRecs.length ? ptsRecs.reduce(function(s, r) { return s + r.points; }, 0) : null;
+  const playoffN = allRecs.filter(function(r) { return r.category === "playoff"; }).length;
+  const debutYrs = (p.records || []).map(function(r) { return termToYear(r.orgId || p.org, r.term); }).filter(function(y) { return y > 1000; });
+  const debutYear = debutYrs.length ? Math.min.apply(null, debutYrs) : null;
+  let lines = [p.name];
+  if (debutYear) lines.push(debutYear + "年デビュー");
+  lines.push("出場: " + allRecs.length + "期");
+  if (playoffN) lines.push("決定戦: " + playoffN + "回");
+  if (totalPts != null) lines.push("通算: " + (totalPts >= 0 ? "+" : "") + totalPts.toFixed(1) + "pt");
+  lines.push(location.origin + location.pathname + "?p=" + encodeURIComponent(pid));
+  navigator.clipboard.writeText(lines.join("\n")).then(function() {
+    if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📄"; }, 1500); }
+  });
+}
 function toggleFilter() {
   const filter = document.getElementById('orgFilter');
   const open = filter.classList.contains('open');
