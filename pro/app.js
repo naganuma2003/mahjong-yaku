@@ -305,14 +305,15 @@ function renderOrgFilter() {
 
   // フィルタークリアボタン
   const anyActive = state.org !== "all" || state.mleagueC || state.mleagueF || state.mtourn ||
-    state.topLeague || state.wleague || state.mcast || state.manalyst || state.mreporter || state.mteam;
+    state.topLeague || state.wleague || state.mcast || state.manalyst || state.mreporter || state.mteam || state.year;
   if (anyActive) {
     const clr = document.createElement("button");
     clr.className = "org-btn clear-btn";
     clr.textContent = "✕ フィルタークリア";
     clr.onclick = () => {
       Object.assign(state, { org:"all", mleagueC:false, mleagueF:false, mtourn:false,
-        topLeague:false, wleague:false, mcast:false, manalyst:false, mreporter:false, mteam:null });
+        topLeague:false, wleague:false, mcast:false, manalyst:false, mreporter:false, mteam:null, year:"" });
+      document.getElementById("yearFilter").value = "";
       renderOrgFilter(); renderList();
     };
     el.orgFilter.appendChild(clr);
