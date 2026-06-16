@@ -194,7 +194,7 @@ function filteredPlayers() {
       if (state.sort === "recent") {
         const latestYear = p => {
           const years = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
-            .concat((p.wrecords || []).map(r => r.term))
+            .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
             .filter(y => y > 1000);
           return years.length ? Math.max(...years) : 0;
         };
