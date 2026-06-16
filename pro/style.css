@@ -259,6 +259,7 @@ body {
 }
 .profile-label { color: var(--muted); font-weight: 600; }
 .profile-value { color: var(--text); }
+.title-badge { display: inline-block; background: #fff8e1; color: #7c5c00; border: 1px solid #ffe082; border-radius: 4px; padding: 1px 7px; font-size: 12px; margin: 1px 2px 1px 0; }
 .profile-links {
   margin-top: 10px;
   display: flex;

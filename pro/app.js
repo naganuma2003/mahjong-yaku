@@ -627,7 +627,10 @@ function renderProfile(p) {
   if (pf.proYear) html += profileRow("プロ入会", pf.proYear + "年");
   if (pf.org) html += profileRow("所属団体", pf.org);
   if (pf.team) html += profileRow("Mリーグ", pf.team);
-  if (pf.titles && pf.titles.length) html += profileRow("主要タイトル", pf.titles.join("、"));
+  if (pf.titles && pf.titles.length) {
+    const badges = pf.titles.map(t => '<span class="title-badge">' + t + '</span>').join(" ");
+    html += profileRow("主要タイトル", badges);
+  }
   if (pf.jantama) html += profileRow("雀魂", pf.jantama);
   html += '</div>';
 
