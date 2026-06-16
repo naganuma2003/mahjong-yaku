@@ -537,7 +537,8 @@ function renderDetail(p) {
   });
   const isMultiOrg = orgIds.length > 1;
 
-  const totalPlayoffs = allRecs.filter(r => r.category === "playoff").length;
+  const totalPlayoffs = allRecs.filter(r => r.category === "playoff").length +
+    (p.wrecords || []).filter(r => r.category === "playoff").length;
 
   // Mリーグチーム情報
   const playerTeams = MLEAGUE_TEAMS.filter(t => playerTeamStatus(p.name, t) !== null);
