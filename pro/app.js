@@ -359,8 +359,14 @@ function renderList() {
 }
 
 // --- 年表 -------------------------------------------------------------
+function scrollToSelected() {
+  const li = el.playerList.querySelector("li.selected");
+  if (li) li.scrollIntoView({ block: "nearest" });
+}
+
 function renderDetail(p) {
   history.replaceState(null, "", "?p=" + encodeURIComponent(p.id));
+  document.title = p.name + " - 麻雀プロ検索";
   const allRecs = p.records.slice().sort((a, b) => b.term - a.term);
 
   // 団体ごとにグループ分け
@@ -525,7 +531,7 @@ function renderDetail(p) {
   el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const mate = DATA.players.find(x => x.id === btn.dataset.id);
-      if (mate) { state.selectedId = mate.id; renderList(); renderDetail(mate); }
+      if (mate) { state.selectedId = mate.id; renderList(); scrollToSelected(); renderDetail(mate); }
     });
   });
   if (window.innerWidth <= 760) {
@@ -845,6 +851,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
+    document.title = "麻雀プロ検索";
     renderList();
     el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
     return;
