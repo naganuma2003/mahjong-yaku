@@ -354,6 +354,10 @@ function filteredPlayers() {
         };
         return totalPts(b) - totalPts(a);
       }
+      if (state.sort === "titles") {
+        const titleCount = p => (p.profile && p.profile.titles) ? p.profile.titles.length : 0;
+        return titleCount(b) - titleCount(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
   _filteredCache = result;
@@ -609,7 +613,7 @@ function renderList() {
   const selectedIdx = state.selectedId ? list.findIndex(p => p.id === state.selectedId) : -1;
   const capEnd = state.showAll ? list.length : Math.max(LIST_CAP, selectedIdx + 1);
   const visibleList = list.length > capEnd ? list.slice(0, capEnd) : list;
-  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier"].includes(state.sort);
+  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier", "titles"].includes(state.sort);
   visibleList.forEach((p, listIdx) => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
