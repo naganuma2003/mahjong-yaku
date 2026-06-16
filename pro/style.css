@@ -43,6 +43,7 @@
   .ongoing-badge { background: #2a2208; color: #d4a820; border-color: #8a6800; }
   .p-pts.pos { color: #5cb87a; }
   .p-pts.neg { color: #e05c50; }
+  mark.hl { background: #4a4010; color: #f0d060; }
   input, select { background: var(--panel); color: var(--text); border-color: var(--border); }
 }
 
@@ -188,6 +189,7 @@ body {
 .p-pts { font-size: 11px; font-weight: 700; margin-left: 3px; }
 .p-pts.pos { color: #2a7a3a; }
 .p-pts.neg { color: #c0392b; }
+mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1px; }
 
 /* --- 詳細 --- */
 .detail {

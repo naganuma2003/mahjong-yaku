@@ -395,9 +395,18 @@ function renderOrgFilter() {
   }
 }
 
+function highlightName(name, q) {
+  if (!q) return name;
+  const norm = normalize(name);
+  const idx = norm.indexOf(q);
+  if (idx < 0) return name;
+  return name.slice(0, idx) + '<mark class="hl">' + name.slice(idx, idx + q.length) + '</mark>' + name.slice(idx + q.length);
+}
+
 function renderList() {
   const _favs = getFavs(); // キャッシュ（localStorage読み込みを1回に）
   const list = filteredPlayers();
+  const _q = normalize(state.query);
   const total = DATA.players.length;
   el.playerCount.textContent = list.length < total
     ? list.length + " / " + total + " 名"
@@ -459,7 +468,7 @@ function renderList() {
     }
     const favStar = _favs.has(p.id) ? '<span class="p-fav">★</span>' : "";
     li.innerHTML =
-      '<span class="pname">' + p.name + "</span>" +
+      '<span class="pname">' + highlightName(p.name, _q) + "</span>" +
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
