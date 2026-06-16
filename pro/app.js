@@ -1371,7 +1371,21 @@ el.search.addEventListener("keydown", e => {
     el.search.blur();
   }
 });
-el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; renderList(); });
+// ソート設定をlocalStorageに保存・復元
+(function() {
+  try {
+    const saved = localStorage.getItem("mj_sort");
+    if (saved && el.sortSelect.querySelector('option[value="' + saved + '"]')) {
+      state.sort = saved;
+      el.sortSelect.value = saved;
+    }
+  } catch(e) {}
+})();
+el.sortSelect.addEventListener("change", e => {
+  state.sort = e.target.value;
+  try { localStorage.setItem("mj_sort", state.sort); } catch(e) {}
+  renderList();
+});
 document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== el.search) {
     e.preventDefault(); el.search.focus(); el.search.select();
