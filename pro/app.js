@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16m プロフィールにデビュー時年齢・前後ナビ・コンテキストバッジ
+// v2026-06-16n 検索にティア名マッチング追加・デビュー時年齢・前後ナビ
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -274,9 +274,13 @@ function filteredPlayers() {
         const org = ORGS[oid] || {};
         return (org.name || "") + (org.shortName || "") + ((org.league || {}).name || "");
       }).join("") + ((p.wleague || {}).name || "");
+      // 最新ティア（検索用）
+      const latestRecQ = (p.records || []).filter(r => !r.ongoing)
+        .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
+      const latestTierQ = latestRecQ ? normalize((latestRecQ.tier === "後期" || latestRecQ.tier === "前期") ? (latestRecQ.result || latestRecQ.tier) : latestRecQ.tier) : "";
       // 全語がいずれかのフィールドにマッチ（AND）
       return qTerms.every(term =>
-        pName.includes(term) || titles.includes(term) || nick.includes(term) || orgText.includes(term)
+        pName.includes(term) || titles.includes(term) || nick.includes(term) || orgText.includes(term) || latestTierQ === term
       );
     })
     .sort((a, b) => {
@@ -2204,7 +2208,7 @@ if (window.innerWidth > 760 && !location.search) {
 
 // 検索プレースホルダーを循環表示（AND検索の使い方をヒント）
 (function() {
-  const hints = ["名前・タイトル・団体で検索…", "例: 瀬戸熊", "例: 連盟 A1", "例: 最高位 決定戦", "例: 田中", "例: 雀王", "例: 協会 B1", "例: RMU"];
+  const hints = ["名前・タイトル・団体で検索…", "例: 瀬戸熊", "例: 連盟 A1", "例: 最高位 決定戦", "例: 田中", "例: 雀王", "例: 協会 B1", "例: RMU", "例: 協会 A2（ティア名で検索可）"];
   let hi = 0;
   setInterval(function() {
     if (document.activeElement === el.search || el.search.value) return;
