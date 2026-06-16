@@ -4,6 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
+const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
 
 const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
 
@@ -362,7 +363,7 @@ function renderOrgFilter() {
 
   const onBtn = document.createElement("button");
   onBtn.className = "org-btn ongoing-filter-btn" + (state.ongoingOnly ? " active" : "");
-  onBtn.textContent = "今期出場中"; onBtn.title = "今シーズン現在リーグ出場中の選手";
+  onBtn.textContent = "今期出場中 (" + ONGOING_COUNT + ")"; onBtn.title = "今シーズン現在リーグ出場中の選手";
   onBtn.onclick = () => { state.ongoingOnly = !state.ongoingOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(onBtn);
 
