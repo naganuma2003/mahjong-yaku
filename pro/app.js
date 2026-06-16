@@ -469,8 +469,10 @@ function renderDetail(p) {
     const groupRecs = orgGroups[oid].slice().sort((a, b) => b.term - a.term);
     const groupPlayoffs = groupRecs.filter(r => r.category === "playoff").length;
     const topTier = groupRecs
-      .map(r => r.tier)
-      .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] || "-";
+      .map(r => (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier)
+      .filter(t => (league.tiers || []).includes(t))
+      .sort((a, b) => (league.tiers || []).indexOf(a) - (league.tiers || []).indexOf(b))[0] ||
+      groupRecs.map(r => r.tier)[0] || "-";
 
     const groupYears = groupRecs.map(r => termToYear(oid, r.term)).filter(y => y > 1000);
     const yearMin = groupYears.length ? Math.min(...groupYears) : null;
