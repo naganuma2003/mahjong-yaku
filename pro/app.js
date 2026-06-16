@@ -1909,14 +1909,26 @@ function renderWleagueSection(p) {
 
   html += wchartSvg(wrecords, wl);
 
-  // 女流ティア別集計
+  // 女流ティア別集計（スタックドバー）
   const wTierCounts = {};
   wrecords.forEach(r => { wTierCounts[r.tier] = (wTierCounts[r.tier] || 0) + 1; });
   const wTierOrder = tiers.concat(Object.keys(wTierCounts).filter(t => !tiers.includes(t)));
-  const wTierBreakdown = wTierOrder.filter(t => wTierCounts[t]).map(t =>
-    '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + wTierCounts[t] + '</span></span>'
-  ).join("");
-  if (wTierBreakdown) html += '<div class="tier-breakdown">' + wTierBreakdown + '</div>';
+  const wTierItems = wTierOrder.filter(t => wTierCounts[t]);
+  if (wTierItems.length) {
+    const wTotal = wrecords.length;
+    const WTC = { A: '#c0392b', B: '#2c5fa8', C: '#3a8c4f', D: '#7d5ba6', E: '#c77f1a' };
+    let wStack = '<div class="tier-stack">';
+    wTierItems.forEach(t => {
+      const pct = (wTierCounts[t] / wTotal * 100).toFixed(1);
+      const col = WTC[tierKey(t)] || '#8a93a2';
+      wStack += '<div class="tier-stack-seg" style="width:' + pct + '%;background:' + col + '" title="' + t + ': ' + wTierCounts[t] + '期"></div>';
+    });
+    wStack += '</div>';
+    const wTierBreakdown = wTierItems.map(t =>
+      '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + wTierCounts[t] + '</span></span>'
+    ).join("");
+    html += '<div class="tier-breakdown">' + wStack + wTierBreakdown + '</div>';
+  }
 
   const termsSorted = wrecords.slice().sort((a, b) => a.term - b.term);
   const displayItems = [];
