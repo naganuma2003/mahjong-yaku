@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16c 累積ptグラフ・昇級率・前後ナビ・スワイプ・ランキング番号・デビュー年代フィルター追加
+// v2026-06-16d 平均順位・最高得点期ハイライト追加
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -807,6 +807,12 @@ function renderDetail(p) {
     const bestPtsStr = bestPts != null && bestPts > -Infinity ? fmtPoints(bestPts) + "pt" : null;
     const totalPts = recsWithPts.length >= 2 ? recsWithPts.reduce((s, r) => s + r.points, 0) : null;
     const totalPtsStr = totalPts != null ? fmtPoints(totalPts) + "pt" : null;
+    const recsWithRank = groupRecs.filter(r => !r.ongoing && r.rank != null);
+    const avgRank = recsWithRank.length >= 3
+      ? (recsWithRank.reduce((s, r) => s + r.rank, 0) / recsWithRank.length)
+      : null;
+    const avgRankStr = avgRank != null ? avgRank.toFixed(1) + "位" : null;
+    const bestPtsRec = recsWithPts.length ? recsWithPts.reduce((best, r) => r.points > best.points ? r : best) : null;
     const topTierName = (league.tiers || [])[0];
     const topFirstYear = topTierName
       ? groupRecs
@@ -859,6 +865,7 @@ function renderDetail(p) {
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
+      if (avgRankStr) html += stat(avgRankStr, "平均順位");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
       html += "</div>";
@@ -875,6 +882,7 @@ function renderDetail(p) {
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
+      if (avgRankStr) html += stat(avgRankStr, "平均順位");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
       html += "</div>";
@@ -961,7 +969,8 @@ function renderDetail(p) {
         const yr = termToYear(r.orgId || oid, r.term);
         const yrHtml = yr > 1000 ? '<span class="rec-year yr-link" data-yr="' + yr + '" title="' + yr + '年で絞り込む">' + yr + '</span>' : '';
         const isYearMatch = state.year && yr === parseInt(state.year, 10);
-        let rowCls = r.ongoing ? ' class="ongoing"' : "";
+        const isBestPts = bestPtsRec && !r.ongoing && r.points != null && r.term === bestPtsRec.term && r.points === bestPtsRec.points;
+        let rowCls = r.ongoing ? ' class="ongoing"' : (isBestPts ? ' class="best-rec"' : "");
         if (isYearMatch) rowCls = ' class="year-match"';
         const catIcon = r.category === "promotion" ? '<span class="cat-icon cat-up">↑</span>'
                       : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'

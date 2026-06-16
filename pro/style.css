@@ -299,6 +299,8 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 
 .timeline tr.gap-row td { color: var(--muted); font-size: 12px; background: #fafafa; font-style: italic; }
 .timeline tr.year-match { background: #fffde7; outline: 1px solid #ffe082; }
+.timeline tr.best-rec { background: #f0fff4; }
+.timeline tr.best-rec td.points { font-weight: 700; }
 .timeline tr.gap-row td.term { font-weight: 400; }
 
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
