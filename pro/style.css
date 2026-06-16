@@ -144,8 +144,11 @@ body {
   border-radius: 8px;
   font-size: 14px;
 }
+.year-nav { display: flex; align-items: center; gap: 2px; }
+.year-step { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font-size: 13px; cursor: pointer; color: var(--muted); line-height: 1; }
+.year-step:hover { border-color: var(--accent); color: var(--accent); }
 .year-input {
-  width: 64px;
+  width: 56px;
   padding: 6px 6px;
   border: 1px solid var(--border);
   border-radius: 8px;

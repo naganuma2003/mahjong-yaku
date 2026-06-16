@@ -25,7 +25,11 @@
     <div class="org-filter" id="orgFilter"></div>
     <div class="search-row">
       <input class="search" id="search" type="search" placeholder="名前・タイトル・団体で検索…">
-      <input class="year-input" id="yearFilter" type="number" placeholder="年" min="1976" max="2030">
+      <div class="year-nav">
+        <button class="year-step" id="yearPrev" title="前年" onclick="stepYear(-1)">‹</button>
+        <input class="year-input" id="yearFilter" type="number" placeholder="年" min="1976" max="2030">
+        <button class="year-step" id="yearNext" title="翌年" onclick="stepYear(1)">›</button>
+      </div>
       <select class="sort-select" id="sortSelect">
         <optgroup label="基本">
           <option value="name">名前順</option>
@@ -154,6 +158,14 @@ function copyPlayerStats() {
   navigator.clipboard.writeText(lines.join("\n")).then(function() {
     if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📄"; }, 1500); }
   });
+}
+function stepYear(delta) {
+  const input = document.getElementById('yearFilter');
+  const cur = parseInt(input.value) || 0;
+  const next = cur ? cur + delta : (delta > 0 ? 1976 : 2026);
+  input.value = next;
+  state.year = String(next);
+  renderList();
 }
 function toggleFilter() {
   const filter = document.getElementById('orgFilter');
