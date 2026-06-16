@@ -57,8 +57,14 @@ document.getElementById('helpBtn').addEventListener('click', function() {
   p.style.display = p.style.display === 'none' ? 'flex' : 'none';
 });
 function copyPlayerLink() {
-  navigator.clipboard.writeText(location.href).then(function() {
-    const btn = document.querySelector('.copy-link-btn');
+  const btn = document.querySelector('.copy-link-btn');
+  const url = location.href;
+  const name = document.title.replace(' - 麻雀プロ検索', '');
+  if (navigator.share) {
+    navigator.share({ title: name + ' - 麻雀プロ検索', url: url }).catch(function(){});
+    return;
+  }
+  navigator.clipboard.writeText(url).then(function() {
     if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '🔗'; }, 1500); }
   });
 }
