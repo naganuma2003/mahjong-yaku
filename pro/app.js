@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16p URLフィルター保存・印刷ボタン・印刷CSS改善
+// v2026-06-16q 期別ptバーチャート追加・URLフィルター保存・印刷ボタン
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1094,7 +1094,25 @@ function renderDetail(p) {
       cSvg += '<text x="' + lastX + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + maxYr + '</text>';
       cSvg += '<text x="4" y="10" font-size="8" fill="#8a93a2">通算pt推移</text>';
       cSvg += '</svg>';
-      html += '<div class="cum-chart">' + cSvg + '</div>';
+      // per-season棒グラフ（バー形式で各期ptを正負表示）
+      const bW = 600, bH = 36, bPadL = 40, bPadR = 8, bPadT = 4, bPadB = 4;
+      const bPts = cumulativeData.map(r => r.points);
+      const bMax = Math.max(...bPts.map(Math.abs), 1);
+      const zeroY = (bH / 2).toFixed(1);
+      const barW = Math.max(1, (bW - bPadL - bPadR) / cumulativeData.length - 1);
+      let bSvg = '<svg viewBox="0 0 ' + bW + ' ' + bH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + bH + 'px">';
+      bSvg += '<line x1="' + bPadL + '" y1="' + zeroY + '" x2="' + (bW - bPadR) + '" y2="' + zeroY + '" stroke="#e2e5ea"/>';
+      cumulativeData.forEach((r, i) => {
+        const bx = (bPadL + i * (barW + 1)).toFixed(1);
+        const pct = r.points / bMax;
+        const barH2 = Math.abs(pct) * (bH / 2 - bPadT);
+        const by = r.points >= 0 ? (bH / 2 - barH2).toFixed(1) : zeroY;
+        const col = r.points >= 0 ? '#2a7a3a' : '#c0392b';
+        bSvg += '<rect x="' + bx + '" y="' + by + '" width="' + barW.toFixed(1) + '" height="' + barH2.toFixed(1) + '" fill="' + col + '" opacity="0.7"/>';
+      });
+      bSvg += '<text x="4" y="' + (bH / 2 + 4) + '" font-size="8" fill="#8a93a2">期別pt</text>';
+      bSvg += '</svg>';
+      html += '<div class="cum-chart">' + cSvg + bSvg + '</div>';
     }
 
     // ティア別集計
