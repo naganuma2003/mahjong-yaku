@@ -96,7 +96,7 @@ const MLEAGUE_FORMER = new Set([
 
 // Mリーグ チーム別メンバー（2025-26現役 + 歴代）
 const MLEAGUE_TEAMS = [
-  { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#006400",
+  { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#228B22",
     current:new Set(["園田賢","鈴木たろう","浅見真紀","渡辺太"]),
     former: new Set(["村上淳","丸山奏子"]) },
   { id:"furin",   name:"EX風林火山",            short:"風林火山",    color:"#8B0023",
@@ -123,7 +123,7 @@ const MLEAGUE_TEAMS = [
   { id:"beast",   name:"BEAST X",                short:"BEAST X",    color:"#1A1A1A",
     current:new Set(["鈴木大介","中田花奈","下石戟","東城りお"]),
     former: new Set(["猿川真寿","菅原千瑛","萩原聖人"]) },
-  { id:"earthjets", name:"EARTH JETS",           short:"アースジェッツ", color:"#228B22",
+  { id:"earthjets", name:"EARTH JETS",           short:"アースジェッツ", color:"#006400",
     current:new Set(["石井一馬","三浦智博","逢川恵夢","HIRO柴田"]),
     former: new Set([]) },
 ];
