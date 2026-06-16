@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16v org絞り込み時に通算ptトップ選手を表示・決定戦ランク
+// v2026-06-16w ティア別集計をスタックドバーで視覚化・org別トップ表示
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1127,7 +1127,7 @@ function renderDetail(p) {
       html += '<div class="cum-chart">' + cSvg + bSvg + '</div>';
     }
 
-    // ティア別集計
+    // ティア別集計（スタックドバー）
     const tierCounts = {};
     groupRecs.forEach(r => {
       const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
@@ -1136,10 +1136,24 @@ function renderDetail(p) {
     const tierOrder = (league.tiers || []).concat(
       Object.keys(tierCounts).filter(t => !(league.tiers || []).includes(t))
     );
-    const tierBreakdown = tierOrder.filter(t => tierCounts[t]).map(t =>
-      '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + tierCounts[t] + '</span></span>'
-    ).join("");
-    if (tierBreakdown) html += '<div class="tier-breakdown">' + tierBreakdown + '</div>';
+    const tierItems = tierOrder.filter(t => tierCounts[t]);
+    const totalRecs = groupRecs.length;
+    if (tierItems.length) {
+      const TC2 = { A: '#c0392b', B: '#2c5fa8', C: '#3a8c4f', D: '#7d5ba6', E: '#c77f1a' };
+      // スタックドバー
+      let stackHtml = '<div class="tier-stack" title="ティア別出場割合">';
+      tierItems.forEach(t => {
+        const pct = (tierCounts[t] / totalRecs * 100).toFixed(1);
+        const col = TC2[tierKey(t)] || '#8a93a2';
+        stackHtml += '<div class="tier-stack-seg" style="width:' + pct + '%;background:' + col + '" title="' + t + ': ' + tierCounts[t] + '期 (' + pct + '%)"></div>';
+      });
+      stackHtml += '</div>';
+      // テキストバッジ
+      const tierBreakdown = tierItems.map(t =>
+        '<span class="tb-item"><span class="tier-badge ' + tierClass(t) + ' tb-tier">' + t + '</span><span class="tb-cnt">' + tierCounts[t] + '</span></span>'
+      ).join("");
+      html += '<div class="tier-breakdown">' + stackHtml + tierBreakdown + '</div>';
+    }
 
     const termsSorted = groupRecs.slice().sort((a, b) => a.term - b.term);
     const displayItems = [];
