@@ -181,8 +181,17 @@ function toggleFilter() {
   const filter = document.getElementById('orgFilter');
   const open = filter.classList.contains('open');
   filter.classList.toggle('open', !open);
+  try { localStorage.setItem('mj_filter_open', !open ? '1' : ''); } catch(e) {}
   renderOrgFilter();
 }
+// フィルターパネルの開閉状態を復元
+(function() {
+  try {
+    if (localStorage.getItem('mj_filter_open')) {
+      document.getElementById('orgFilter').classList.add('open');
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
