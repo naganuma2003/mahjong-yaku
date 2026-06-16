@@ -849,6 +849,38 @@ function renderDetail(p) {
 
     html += chartSvg(groupRecs, oid);
 
+    // 累積ポイントスパークライン（5期以上ある場合）
+    const cumulativeData = groupRecs.slice()
+      .filter(r => !r.ongoing && r.points != null)
+      .sort((a, b) => termToYear(oid, a.term) - termToYear(oid, b.term));
+    if (cumulativeData.length >= 5) {
+      let cumSum = 0;
+      const cumPts = cumulativeData.map(r => { cumSum += r.points; return { yr: termToYear(oid, r.term), v: cumSum }; });
+      const minV = Math.min(0, ...cumPts.map(d => d.v));
+      const maxV = Math.max(0, ...cumPts.map(d => d.v));
+      const vRange = maxV - minV || 1;
+      const minYr = cumPts[0].yr, maxYr = cumPts[cumPts.length - 1].yr;
+      const yrRange = maxYr - minYr || 1;
+      const cW = 600, cH = 50, cPadL = 40, cPadR = 8, cPadT = 8, cPadB = 12;
+      const cxFn = yr => cPadL + (yr - minYr) / yrRange * (cW - cPadL - cPadR);
+      const cyFn = v => cPadT + (1 - (v - minV) / vRange) * (cH - cPadT - cPadB);
+      const zero = cyFn(0).toFixed(1);
+      let cSvg = '<svg viewBox="0 0 ' + cW + ' ' + cH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:50px">';
+      cSvg += '<line x1="' + cPadL + '" y1="' + zero + '" x2="' + (cW - cPadR) + '" y2="' + zero + '" stroke="#e2e5ea" stroke-dasharray="3 2"/>';
+      const path = cumPts.map((d, i) => (i === 0 ? 'M' : 'L') + cxFn(d.yr).toFixed(1) + ' ' + cyFn(d.v).toFixed(1)).join(' ');
+      const lastV = cumPts[cumPts.length - 1].v;
+      const lineColor = lastV >= 0 ? '#2a7a3a' : '#c0392b';
+      cSvg += '<path d="' + path + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5"/>';
+      const lastX = cxFn(cumPts[cumPts.length - 1].yr).toFixed(1);
+      const lastY = cyFn(lastV).toFixed(1);
+      cSvg += '<circle cx="' + lastX + '" cy="' + lastY + '" r="3" fill="' + lineColor + '"/>';
+      const label = (lastV >= 0 ? '+' : '') + lastV.toFixed(1);
+      cSvg += '<text x="4" y="' + (parseFloat(lastY) + 4) + '" font-size="9" fill="' + lineColor + '">' + label + '</text>';
+      cSvg += '<text x="4" y="' + (cH - 2) + '" font-size="8" fill="#8a93a2">通算pt推移</text>';
+      cSvg += '</svg>';
+      html += '<div class="cum-chart">' + cSvg + '</div>';
+    }
+
     // ティア別集計
     const tierCounts = {};
     groupRecs.forEach(r => {
