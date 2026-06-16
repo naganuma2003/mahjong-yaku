@@ -751,8 +751,10 @@ function renderWleagueSection(p) {
       const rankHtml = (r.rank !== undefined && r.rank !== null)
         ? ' <span class="rank">' + r.rank + '位</span>' : "";
       const tierLabel = r.tier.length <= 2 ? "女流" + r.tier : r.tier;
+      const wyr = wTermToYear(wl, r.term);
+      const wyrHtml = wyr > 1000 ? '<span class="rec-year">' + wyr + '</span>' : '';
       html += '<tr>' +
-        '<td class="term">第' + r.term + '期</td>' +
+        '<td class="term">第' + r.term + '期' + wyrHtml + '</td>' +
         '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + tierLabel + '</span></td>' +
         '<td class="result-' + r.category + '">' + (r.result || "—") + rankHtml + '</td>' +
         '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + '</td>' +
