@@ -584,17 +584,26 @@ function renderDetail(p) {
   // チームメイトセクション
   if (playerTeams.length) {
     playerTeams.forEach(team => {
-      const teammates = [...team.current].filter(name => normalize(name) !== normalize(p.name));
-      if (!teammates.length) return;
+      const myStatus = playerTeamStatus(p.name, team);
+      const currentMates = [...team.current].filter(name => normalize(name) !== normalize(p.name));
+      const formerMates  = [...team.former].filter(name => normalize(name) !== normalize(p.name));
+      const allMates = myStatus === "current"
+        ? currentMates
+        : [...currentMates.map(n => ({ name: n, label: "現役" })),
+           ...formerMates.map(n => ({ name: n, label: "元" }))];
+      if (!allMates.length) return;
       html += '<div class="teammates-section">';
-      html += '<div class="teammates-head"><span style="color:' + team.color + ';font-weight:700">' + team.name + '</span> チームメイト</div>';
+      const headLabel = myStatus === "current" ? "チームメイト" : "チームメンバー";
+      html += '<div class="teammates-head"><span style="color:' + team.color + ';font-weight:700">' + team.name + '</span> ' + headLabel + '</div>';
       html += '<div class="teammates-list">';
-      teammates.forEach(name => {
+      allMates.forEach(item => {
+        const name = typeof item === "string" ? item : item.name;
+        const sub  = typeof item === "object" ? '<span class="mate-sub">' + item.label + '</span>' : "";
         const mate = DATA.players.find(x => normalize(x.name) === normalize(name));
         if (mate) {
-          html += '<button class="teammate-btn" data-id="' + mate.id + '" style="border-color:' + team.color + ';color:' + team.color + '">' + name + '</button>';
+          html += '<button class="teammate-btn" data-id="' + mate.id + '" style="border-color:' + team.color + ';color:' + team.color + '">' + name + sub + '</button>';
         } else {
-          html += '<span class="teammate-btn" style="border-color:#ccc;color:#999">' + name + '</span>';
+          html += '<span class="teammate-btn" style="border-color:#ccc;color:#999">' + name + sub + '</span>';
         }
       });
       html += '</div></div>';
