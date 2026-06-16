@@ -11,6 +11,39 @@
   --tier-d: #7d5ba6;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151a;
+    --panel: #1c2030;
+    --border: #2e3444;
+    --text: #e2e6ef;
+    --muted: #6b7585;
+    --accent: #e05c50;
+    --tier-a: #e05c50;
+    --tier-b: #5b8fe8;
+    --tier-c: #5cb87a;
+    --tier-d: #a07dd6;
+  }
+  .player-list li { background: var(--panel); }
+  .player-list li.selected { background: #252b3b; }
+  .player-list li:hover { background: #222736; }
+  .tier-badge { opacity: 0.9; }
+  .help-panel { background: #1a1f2e; }
+  .org-btn { background: var(--panel); }
+  .org-btn.active { filter: brightness(1.15); }
+  .stat { background: #1a1f2e; }
+  .profile-section { background: #1a1f2e; }
+  .profile-section td { border-color: var(--border); }
+  .timeline th { background: #1a1f2e; }
+  .timeline tr:nth-child(even) { background: #1e2436; }
+  .teammate-btn { background: var(--panel); border-color: var(--border); }
+  .recent-btn { background: var(--panel); }
+  .title-badge { background: #2a2510; color: #d4b060; border-color: #4a3f10; }
+  .p-ongoing { background: #2a2208; color: #d4a820; border-color: #8a6800; }
+  .ongoing-badge { background: #2a2208; color: #d4a820; border-color: #8a6800; }
+  input, select { background: var(--panel); color: var(--text); border-color: var(--border); }
+}
+
 * { box-sizing: border-box; }
 
 body {
