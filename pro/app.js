@@ -4,7 +4,7 @@ const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 
-const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false };
+const state = { org: "all", mleagueC: false, mleagueF: false, mtourn: false, topLeague: false, wleague: false, mcast: false, manalyst: false, mreporter: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false };
 
 // Mリーグ 2024-25 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -158,6 +158,8 @@ function playerTeamStatus(name, team) {
   return null;
 }
 
+function resetAndRenderList() { state.showAll = false; renderList(); }
+
 function filteredPlayers() {
   const q = normalize(state.query);
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
@@ -249,7 +251,7 @@ function renderOrgFilter() {
     const b = document.createElement("button");
     b.className = "org-btn" + (state.org === o.id ? " active" : "");
     b.textContent = o.shortName || o.name;
-    b.onclick = () => { state.org = o.id; renderOrgFilter(); renderList(); };
+    b.onclick = () => { state.org = o.id; renderOrgFilter(); resetAndRenderList(); };
     el.orgFilter.appendChild(b);
   });
 
@@ -261,37 +263,37 @@ function renderOrgFilter() {
   const mc = document.createElement("button");
   mc.className = "org-btn mleague-btn" + (state.mleagueC ? " active" : "");
   mc.textContent = "現Mリーガー";
-  mc.onclick = () => { state.mleagueC = !state.mleagueC; renderOrgFilter(); renderList(); };
+  mc.onclick = () => { state.mleagueC = !state.mleagueC; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(mc);
 
   const mf = document.createElement("button");
   mf.className = "org-btn mleague-former-btn" + (state.mleagueF ? " active" : "");
   mf.textContent = "旧Mリーガー";
-  mf.onclick = () => { state.mleagueF = !state.mleagueF; renderOrgFilter(); renderList(); };
+  mf.onclick = () => { state.mleagueF = !state.mleagueF; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(mf);
 
   const mt = document.createElement("button");
   mt.className = "org-btn mtourn-btn" + (state.mtourn ? " active" : "");
   mt.textContent = "Mトーナメント";
-  mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); renderList(); };
+  mt.onclick = () => { state.mtourn = !state.mtourn; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(mt);
 
   const tb = document.createElement("button");
   tb.className = "org-btn topleague-btn" + (state.topLeague ? " active" : "");
   tb.textContent = "最高リーグ";
-  tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); renderList(); };
+  tb.onclick = () => { state.topLeague = !state.topLeague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(tb);
 
   const wb = document.createElement("button");
   wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
   wb.textContent = "女流あり";
-  wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); renderList(); };
+  wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(wb);
 
   const favBtn = document.createElement("button");
   favBtn.className = "org-btn fav-btn" + (state.favOnly ? " active" : "");
   favBtn.textContent = "☆ お気に入り";
-  favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); renderList(); };
+  favBtn.onclick = () => { state.favOnly = !state.favOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(favBtn);
 
   // M関係セクション
@@ -303,19 +305,19 @@ function renderOrgFilter() {
   const cast = document.createElement("button");
   cast.className = "org-btn mcast-btn" + (state.mcast ? " active" : "");
   cast.textContent = "実況";
-  cast.onclick = () => { state.mcast = !state.mcast; renderOrgFilter(); renderList(); };
+  cast.onclick = () => { state.mcast = !state.mcast; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(cast);
 
   const analyst = document.createElement("button");
   analyst.className = "org-btn manalyst-btn" + (state.manalyst ? " active" : "");
   analyst.textContent = "解説";
-  analyst.onclick = () => { state.manalyst = !state.manalyst; renderOrgFilter(); renderList(); };
+  analyst.onclick = () => { state.manalyst = !state.manalyst; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(analyst);
 
   const reporter = document.createElement("button");
   reporter.className = "org-btn mreporter-btn" + (state.mreporter ? " active" : "");
   reporter.textContent = "リポーター";
-  reporter.onclick = () => { state.mreporter = !state.mreporter; renderOrgFilter(); renderList(); };
+  reporter.onclick = () => { state.mreporter = !state.mreporter; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(reporter);
 
   // Mチームセクション（折りたたみ）
@@ -394,8 +396,10 @@ function renderList() {
     el.playerList.appendChild(li);
     return;
   }
+  const LIST_CAP = 200;
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
-  list.forEach(p => {
+  const visibleList = list.length > LIST_CAP && !state.showAll ? list.slice(0, LIST_CAP) : list;
+  visibleList.forEach(p => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
     const curOrg = ORGS[currentOrgId(p)];
@@ -437,6 +441,13 @@ function renderList() {
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
   });
+  if (list.length > LIST_CAP && !state.showAll) {
+    const more = document.createElement("li");
+    more.style.cssText = "justify-content:center;cursor:pointer;color:var(--accent);font-size:13px;font-weight:600";
+    more.textContent = "もっと見る（残り " + (list.length - LIST_CAP) + " 名）";
+    more.onclick = () => { state.showAll = true; renderList(); };
+    el.playerList.appendChild(more);
+  }
 }
 
 // --- 年表 -------------------------------------------------------------
@@ -1196,7 +1207,7 @@ function renderRecentHistory() {
 }
 
 // --- 起動 -------------------------------------------------------------
-el.search.addEventListener("input", e => { state.query = e.target.value; renderList(); });
+el.search.addEventListener("input", e => { state.query = e.target.value; state.showAll = false; renderList(); });
 document.getElementById("yearFilter").addEventListener("input", e => { state.year = e.target.value; renderList(); });
 el.search.addEventListener("keydown", e => {
   if (e.key === "Enter") {
