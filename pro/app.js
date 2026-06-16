@@ -310,6 +310,13 @@ function renderList() {
     ? list.length + " / " + total + " 名"
     : total + " 名";
   el.playerList.innerHTML = "";
+  if (!list.length) {
+    const li = document.createElement("li");
+    li.style.cssText = "color:var(--muted);font-size:13px;justify-content:center;cursor:default";
+    li.textContent = "該当する選手がいません";
+    el.playerList.appendChild(li);
+    return;
+  }
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   list.forEach(p => {
     const li = document.createElement("li");
@@ -799,6 +806,13 @@ el.sortSelect.addEventListener("change", e => { state.sort = e.target.value; ren
 document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== el.search) {
     e.preventDefault(); el.search.focus(); el.search.select();
+    return;
+  }
+  if (e.key === "Escape" && state.selectedId) {
+    state.selectedId = null;
+    history.replaceState(null, "", location.pathname);
+    renderList();
+    el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>';
     return;
   }
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
