@@ -384,7 +384,8 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
   padding: 4px 9px;
   border-radius: 6px;
   pointer-events: none;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 180px;
   z-index: 10;
   transform: translate(-50%, -110%);
 }
