@@ -140,16 +140,14 @@ function currentOrgId(p) {
 // --- 選手一覧 ---------------------------------------------------------
 function isTopLeague(p) {
   if (!p.records || p.records.length === 0) return false;
-  const latest = p.records.slice().sort((a, b) => {
-    const ya = termToYear(a.orgId || p.org, a.term);
-    const yb = termToYear(b.orgId || p.org, b.term);
-    return yb - ya;
-  })[0];
-  const orgId = latest.orgId || p.org;
-  const org = ORGS[orgId];
-  if (!org) return false;
-  const topTier = (org.league.tiers || [])[0];
-  return latest.tier === topTier;
+  return p.records.some(r => {
+    const orgId = r.orgId || p.org;
+    const org = ORGS[orgId];
+    if (!org) return false;
+    const topTier = (org.league.tiers || [])[0];
+    const tier = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+    return tier === topTier;
+  });
 }
 
 // 選手がチームに所属（現役/元）しているか返す
