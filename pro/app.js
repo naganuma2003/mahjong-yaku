@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16r 本日誕生日選手セクション・期別ptバー・URLフィルター保存
+// v2026-06-16s 誕生日セクション・ptバー・インサイト強化（連続プラス・ポジティブ率）
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -1258,12 +1258,24 @@ function renderDetail(p) {
     const recentAvg = recentRecs.reduce((s, r) => s + r.points, 0) / recentRecs.length;
     const allAvg = insightRecs.reduce((s, r) => s + r.points, 0) / insightRecs.length;
     const bestRec = insightRecs.reduce((best, r) => r.points > best.points ? r : best);
+    const worstRec = insightRecs.reduce((worst, r) => r.points < worst.points ? r : worst);
     const bestYear = recYear(bestRec);
     if (bestYear > 1000) insightParts.push("キャリアハイは" + bestYear + "年の" + fmtPoints(bestRec.points) + "pt");
     if (insightRecs.length >= 5) {
       const trend = recentAvg - allAvg;
       if (trend > 20) insightParts.push("直近3期は平均比+" + Math.round(trend) + "ptと好調");
       else if (trend < -20) insightParts.push("直近3期は平均比" + Math.round(trend) + "ptと苦戦");
+      // 連続プラス期最長
+      const ptsTimeline = insightRecs.slice().sort((a, b) => recYear(a) - recYear(b)).map(r => r.points);
+      let maxPos = 0, curPos = 0;
+      ptsTimeline.forEach(v => { if (v > 0) { curPos++; maxPos = Math.max(maxPos, curPos); } else curPos = 0; });
+      if (maxPos >= 4) insightParts.push("最長" + maxPos + "期連続プラス");
+      // ポジティブ率
+      const posCount = ptsTimeline.filter(v => v > 0).length;
+      const posRate = Math.round(posCount / ptsTimeline.length * 100);
+      if (insightRecs.length >= 8 && (posRate >= 70 || posRate <= 30)) {
+        insightParts.push("プラス期" + posRate + "%（" + posCount + "/" + ptsTimeline.length + "期）");
+      }
     }
     if (insightParts.length) {
       html += '<div class="career-insight">' + insightParts.join('。') + '。</div>';
