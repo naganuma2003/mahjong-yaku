@@ -465,6 +465,15 @@ function renderDetail(p) {
     const yearRange = yearMin
       ? (yearMin === yearMax ? yearMin + "年" : yearMin + "〜" + yearMax + "年")
       : "-";
+    const topTierName = (league.tiers || [])[0];
+    const topFirstYear = topTierName
+      ? groupRecs
+          .filter(r => r.tier === topTierName)
+          .map(r => termToYear(oid, r.term))
+          .filter(y => y > 1000)
+          .reduce((min, y) => Math.min(min, y), Infinity)
+      : Infinity;
+    const topFirstYearStr = topFirstYear < Infinity ? topFirstYear + "年" : "-";
 
     if (isMultiOrg) {
       html += '<div class="org-section' + (idx === 0 ? " org-section-first" : "") + '">';
@@ -475,6 +484,7 @@ function renderDetail(p) {
       html += '<div class="summary summary-sm">';
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
+      if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       html += stat(groupChamps, "優勝");
       html += stat(yearRange, "活動期間");
@@ -484,6 +494,7 @@ function renderDetail(p) {
       html += '<div class="summary">';
       html += stat(groupRecs.length, "出場期数");
       html += stat(topTier, "最高到達");
+      if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       html += stat(groupChamps, "優勝");
       html += stat(yearRange, "活動期間");
