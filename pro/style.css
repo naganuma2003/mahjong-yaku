@@ -239,7 +239,7 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .playoff-badge { background: #fff8e1; color: #9b6e00; border: 1px solid #f9a825; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 .debut-year { font-size: 12px; color: var(--muted); }
 .best-tier { opacity: 0.6; font-size: 10px !important; }
-.detail-nav { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.detail-nav { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; justify-content: space-between; }
 .nav-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 12px; cursor: pointer; color: var(--text); font-family: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
 .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 .nav-disabled { flex: 1; min-width: 60px; }
