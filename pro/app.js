@@ -549,7 +549,9 @@ function renderDetail(p) {
 }
 
 function stat(num, lbl) {
-  return '<div class="stat"><div class="num">' + num +
+  const numStr = String(num);
+  const cls = numStr.length > 6 ? " sm" : "";
+  return '<div class="stat"><div class="num' + cls + '">' + numStr +
          '</div><div class="lbl">' + lbl + "</div></div>";
 }
 
