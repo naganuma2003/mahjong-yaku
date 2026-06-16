@@ -239,6 +239,7 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .playoff-badge { background: #fff8e1; color: #9b6e00; border: 1px solid #f9a825; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 .debut-year { font-size: 12px; color: var(--muted); }
 .best-tier { opacity: 0.6; font-size: 10px !important; }
+.list-rank { font-size: 10px; color: var(--muted); min-width: 20px; text-align: right; margin-right: 4px; flex-shrink: 0; }
 .list-pos { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
 .career-insight { font-size: 12px; color: var(--muted); background: var(--bg); border-left: 3px solid var(--border); padding: 6px 10px; margin: 8px 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
 .role-badge { border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }

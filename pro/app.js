@@ -565,7 +565,8 @@ function renderList() {
   const selectedIdx = state.selectedId ? list.findIndex(p => p.id === state.selectedId) : -1;
   const capEnd = state.showAll ? list.length : Math.max(LIST_CAP, selectedIdx + 1);
   const visibleList = list.length > capEnd ? list.slice(0, capEnd) : list;
-  visibleList.forEach(p => {
+  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier"].includes(state.sort);
+  visibleList.forEach((p, listIdx) => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
     const curOrg = ORGS[currentOrgId(p)];
@@ -641,8 +642,9 @@ function renderList() {
       titleParts.push("通算" + (tot >= 0 ? "+" : "") + tot.toFixed(1) + "pt");
     }
     if (titleParts.length) li.title = titleParts.join(" / ");
+    const rankNum = showRank ? '<span class="list-rank">' + (listIdx + 1) + '</span>' : "";
     li.innerHTML =
-      '<span class="pname">' + highlightName(p.name, _q) + "</span>" +
+      rankNum + '<span class="pname">' + highlightName(p.name, _q) + "</span>" +
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
