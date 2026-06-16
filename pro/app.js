@@ -398,7 +398,10 @@ function renderList() {
   }
   const LIST_CAP = 200;
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
-  const visibleList = list.length > LIST_CAP && !state.showAll ? list.slice(0, LIST_CAP) : list;
+  // 選択中の選手が表示範囲外にある場合はその位置まで表示
+  const selectedIdx = state.selectedId ? list.findIndex(p => p.id === state.selectedId) : -1;
+  const capEnd = state.showAll ? list.length : Math.max(LIST_CAP, selectedIdx + 1);
+  const visibleList = list.length > capEnd ? list.slice(0, capEnd) : list;
   visibleList.forEach(p => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
@@ -441,10 +444,10 @@ function renderList() {
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
   });
-  if (list.length > LIST_CAP && !state.showAll) {
+  if (visibleList.length < list.length) {
     const more = document.createElement("li");
     more.style.cssText = "justify-content:center;cursor:pointer;color:var(--accent);font-size:13px;font-weight:600";
-    more.textContent = "もっと見る（残り " + (list.length - LIST_CAP) + " 名）";
+    more.textContent = "もっと見る（残り " + (list.length - visibleList.length) + " 名）";
     more.onclick = () => { state.showAll = true; renderList(); };
     el.playerList.appendChild(more);
   }
