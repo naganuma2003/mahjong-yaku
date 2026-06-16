@@ -581,7 +581,8 @@ function renderDetail(p) {
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回">★決定戦×' + totalPlayoffs + '</span>' : '') +
     '<button class="fav-toggle-btn' + (isFav ? " active" : "") + '" id="favToggleBtn" title="お気に入り">' + (isFav ? "★" : "☆") + '</button>' +
-    '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>';
+    '<button class="copy-link-btn" onclick="copyPlayerLink()" title="URLをコピー">🔗</button>' +
+    '<a class="x-share-btn" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(p.name + ' - 麻雀プロ検索') + '&url=' + encodeURIComponent(location.origin + location.pathname + '?p=' + encodeURIComponent(p.id)) + '" target="_blank" rel="noopener" title="Xでシェア">𝕏</a>';
   if (isMultiOrg) {
     html += '<span class="transfer-badge">移籍歴あり</span>';
   } else {
