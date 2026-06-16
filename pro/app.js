@@ -970,7 +970,11 @@ function renderDetail(p) {
       cSvg += '<circle cx="' + lastX + '" cy="' + lastY + '" r="3" fill="' + lineColor + '"/>';
       const label = (lastV >= 0 ? '+' : '') + lastV.toFixed(1);
       cSvg += '<text x="4" y="' + (parseFloat(lastY) + 4) + '" font-size="9" fill="' + lineColor + '">' + label + '</text>';
-      cSvg += '<text x="4" y="' + (cH - 2) + '" font-size="8" fill="#8a93a2">通算pt推移</text>';
+      // 年ラベル（開始・終了）
+      const firstX = cxFn(minYr).toFixed(1);
+      cSvg += '<text x="' + firstX + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + minYr + '</text>';
+      cSvg += '<text x="' + lastX + '" y="' + (cH - 2) + '" text-anchor="middle" font-size="8" fill="#8a93a2">' + maxYr + '</text>';
+      cSvg += '<text x="4" y="10" font-size="8" fill="#8a93a2">通算pt推移</text>';
       cSvg += '</svg>';
       html += '<div class="cum-chart">' + cSvg + '</div>';
     }
