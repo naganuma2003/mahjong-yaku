@@ -1,10 +1,10 @@
 "use strict";
-// v2026-06-16i 女流セクション統計強化・折りたたみ・最高得点期ハイライト追加
+// v2026-06-16j 通算ptランキングを選手詳細ヘッダーに表示
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
 const WLEAGUE_COUNT = DATA.players.filter(p => p.wrecords && p.wrecords.length > 0).length;
-// 全選手の通算pt・平均ptをソートしてパーセンタイル計算用にキャッシュ
+// 全選手の平均ptをソートしてパーセンタイル計算用にキャッシュ
 const _allAvgPts = DATA.players.map(p => {
   const recs = (p.records||[]).concat(p.wrecords||[]).filter(r => !r.ongoing && r.points != null);
   return recs.length >= 3 ? recs.reduce((s,r)=>s+r.points,0)/recs.length : null;
@@ -13,6 +13,18 @@ function avgPtsPercentile(avg) {
   if (avg == null || !_allAvgPts.length) return null;
   const rank = _allAvgPts.filter(v => v <= avg).length;
   return Math.round(rank / _allAvgPts.length * 100);
+}
+// 通算ptランキング（5期以上出場選手中）
+const _totalPtsRanking = DATA.players
+  .map(p => {
+    const recs = (p.records||[]).concat(p.wrecords||[]).filter(r => !r.ongoing && r.points != null);
+    return recs.length >= 5 ? { id: p.id, total: recs.reduce((s,r)=>s+r.points,0) } : null;
+  })
+  .filter(Boolean)
+  .sort((a,b)=>b.total-a.total);
+function totalPtsRank(id) {
+  const idx = _totalPtsRanking.findIndex(x => x.id === id);
+  return idx >= 0 ? idx + 1 : null;
 }
 const ONGOING_COUNT = DATA.players.filter(p => (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing)).length;
 const PLAYOFF_COUNT = DATA.players.filter(p =>
@@ -832,7 +844,9 @@ function renderDetail(p) {
     prevBtn + nextBtn +
     '</div>';
   const isFav = getFavs().has(p.id);
-  html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel +
+  const ptRank = totalPtsRank(p.id);
+  const ptRankLabel = ptRank ? '<span class="list-pos" title="5期以上出場選手中の通算pt順位（' + _totalPtsRanking.length + '人中）">通算pt ' + ptRank + '位</span>' : '';
+  html += '<div class="detail-head"><h2>' + p.name + "</h2>" + posLabel + ptRankLabel +
     (debutYear ? '<span class="debut-year" title="デビュー年">' + debutYear + '年デビュー' + (careerYrs && careerYrs > 0 ? '（' + careerYrs + '年目）' : '') + '</span>' : '') +
     (isOngoing ? '<span class="ongoing-badge">開催中</span>' : '') +
     (totalPlayoffs > 0 ? '<span class="playoff-badge" title="決定戦進出' + totalPlayoffs + '回: ' + playoffYears.join('、') + '年">★決定戦×' + totalPlayoffs + '</span>' : '') +
