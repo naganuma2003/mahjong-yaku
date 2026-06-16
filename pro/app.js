@@ -817,8 +817,13 @@ function chartSvg(recs, orgId) {
   const tiers = (org.league || {}).tiers || [];
   if (!tiers.length) return "";
 
+  const regularTerms = new Set(recs.filter(r => r.tier !== "後期" && r.tier !== "前期").map(r => r.term));
   const pts = recs
     .filter(r => !r.ongoing)
+    .filter(r => {
+      const isHalf = r.tier === "後期" || r.tier === "前期";
+      return !isHalf || !regularTerms.has(r.term); // 同期の通常レコードがあれば後期を除外
+    })
     .map(r => {
       const isHalf = r.tier === "後期" || r.tier === "前期";
       const tier = isHalf ? (r.result || r.tier) : r.tier;
