@@ -958,6 +958,21 @@ function renderDetail(p) {
     const org = ORGS[p.org] || {};
     html += '<span class="org-name">' + (org.name || "") + "</span>";
   }
+  // キャリアマイルストーンバッジ
+  {
+    const milestones = [];
+    if (allRecs.length >= 30) milestones.push({ label: '30期+', title: allRecs.length + '期出場', cls: 'ms-legend' });
+    else if (allRecs.length >= 20) milestones.push({ label: '20期+', title: allRecs.length + '期出場', cls: 'ms-veteran' });
+    else if (allRecs.length >= 10) milestones.push({ label: '10期+', title: allRecs.length + '期出場', cls: 'ms-regular' });
+    const allPtsRecs2 = allRecs.filter(r => !r.ongoing && r.points != null);
+    if (allPtsRecs2.length >= 5) {
+      const posRate = allPtsRecs2.filter(r => r.points > 0).length / allPtsRecs2.length;
+      if (posRate >= 0.75) milestones.push({ label: '安定', title: 'プラス率' + Math.round(posRate * 100) + '%', cls: 'ms-stable' });
+    }
+    milestones.forEach(m => {
+      html += '<span class="career-milestone ' + m.cls + '" title="' + m.title + '">' + m.label + '</span>';
+    });
+  }
   playerTeams.forEach(t => {
     const status = playerTeamStatus(p.name, t);
     const label = status === "current" ? t.name : t.name + "（元）";
