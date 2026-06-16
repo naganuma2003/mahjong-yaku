@@ -1,5 +1,5 @@
 "use strict";
-// v2026-06-16j 通算ptランキングを選手詳細ヘッダーに表示
+// v2026-06-16k ソート順に応じたコンテキストバッジをリストに表示
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
 DATA.organizations.forEach(o => { ORGS[o.id] = o; });
@@ -689,6 +689,38 @@ function renderList() {
     const titlesBadge = state.sort === "titles" && p.profile && p.profile.titles && p.profile.titles.length
       ? '<span class="p-titles-cnt" title="' + p.profile.titles.join('、') + '">🏆' + p.profile.titles.length + '</span>'
       : "";
+    // ソート順に応じたコンテキストバッジ
+    let contextBadge = "";
+    if (state.sort === "totalpts" || state.sort === "avgpts" || state.sort === "avgrank" || state.sort === "debut" || state.sort === "career" || state.sort === "records") {
+      const allRecs2 = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+      if (state.sort === "totalpts" && allRecs2.length >= 2) {
+        const tot = allRecs2.reduce((s, r) => s + r.points, 0);
+        const sign = tot >= 0 ? "+" : "";
+        contextBadge = '<span class="p-ctx' + (tot >= 0 ? " pos" : " neg") + '">' + sign + tot.toFixed(0) + '</span>';
+      } else if (state.sort === "avgpts" && allRecs2.length >= 3) {
+        const avg = allRecs2.reduce((s, r) => s + r.points, 0) / allRecs2.length;
+        const sign = avg >= 0 ? "+" : "";
+        contextBadge = '<span class="p-ctx' + (avg >= 0 ? " pos" : " neg") + '">' + sign + avg.toFixed(1) + 'avg</span>';
+      } else if (state.sort === "avgrank") {
+        const rankRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.rank != null);
+        if (rankRecs.length >= 2) {
+          const avg = rankRecs.reduce((s, r) => s + r.rank, 0) / rankRecs.length;
+          contextBadge = '<span class="p-ctx neu">平均' + avg.toFixed(2) + '位</span>';
+        }
+      } else if (state.sort === "debut") {
+        const ys = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term))).filter(y => y > 1000);
+        if (ys.length) contextBadge = '<span class="p-ctx neu">' + Math.min(...ys) + '年〜</span>';
+      } else if (state.sort === "career") {
+        const ys2 = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term)).concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term))).filter(y => y > 1000);
+        if (ys2.length > 1) {
+          const span = Math.max(...ys2) - Math.min(...ys2) + 1;
+          contextBadge = '<span class="p-ctx neu">' + span + '年</span>';
+        }
+      } else if (state.sort === "records") {
+        const cnt = (p.records || []).length + (p.wrecords || []).length;
+        if (cnt) contextBadge = '<span class="p-ctx neu">' + cnt + '期</span>';
+      }
+    }
     // 最新のティアを取得
     const latestRec = (p.records || []).filter(r => !r.ongoing)
       .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
@@ -768,7 +800,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + bestTierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + titlesBadge + favStar +
+      ongoingBadge + tierBadge + bestTierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + titlesBadge + contextBadge + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);

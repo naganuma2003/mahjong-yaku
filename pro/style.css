@@ -237,6 +237,10 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .ongoing-filter-btn { border-color: #856404 !important; color: #856404 !important; }
 .ongoing-filter-btn.active { background: #856404 !important; color: #fff !important; }
 .p-fav { color: #c89000; font-size: 11px; margin-left: 2px; }
+.p-ctx { font-size: 10px; font-weight: 600; margin-left: 3px; padding: 1px 4px; border-radius: 3px; background: var(--bg); border: 1px solid var(--border); }
+.p-ctx.pos { color: #2a7a3a; border-color: #b8e0c0; }
+.p-ctx.neg { color: #c0392b; border-color: #f0c0bc; }
+.p-ctx.neu { color: var(--muted); }
 .detail-head h2 { margin: 0; font-size: 22px; }
 .detail-head .league-name { color: var(--accent); font-weight: 600; }
 .detail-head .org-name { color: var(--muted); font-size: 13px; }
