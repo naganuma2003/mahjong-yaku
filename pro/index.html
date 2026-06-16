@@ -36,6 +36,7 @@
     </div>
     <div class="count-row">
   <div class="player-count" id="playerCount"></div>
+  <button class="help-btn" id="copyListBtn" title="一覧をコピー" onclick="copyPlayerList()">📋</button>
   <button class="help-btn" id="randomBtn" title="ランダムに選手を表示" onclick="openRandomPlayer()">🎲</button>
   <button class="help-btn" id="helpBtn" title="キーボードショートカット">?</button>
 </div>
@@ -72,6 +73,15 @@ function copyPlayerLink() {
   }
   navigator.clipboard.writeText(url).then(function() {
     if (btn) { btn.textContent = '✓'; setTimeout(function() { btn.textContent = '🔗'; }, 1500); }
+  });
+}
+function copyPlayerList() {
+  const list = filteredPlayers();
+  if (!list.length) return;
+  const text = list.map(p => p.name).join("\n");
+  const btn = document.getElementById("copyListBtn");
+  navigator.clipboard.writeText(text).then(function() {
+    if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📋"; }, 1500); }
   });
 }
 function openRandomPlayer() {
