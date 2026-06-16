@@ -466,6 +466,10 @@ function renderDetail(p) {
       ? (recsWithPts.reduce((s, r) => s + r.points, 0) / recsWithPts.length)
       : null;
     const avgPtsStr = avgPts != null ? fmtPoints(avgPts) + "pt" : null;
+    const bestPts = recsWithPts.length
+      ? recsWithPts.reduce((max, r) => r.points > max ? r.points : max, -Infinity)
+      : null;
+    const bestPtsStr = bestPts != null && bestPts > -Infinity ? fmtPoints(bestPts) + "pt" : null;
     const topTierName = (league.tiers || [])[0];
     const topFirstYear = topTierName
       ? groupRecs
@@ -487,6 +491,7 @@ function renderDetail(p) {
       html += stat(topTier, "最高到達");
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
+      if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
@@ -498,6 +503,7 @@ function renderDetail(p) {
       html += stat(topTier, "最高到達");
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
+      if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
       if (avgPtsStr) html += stat(avgPtsStr, "平均pt");
       if (latestPtsStr) html += stat(latestPtsStr, "直近pt");
       html += stat(yearRange, "活動期間");
