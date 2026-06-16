@@ -29,6 +29,7 @@
         <button class="year-step" id="yearPrev" title="前年" onclick="stepYear(-1)">‹</button>
         <input class="year-input" id="yearFilter" type="number" placeholder="年" min="1976" max="2030">
         <button class="year-step" id="yearNext" title="翌年" onclick="stepYear(1)">›</button>
+        <button class="year-step" id="yearClear" title="年フィルターをクリア" onclick="clearYear()" style="font-size:11px;opacity:0.6">✕</button>
       </div>
       <select class="sort-select" id="sortSelect">
         <optgroup label="基本">
@@ -161,6 +162,12 @@ function copyPlayerStats() {
   navigator.clipboard.writeText(lines.join("\n")).then(function() {
     if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📄"; }, 1500); }
   });
+}
+function clearYear() {
+  const input = document.getElementById('yearFilter');
+  input.value = '';
+  state.year = '';
+  renderList();
 }
 function stepYear(delta) {
   const input = document.getElementById('yearFilter');
