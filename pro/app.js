@@ -476,6 +476,12 @@ function renderList() {
     const tierBadge = latestTier
       ? '<span class="ptier tier-badge ' + tierClass(latestTier) + '">' + latestTier + '</span>'
       : "";
+    // 昇降級トレンドアイコン
+    let trendIcon = "";
+    if (latestRec) {
+      if (latestRec.category === "promotion") trendIcon = '<span class="p-trend trend-up" title="昇級">↑</span>';
+      else if (latestRec.category === "demotion") trendIcon = '<span class="p-trend trend-dn" title="降級">↓</span>';
+    }
     // M関係ロールラベル（成績なし選手のみ）
     let roleLabel = "";
     if (!latestRec && !curOrg) {
@@ -490,7 +496,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      ongoingBadge + tierBadge + roleLabel + teamBadge + ongoingPts + favStar +
+      ongoingBadge + tierBadge + trendIcon + roleLabel + teamBadge + ongoingPts + favStar +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);

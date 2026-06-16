@@ -44,6 +44,8 @@
   .p-pts.pos { color: #5cb87a; }
   .p-pts.neg { color: #e05c50; }
   mark.hl { background: #4a4010; color: #f0d060; }
+  .trend-up { color: #5cb87a; }
+  .trend-dn { color: #e05c50; }
   input, select { background: var(--panel); color: var(--text); border-color: var(--border); }
 }
 
@@ -190,6 +192,9 @@ body {
 .p-pts.pos { color: #2a7a3a; }
 .p-pts.neg { color: #c0392b; }
 mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1px; }
+.p-trend { font-size: 11px; font-weight: 700; margin-left: 1px; }
+.trend-up { color: #2a7a3a; }
+.trend-dn { color: #c0392b; }
 
 /* --- 詳細 --- */
 .detail {
