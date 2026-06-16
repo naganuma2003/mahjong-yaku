@@ -329,6 +329,9 @@ function renderList() {
       if (status === "current") teamBadge = '<span class="pteam pteam-current">現役</span>';
       else if (status === "former") teamBadge = '<span class="pteam pteam-former">元</span>';
     }
+    // 今期出場中
+    const hasOngoing = (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
+    const ongoingBadge = hasOngoing ? '<span class="p-ongoing">今期</span>' : "";
     // 最新のティアを取得
     const latestRec = (p.records || []).filter(r => !r.ongoing)
       .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
@@ -348,7 +351,7 @@ function renderList() {
       '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      tierBadge + roleLabel + teamBadge +
+      ongoingBadge + tierBadge + roleLabel + teamBadge +
       '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
