@@ -2247,6 +2247,16 @@ document.addEventListener("keydown", e => {
       if (li) li.scrollIntoView({ block: "nearest" });
     }
   }
+  // 数字キーで団体フィルター切替（1=最高位戦、2=連盟、3=協会、4=RMU、5=μ、0=全て）
+  if (document.activeElement !== el.search && /^[0-5]$/.test(e.key)) {
+    const orgMap = { "0": "all", "1": "saikouisen", "2": "renmei", "3": "kyokai", "4": "rmu", "5": "mu" };
+    const newOrg = orgMap[e.key];
+    if (newOrg && DATA.organizations.find(o => o.id === newOrg) || newOrg === "all") {
+      state.org = newOrg;
+      renderOrgFilter();
+      resetAndRenderList();
+    }
+  }
 });
 renderOrgFilter();
 renderList();
