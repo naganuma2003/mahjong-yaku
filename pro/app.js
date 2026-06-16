@@ -316,11 +316,19 @@ function renderList() {
       if (status === "current") teamBadge = '<span class="pteam pteam-current">現役</span>';
       else if (status === "former") teamBadge = '<span class="pteam pteam-former">元</span>';
     }
+    // 最新のティアを取得
+    const latestRec = (p.records || []).filter(r => !r.ongoing)
+      .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
+    const tierBadge = latestRec
+      ? '<span class="ptier tier-badge ' + tierClass(latestRec.tier) + '">' + latestRec.tier + '</span>'
+      : "";
     li.innerHTML =
       '<span class="pname">' + p.name + "</span>" +
+      '<span class="pright">' +
       '<span class="porg' + (isTransfer ? " transfer" : "") + '">' +
       (curOrg ? curOrg.shortName : "") + (isTransfer ? "↩" : "") + "</span>" +
-      teamBadge;
+      tierBadge + teamBadge +
+      '</span>';
     li.onclick = () => { state.selectedId = p.id; renderList(); renderDetail(p); };
     el.playerList.appendChild(li);
   });

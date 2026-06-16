@@ -119,8 +119,10 @@ body {
 .player-list li:hover { background: #f0f2f5; }
 .player-list li.selected { background: #eaf0fb; }
 .player-list .pname { font-size: 14px; }
+.player-list .pright { display: flex; align-items: center; gap: 4px; }
 .player-list .porg { font-size: 11px; color: var(--muted); }
 .player-list .porg.transfer { color: #7b1fa2; font-weight: 600; }
+.player-list .ptier { font-size: 10px; padding: 1px 5px; min-width: 22px; }
 
 /* --- 詳細 --- */
 .detail {
