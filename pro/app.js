@@ -1003,6 +1003,11 @@ document.addEventListener("keydown", e => {
     e.preventDefault(); el.search.focus(); el.search.select();
     return;
   }
+  if (e.key === "?" && document.activeElement !== el.search) {
+    const panel = document.getElementById("helpPanel");
+    if (panel) panel.style.display = panel.style.display === "none" ? "flex" : "none";
+    return;
+  }
   if (e.key === "Escape" && state.selectedId) {
     state.selectedId = null;
     history.replaceState(null, "", location.pathname);
