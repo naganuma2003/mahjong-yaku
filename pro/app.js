@@ -427,11 +427,14 @@ function renderDetail(p) {
     displayItems.forEach(item => {
       if (item.gap) {
         const count = item.to - item.from + 1;
+        const gyrFrom = termToYear(oid, item.from);
+        const gyrTo   = termToYear(oid, item.to);
+        const gyrStr  = gyrFrom > 1000 ? (gyrFrom === gyrTo ? gyrFrom : gyrFrom + "〜" + gyrTo) + "年 " : "";
         const label = item.from === item.to
           ? "第" + item.from + "期"
           : "第" + item.from + "期〜第" + item.to + "期";
         const note = count >= 3 ? "休戦の可能性" : "データなし";
-        html += '<tr class="gap-row"><td class="term">' + label + "</td><td colspan='3'>" + note + "（" + count + "期分）</td></tr>";
+        html += '<tr class="gap-row"><td class="term">' + label + '</td><td colspan="3">' + gyrStr + note + "（" + count + "期分）</td></tr>";
       } else {
         const r = item.rec;
         const rowCls = r.ongoing ? ' class="ongoing"' : "";
