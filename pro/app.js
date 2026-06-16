@@ -612,7 +612,9 @@ function renderList() {
     const favStar = _favs.has(p.id) ? '<span class="p-fav">★</span>' : "";
     // ホバーtitleに要約情報
     const titleParts = [];
-    if (latestTier) titleParts.push("最終ティア: " + latestTier);
+    if (latestTier) titleParts.push("直近: " + latestTier);
+    const debutYr = (() => { const ys = (p.records||[]).map(r=>termToYear(r.orgId||p.org,r.term)).concat((p.wrecords||[]).map(r=>wTermToYear(p.wleague||{},r.term))).filter(y=>y>1000); return ys.length ? Math.min(...ys) : null; })();
+    if (debutYr) titleParts.push(debutYr + "年〜");
     const totalRecCount = (p.records || []).length + (p.wrecords || []).length;
     if (totalRecCount) titleParts.push(totalRecCount + "期");
     const playoffCount = (p.records || []).filter(r => r.category === "playoff").length + (p.wrecords || []).filter(r => r.category === "playoff").length;
