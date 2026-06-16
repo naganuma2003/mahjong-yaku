@@ -833,6 +833,15 @@ function renderDetail(p) {
     }
     const streakStr = sortedTerms.length > 1 && maxStreak >= 3 ? maxStreak + "期" : null;
 
+    // 最長連続昇級
+    const catsSorted = groupRecs.slice().sort((a, b) => a.term - b.term).map(r => r.category).filter(c => c === "promotion" || c === "demotion" || c === "stay");
+    let maxPromoStreak = 0, curPromoStreak = 0;
+    catsSorted.forEach(c => {
+      if (c === "promotion") { curPromoStreak++; maxPromoStreak = Math.max(maxPromoStreak, curPromoStreak); }
+      else curPromoStreak = 0;
+    });
+    const promoStreakStr = maxPromoStreak >= 3 ? maxPromoStreak + "連続昇級" : null;
+
     if (isMultiOrg) {
       html += '<div class="org-section' + (idx === 0 ? " org-section-first" : "") + '">';
       html += '<div class="org-section-head">';
@@ -845,6 +854,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       if (streakStr) html += stat(streakStr, "最長連続");
+      if (promoStreakStr) html += stat(promoStreakStr, "連続記録");
       if (promoRateStr) html += stat(promoRateStr, "昇級率");
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
@@ -860,6 +870,7 @@ function renderDetail(p) {
       if (topFirstYearStr !== "-") html += stat(topFirstYearStr, "最高リーグ初年");
       html += stat(groupPlayoffs, "決定戦進出");
       if (streakStr) html += stat(streakStr, "最長連続");
+      if (promoStreakStr) html += stat(promoStreakStr, "連続記録");
       if (promoRateStr) html += stat(promoRateStr, "昇級率");
       if (totalPtsStr) html += stat(totalPtsStr, "通算pt");
       if (bestPtsStr) html += stat(bestPtsStr, "最高pt");
