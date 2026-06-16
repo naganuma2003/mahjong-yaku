@@ -178,7 +178,14 @@ function playerTeamStatus(name, team) {
 
 function resetAndRenderList() { state.showAll = false; renderList(); }
 
+let _filteredCache = null, _filteredStateKey = null;
 function filteredPlayers() {
+  const favsKey = state.favOnly ? [...getFavs()].sort().join(",") : "";
+  const stateKey = JSON.stringify([state.org, state.mleagueC, state.mleagueF, state.mtourn,
+    state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mcast, state.manalyst,
+    state.mreporter, state.mteam, state.year, state.favOnly, state.debutDecade, state.query, state.sort, favsKey]);
+  if (_filteredStateKey === stateKey && _filteredCache) return _filteredCache;
+  _filteredStateKey = stateKey;
   // スペース区切りでAND検索（各語を個別にnormalize）
   const rawTerms = state.query.trim().split(/\s+|　+/).filter(Boolean);
   const qTerms = rawTerms.map(normalize).filter(Boolean);
@@ -186,7 +193,7 @@ function filteredPlayers() {
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   const favs = state.favOnly ? getFavs() : null;
 
-  return DATA.players
+  const result = DATA.players
     .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
     .filter(p => {
       if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mcast && !state.manalyst && !state.mreporter && !activeTeam) return true;
@@ -327,6 +334,8 @@ function filteredPlayers() {
       }
       return a.name.localeCompare(b.name, "ja");
     });
+  _filteredCache = result;
+  return result;
 }
 
 function renderOrgFilter() {
