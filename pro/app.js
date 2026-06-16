@@ -600,6 +600,10 @@ function renderDetail(p) {
   addToHistory(p);
 
   el.detail.innerHTML = html;
+  if (state.year) {
+    const matchRow = el.detail.querySelector("tr.year-match");
+    if (matchRow) setTimeout(() => matchRow.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+  }
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const mate = DATA.players.find(x => x.id === btn.dataset.id);
