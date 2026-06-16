@@ -1425,7 +1425,12 @@ function renderDetail(p) {
     const worstRec = insightRecs.reduce((worst, r) => r.points < worst.points ? r : worst);
     const bestYear = recYear(bestRec);
     if (bestYear > 1000) insightParts.push("キャリアハイは" + bestYear + "年の" + fmtPoints(bestRec.points) + "pt");
+    const worstYear = recYear(worstRec);
+    if (worstRec.points < -100 && worstYear > 1000) insightParts.push("最大マイナスは" + worstYear + "年の" + fmtPoints(worstRec.points) + "pt");
     if (insightRecs.length >= 5) {
+      const recent5 = insightRecs.slice().sort((a, b) => recYear(b) - recYear(a)).slice(0, 5);
+      const recent5total = recent5.reduce((s, r) => s + r.points, 0);
+      if (Math.abs(recent5total) > 50) insightParts.push("直近5期合計" + (recent5total >= 0 ? "+" : "") + fmtPoints(recent5total) + "pt");
       const trend = recentAvg - allAvg;
       if (trend > 20) insightParts.push("直近3期は平均比+" + Math.round(trend) + "ptと好調");
       else if (trend < -20) insightParts.push("直近3期は平均比" + Math.round(trend) + "ptと苦戦");
