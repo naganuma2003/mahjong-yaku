@@ -59,6 +59,7 @@
   <button class="help-btn" id="copyListBtn" title="一覧をコピー" onclick="copyPlayerList()">📋</button>
   <button class="help-btn" id="randomBtn" title="ランダムに選手を表示" onclick="openRandomPlayer()">🎲</button>
   <button class="help-btn" id="shareFilterBtn" title="現在の絞り込み状態をURLでシェア" onclick="shareFilterUrl()">🔗</button>
+  <button class="help-btn" id="csvBtn" title="CSV形式でダウンロード（Excel対応）" onclick="downloadCsv()">⬇</button>
   <button class="help-btn" id="helpBtn" title="キーボードショートカット">?</button>
 </div>
 <div class="help-panel" id="helpPanel" style="display:none">
@@ -138,6 +139,34 @@ function copyPlayerList() {
   navigator.clipboard.writeText(text).then(function() {
     if (btn) { btn.textContent = "✓"; setTimeout(function() { btn.textContent = "📋"; }, 1500); }
   });
+}
+function downloadCsv() {
+  const list = filteredPlayers();
+  if (!list.length) return;
+  const esc = function(v) { v = String(v); return v.includes(',') || v.includes('"') || v.includes('\n') ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const header = ["名前","団体","デビュー年","出場期数","決定戦","通算pt","平均pt","直近ティア","タイトル"].map(esc).join(",");
+  const rows = list.map(function(p) {
+    const orgId = (p.records && p.records.length) ? (p.records[p.records.length - 1].orgId || p.org) : p.org;
+    const org = window.MJ_DATA.organizations.find(function(o) { return o.id === orgId; });
+    const debutYrs = (p.records || []).map(function(r) { return termToYear(r.orgId || p.org, r.term); }).filter(function(y) { return y > 1000; });
+    const debut = debutYrs.length ? Math.min.apply(null, debutYrs) : "";
+    const recs = (p.records || []).concat(p.wrecords || []).filter(function(r) { return !r.ongoing && r.points != null; });
+    const totalPts = recs.length ? recs.reduce(function(s, r) { return s + r.points; }, 0).toFixed(1) : "";
+    const avgPts = recs.length >= 3 ? (recs.reduce(function(s, r) { return s + r.points; }, 0) / recs.length).toFixed(1) : "";
+    const totalRecs = (p.records || []).length + (p.wrecords || []).length;
+    const playoffs = (p.records || []).filter(function(r) { return r.category === "playoff"; }).length + (p.wrecords || []).filter(function(r) { return r.category === "playoff"; }).length;
+    const latestRec = (p.records || []).filter(function(r) { return !r.ongoing; }).sort(function(a, b) { return termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term); })[0];
+    const latestTier = latestRec ? ((latestRec.tier === "後期" || latestRec.tier === "前期") ? (latestRec.result || latestRec.tier) : latestRec.tier) : "";
+    const titles = (p.profile && p.profile.titles) ? p.profile.titles.join("・") : "";
+    return [p.name, org ? org.shortName : p.org, debut, totalRecs, playoffs, totalPts, avgPts, latestTier, titles].map(esc).join(",");
+  });
+  const csv = "﻿" + header + "\n" + rows.join("\n"); // BOM付きでExcel対応
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "mahjong-pro-" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 function openRandomPlayer() {
   const list = filteredPlayers();
