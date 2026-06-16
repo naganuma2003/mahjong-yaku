@@ -228,6 +228,7 @@ body {
 
 .result-promotion, .result-playoff { color: var(--accent); font-weight: 600; }
 .cat-icon { font-size: 11px; margin-right: 3px; font-weight: 700; }
+.half { font-size: 9px; color: var(--muted); margin-left: 3px; vertical-align: middle; }
 .cat-up { color: #2e7d32; }
 .cat-dn { color: #1565c0; }
 .cat-po { color: #b8860b; }

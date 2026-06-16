@@ -561,10 +561,15 @@ function renderDetail(p) {
                       : r.category === "demotion"  ? '<span class="cat-icon cat-dn">↓</span>'
                       : r.category === "playoff"   ? '<span class="cat-icon cat-po">★</span>'
                       : "";
+        // 後期/前期ティアは result をティア名として表示
+        const isHalfSeason = r.tier === "後期" || r.tier === "前期";
+        const displayTier = isHalfSeason && r.result ? r.result : r.tier;
+        const halfLabel = isHalfSeason ? '<span class="half">' + r.tier + '</span>' : "";
+        const displayResult = isHalfSeason ? "" : resultText;
         html += "<tr" + rowCls + ">" +
           '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
-          '<td><span class="tier-badge ' + tierClass(r.tier) + '">' + r.tier + "</span></td>" +
-          '<td class="result-' + r.category + '">' + catIcon + resultText + "</td>" +
+          '<td><span class="tier-badge ' + tierClass(displayTier) + '">' + displayTier + "</span>" + halfLabel + "</td>" +
+          '<td class="result-' + r.category + '">' + catIcon + displayResult + "</td>" +
           '<td class="points ' + ptsCls + '">' + fmtPoints(r.points) + "</td></tr>";
       }
     });
