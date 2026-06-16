@@ -377,6 +377,10 @@ function renderDetail(p) {
     const label = status === "current" ? t.name : t.name + "（元）";
     html += '<span class="mteam-badge" style="background:' + t.color + '">' + label + '</span>';
   });
+  const n = normalize(p.name);
+  if (MCAST.has(n))     html += '<span class="role-badge role-cast">実況</span>';
+  if (MANALYST.has(n))  html += '<span class="role-badge role-analyst">解説</span>';
+  if (MREPORTER.has(n)) html += '<span class="role-badge role-reporter">リポーター</span>';
   html += "</div>";
 
   html += renderProfile(p);
