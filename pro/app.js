@@ -1429,11 +1429,12 @@ function renderDetail(p) {
     const doFold = needsFold && !hasYearMatchInOld;
     const tableId = "tbl-" + oid + "-" + idx;
 
-    html += '<table class="timeline" id="' + tableId + '"><thead><tr><th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th></tr></thead><tbody>';
+    const srcUrl = p.sourceUrl;
+    html += '<table class="timeline" id="' + tableId + '"><thead><tr><th>期</th><th>リーグ</th><th>結果</th><th>ポイント</th>' + (srcUrl ? '<th></th>' : '') + '</tr></thead><tbody>';
     displayItems.forEach((item, itemIdx) => {
       if (doFold && itemIdx === FOLD_SHOW) {
         const hiddenCount = displayItems.length - FOLD_SHOW;
-        html += '<tr class="fold-toggle-row"><td colspan="4"><button class="fold-btn" data-table="' + tableId + '" data-hidden="' + hiddenCount + '">▼ 過去' + hiddenCount + '期を表示</button></td></tr>';
+        html += '<tr class="fold-toggle-row"><td colspan="' + (srcUrl ? '5' : '4') + '"><button class="fold-btn" data-table="' + tableId + '" data-hidden="' + hiddenCount + '">▼ 過去' + hiddenCount + '期を表示</button></td></tr>';
         html += '</tbody><tbody class="fold-body" id="' + tableId + '-old" style="display:none">';
       }
       if (item.gap) {
@@ -1445,7 +1446,7 @@ function renderDetail(p) {
           ? "第" + item.from + "期"
           : "第" + item.from + "期〜第" + item.to + "期";
         const note = count >= 3 ? "休戦の可能性" : "データなし";
-        html += '<tr class="gap-row"><td class="term">' + label + '</td><td colspan="3">' + gyrStr + note + "（" + count + "期分）</td></tr>";
+        html += '<tr class="gap-row"><td class="term">' + label + '</td><td colspan="' + (srcUrl ? '4' : '3') + '">' + gyrStr + note + "（" + count + "期分）</td></tr>";
       } else {
         const r = item.rec;
         const ptsCls = (r.points !== null && r.points < 0) ? "pts-neg" : "pts-pos";
@@ -1482,7 +1483,8 @@ function renderDetail(p) {
           '<td class="term">第' + r.term + "期" + yrHtml + "</td>" +
           '<td><span class="tier-badge ' + tierClass(displayTier) + '">' + displayTier + "</span>" + halfLabel + "</td>" +
           '<td class="result-' + r.category + '">' + catIcon + displayResult + "</td>" +
-          '<td class="points ' + ptsCls + '">' + (r.points != null ? fmtPoints(r.points) : "—") + deltaHtml + "</td></tr>";
+          '<td class="points ' + ptsCls + '">' + (r.points != null ? fmtPoints(r.points) : "—") + deltaHtml + "</td>" +
+          (srcUrl ? '<td class="src-link"><a href="' + srcUrl + '" target="_blank" rel="noopener" title="公式データソース">🔗</a></td>' : '') + "</tr>";
       }
     });
     html += "</tbody></table>";
@@ -2875,6 +2877,71 @@ window.addEventListener("popstate", function(e) {
 // デスクトップでは検索欄に初期フォーカス
 if (window.innerWidth > 760 && !location.search) {
   el.search.focus();
+}
+
+// --- 管理モード: ?admin=1 で最高リーグのcategory編集 ---
+if (params.get("admin") === "1") {
+  (function() {
+    const TOP_TIERS = { kyokai: "A1", renmei: "A1", saikouisen: "A1" };
+    const edits = {};
+    const targets = [];
+    DATA.players.forEach(p => {
+      const org = p.org;
+      const topTier = TOP_TIERS[org];
+      if (!topTier) return;
+      const recs = (p.records || []).filter(r => {
+        const t = (r.tier === "後期" || r.tier === "前期") ? (r.result || r.tier) : r.tier;
+        return t === topTier;
+      });
+      if (!recs.length) return;
+      const latest = recs.reduce((a, b) => a.term > b.term ? a : b);
+      if (!latest.category || latest.category === "other") {
+        targets.push({ player: p, rec: latest, org });
+      }
+    });
+    targets.sort((a, b) => a.org.localeCompare(b.org) || a.player.name.localeCompare(b.player.name));
+    if (!targets.length) return;
+    const panel = document.createElement("div");
+    panel.style.cssText = "position:fixed;bottom:0;left:0;right:0;max-height:50vh;overflow:auto;background:var(--bg);border-top:3px solid #c0392b;z-index:9999;padding:12px;font-size:13px";
+    panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>管理: 最高リーグ カテゴリ未設定 (' + targets.length + '名)</b><span><button id="adminCopy" style="margin-right:8px">📋 変更をコピー</button><button id="adminApply">✅ 適用</button><button id="adminClose" style="margin-left:8px">✕</button></span></div>';
+    let tbl = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>団体</th><th>選手</th><th>期</th><th>リーグ</th><th>順位</th><th>pt</th><th>カテゴリ</th><th>リンク</th></tr></thead><tbody>';
+    const CATS = [["","未設定"],["stay","残留"],["promotion","昇級"],["demotion","降級"],["playoff","決定戦"],["other","その他"]];
+    targets.forEach((t, i) => {
+      const r = t.rec;
+      const orgName = (ORGS[t.org] || {}).shortName || t.org;
+      tbl += '<tr style="border-bottom:1px solid var(--border)"><td>' + orgName + '</td><td><a href="?p=' + encodeURIComponent(t.player.id) + '" target="_blank">' + t.player.name + '</a></td><td>' + r.term + '期</td><td>' + r.tier + '</td><td>' + (r.rank || "-") + '</td><td>' + (r.points != null ? r.points : "-") + '</td><td><select data-admin-idx="' + i + '">' + CATS.map(c => '<option value="' + c[0] + '">' + c[1] + '</option>').join('') + '</select></td><td>' + (t.player.sourceUrl ? '<a href="' + t.player.sourceUrl + '" target="_blank">🔗</a>' : '-') + '</td></tr>';
+    });
+    tbl += '</tbody></table>';
+    panel.innerHTML += tbl;
+    document.body.appendChild(panel);
+    panel.querySelectorAll("select[data-admin-idx]").forEach(sel => {
+      sel.onchange = function() {
+        const idx = parseInt(this.dataset.adminIdx);
+        const t = targets[idx];
+        if (this.value) edits[t.player.id + ":" + t.rec.term] = { id: t.player.id, name: t.player.name, org: t.org, term: t.rec.term, category: this.value };
+        else delete edits[t.player.id + ":" + t.rec.term];
+      };
+    });
+    document.getElementById("adminCopy").onclick = function() {
+      const changes = Object.values(edits);
+      if (!changes.length) { alert("変更なし"); return; }
+      navigator.clipboard.writeText(JSON.stringify(changes, null, 2)).then(() => { this.textContent = "✓ コピー済"; setTimeout(() => this.textContent = "📋 変更をコピー", 1500); });
+    };
+    document.getElementById("adminApply").onclick = function() {
+      const changes = Object.values(edits);
+      if (!changes.length) { alert("変更なし"); return; }
+      changes.forEach(c => {
+        const p = DATA.players.find(x => x.id === c.id);
+        if (!p) return;
+        const rec = (p.records || []).find(r => r.term === c.term);
+        if (rec) rec.category = c.category;
+      });
+      renderList();
+      if (state.selectedId) { const sp = DATA.players.find(x => x.id === state.selectedId); if (sp) renderDetail(sp); }
+      alert(changes.length + "件適用しました（表示のみ・永続化はJSONコピーで）");
+    };
+    document.getElementById("adminClose").onclick = function() { panel.remove(); };
+  })();
 }
 
 // 検索プレースホルダーを循環表示（AND検索の使い方をヒント）

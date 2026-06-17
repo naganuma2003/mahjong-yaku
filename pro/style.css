@@ -413,6 +413,9 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 
 .source-link { margin-top: 16px; font-size: 12px; }
 .source-link a { color: var(--muted); }
+.timeline td.src-link { width: 24px; text-align: center; padding: 2px; }
+.timeline td.src-link a { text-decoration: none; font-size: 12px; opacity: 0.5; }
+.timeline td.src-link a:hover { opacity: 1; }
 
 /* プロフィールカード */
 .profile-card {
