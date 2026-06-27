@@ -73,28 +73,29 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
 
 const state = { org: "all", mleagueC: true, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mRelated: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null, minRec: null, extraOpen: false };
 
-// Mリーグ 2024-25 現役選手
+// Mリーグ 2026-27 現役選手
 const MLEAGUE_CURRENT = new Set([
   "園田賢","鈴木たろう","浅見真紀","渡辺太",
   "二階堂亜樹","勝又健志","永井孝典","内川幸太郎",
-  "岡田紗佳","堀慎吾","渋川難波","阿久津翔太",
+  "岡田紗佳","堀慎吾","尻無濱航","阿久津翔太",
   "佐々木寿人","高宮まり","伊達朱里紗","滝沢和典",
   "多井隆晴","白鳥翔","松本吉弘","日向藍子",
-  "茅森早香","醍醐大","竹内元太","浅井堂岐",
+  "茅森早香","醍醐大","竹内元太","佐野ひなこ",
   "萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広",
   "鈴木大介","中田花奈","下石戟","東城りお",
-  "小林剛","瑞原明奈","鈴木優","仲林圭",
+  "朝倉康心","瑞原明奈","鈴木優","仲林圭",
   "石井一馬","三浦智博","逢川恵夢","HIRO柴田",
 ]);
 
 // Mリーグ 退団済み（歴代）
 const MLEAGUE_FORMER = new Set([
-  "前原雄大","藤崎智","和久津晶","朝倉康心","石橋伸洋",
+  "前原雄大","藤崎智","和久津晶","石橋伸洋",
   "沢崎誠","近藤誠一","村上淳","丸山奏子","魚谷侑未",
   "松ヶ瀬隆弥","二階堂瑠美","猿川真寿","菅原千瑛",
+  "渋川難波","浅井堂岐","小林剛",
 ]);
 
-// Mリーグ チーム別メンバー（2025-26現役 + 歴代）
+// Mリーグ チーム別メンバー（2026-27現役 + 歴代）
 const MLEAGUE_TEAMS = [
   { id:"drives",  name:"赤坂ドリブンズ",       short:"ドリブンズ",  color:"#228B22",
     current:new Set(["園田賢","鈴木たろう","浅見真紀","渡辺太"]),
@@ -103,8 +104,8 @@ const MLEAGUE_TEAMS = [
     current:new Set(["二階堂亜樹","勝又健志","永井孝典","内川幸太郎"]),
     former: new Set(["滝沢和典","松ヶ瀬隆弥","二階堂瑠美"]) },
   { id:"sakura",  name:"KADOKAWAサクラナイツ",  short:"サクラナイツ",color:"#E8739A",
-    current:new Set(["岡田紗佳","堀慎吾","渋川難波","阿久津翔太"]),
-    former: new Set(["沢崎誠","内川幸太郎"]) },
+    current:new Set(["岡田紗佳","堀慎吾","尻無濱航","阿久津翔太"]),
+    former: new Set(["沢崎誠","内川幸太郎","渋川難波"]) },
   { id:"konami",  name:"KONAMI麻雀格闘倶楽部",  short:"格闘倶楽部", color:"#CC0000",
     current:new Set(["佐々木寿人","高宮まり","伊達朱里紗","滝沢和典"]),
     former: new Set(["前原雄大","藤崎智"]) },
@@ -112,11 +113,11 @@ const MLEAGUE_TEAMS = [
     current:new Set(["多井隆晴","白鳥翔","松本吉弘","日向藍子"]),
     former: new Set([]) },
   { id:"phoenix", name:"セガサミーフェニックス",  short:"フェニックス",color:"#E86C00",
-    current:new Set(["茅森早香","醍醐大","竹内元太","浅井堂岐"]),
-    former: new Set(["近藤誠一","魚谷侑未","和久津晶","東城りお"]) },
+    current:new Set(["茅森早香","醍醐大","竹内元太","佐野ひなこ"]),
+    former: new Set(["近藤誠一","魚谷侑未","和久津晶","東城りお","浅井堂岐"]) },
   { id:"pirates", name:"U-NEXTパイレーツ",       short:"パイレーツ", color:"#001F5B",
-    current:new Set(["小林剛","瑞原明奈","鈴木優","仲林圭"]),
-    former: new Set(["朝倉康心","石橋伸洋"]) },
+    current:new Set(["朝倉康心","瑞原明奈","鈴木優","仲林圭"]),
+    former: new Set(["石橋伸洋","小林剛"]) },
   { id:"raiden",  name:"TEAM RAIDEN/雷電",       short:"雷電",       color:"#FFD700",
     current:new Set(["萩原聖人","瀬戸熊直樹","黒沢咲","本田朋広"]),
     former: new Set([]) },
