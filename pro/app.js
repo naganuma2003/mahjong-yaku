@@ -265,7 +265,7 @@ function renderMLeagueMatrix() {
     if (g === "BEAST Japanext") g = "BEAST X";
     (groups[g] = groups[g] || []).push({ name, hist, latestIdx: latest.idx });
   });
-  let html = '<div class="ml-page-intro">2018年の開幕から現在まで、Mリーガー各選手のシーズン別所属チームの変遷です。セルの色はそのシーズンの所属チーム、★は移籍を表します。選手名をタップすると詳細へ移動します。</div>';
+  let html = '<div class="ml-page-intro">2018年の開幕から現在まで、Mリーガー各選手のシーズン別所属チームの変遷です。セルの色はそのシーズンの所属チーム、★は移籍、👑（金枠）はそのシーズンのチーム優勝、🏅は個人賞受賞を表します。選手名をタップすると詳細へ移動します。</div>';
 
   // 凡例
   html += '<div class="ml-legend">';
@@ -300,7 +300,10 @@ function renderMLeagueMatrix() {
         const seasonStr = ML_SEASONS[i] + "-" + String(parseInt(ML_SEASONS[i]) + 1).slice(2);
         const aw = ML_AWARDS.filter(a => a.p === name && a.s === seasonStr);
         const awMark = aw.length ? '<span class="ml-aw" title="' + aw.map(a => a.a).join("・") + '">🏅</span>' : '';
-        html += '<td class="ml-c" style="background:' + mlTeamColor(t) + '" title="' + t + (aw.length ? '：' + aw.map(a=>a.a).join("・") : '') + '">' + mlTeamShort(t) + '<span class="ml-move">' + moved + '</span>' + awMark + '</td>';
+        const champ = mlTeamRank(t, ML_SEASONS[i]) === 1;
+        const champCls = champ ? ' ml-champ' : '';
+        const crown = champ ? '<span class="ml-crown" title="' + ML_SEASONS[i] + '-' + String(parseInt(ML_SEASONS[i])+1).slice(2) + ' 優勝">👑</span>' : '';
+        html += '<td class="ml-c' + champCls + '" style="background:' + mlTeamColor(t) + '" title="' + t + (champ ? '（優勝）' : '') + (aw.length ? '：' + aw.map(a=>a.a).join("・") : '') + '">' + crown + mlTeamShort(t) + '<span class="ml-move">' + moved + '</span>' + awMark + '</td>';
       });
       html += '</tr>';
     });
