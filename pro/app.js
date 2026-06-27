@@ -129,6 +129,147 @@ const MLEAGUE_TEAMS = [
     former: new Set([]) },
 ];
 
+// Mリーグ シーズン別選手変遷・順位・個人賞
+const ML_SEASONS = ["2018","2019","2020","2021","2022","2023","2024","2025","2026"];
+const ML_STANDINGS = {
+  "2018":["赤坂ドリブンズ","EX風林火山","渋谷ABEMAS","KONAMI麻雀格闘倶楽部","セガサミーフェニックス","TEAM RAIDEN/雷電","U-NEXT Pirates"],
+  "2019":["U-NEXT Pirates","セガサミーフェニックス","渋谷ABEMAS","KADOKAWAサクラナイツ","KONAMI麻雀格闘倶楽部","TEAM RAIDEN/雷電","EX風林火山","赤坂ドリブンズ"],
+  "2020":["EX風林火山","KADOKAWAサクラナイツ","渋谷ABEMAS","KONAMI麻雀格闘倶楽部","赤坂ドリブンズ","セガサミーフェニックス","U-NEXT Pirates","TEAM RAIDEN/雷電"],
+  "2021":["KADOKAWAサクラナイツ","セガサミーフェニックス","渋谷ABEMAS","KONAMI麻雀格闘倶楽部","EX風林火山","U-NEXT Pirates","赤坂ドリブンズ","TEAM RAIDEN/雷電"],
+  "2022":["渋谷ABEMAS","KONAMI麻雀格闘倶楽部","KADOKAWAサクラナイツ","EX風林火山","赤坂ドリブンズ","U-NEXT Pirates","TEAM RAIDEN/雷電","セガサミーフェニックス"],
+  "2023":["U-NEXT Pirates","KADOKAWAサクラナイツ","赤坂ドリブンズ","渋谷ABEMAS","KONAMI麻雀格闘倶楽部","EX風林火山","BEAST Japanext","TEAM RAIDEN/雷電","セガサミーフェニックス"],
+  "2024":["セガサミーフェニックス","U-NEXT Pirates","赤坂ドリブンズ","TEAM RAIDEN/雷電","KONAMI麻雀格闘倶楽部","渋谷ABEMAS","KADOKAWAサクラナイツ","EX風林火山","BEAST X"],
+  "2025":["EX風林火山","KONAMI麻雀格闘倶楽部","BEAST X","赤坂ドリブンズ","セガサミーフェニックス","TEAM RAIDEN/雷電","渋谷ABEMAS","U-NEXT Pirates","KADOKAWAサクラナイツ","EARTH JETS"],
+};
+const ML_PLAYER_HISTORY = {
+  "園田賢":["赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ"],
+  "村上淳":["赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","","","",""],
+  "鈴木たろう":["赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ"],
+  "丸山奏子":["","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","","","",""],
+  "浅見真紀":["","","","","","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ"],
+  "渡辺太":["","","","","","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ","赤坂ドリブンズ"],
+  "二階堂亜樹":["EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山"],
+  "勝又健志":["EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山","EX風林火山"],
+  "内川幸太郎":["","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","EX風林火山","EX風林火山"],
+  "二階堂瑠美":["","","","EX風林火山","EX風林火山","EX風林火山","EX風林火山","",""],
+  "松ヶ瀬隆弥":["","","","EX風林火山","EX風林火山","EX風林火山","EX風林火山","",""],
+  "永井孝典":["","","","","","","","EX風林火山","EX風林火山"],
+  "滝沢和典":["EX風林火山","EX風林火山","EX風林火山","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部"],
+  "多井隆晴":["渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS"],
+  "松本吉弘":["渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS"],
+  "白鳥翔":["渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS"],
+  "日向藍子":["","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS","渋谷ABEMAS"],
+  "佐々木寿人":["KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部"],
+  "前原雄大":["KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","","","","","",""],
+  "高宮まり":["KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部"],
+  "藤崎智":["","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","","","","","",""],
+  "伊達朱里紗":["","","","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部","KONAMI麻雀格闘倶楽部"],
+  "茅森早香":["セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス"],
+  "近藤誠一":["セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","","","",""],
+  "魚谷侑未":["セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","","",""],
+  "和久津晶":["","セガサミーフェニックス","セガサミーフェニックス","","","","","",""],
+  "醍醐大":["","","","","","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス"],
+  "浅井堂岐":["","","","","","","セガサミーフェニックス","セガサミーフェニックス",""],
+  "竹内元太":["","","","","","","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス"],
+  "佐野ひなこ":["","","","","","","","","セガサミーフェニックス"],
+  "瀬戸熊直樹":["TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電"],
+  "萩原聖人":["TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電"],
+  "黒沢咲":["TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電"],
+  "本田朋広":["","","","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電","TEAM RAIDEN/雷電"],
+  "小林剛":["U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates",""],
+  "朝倉康心":["U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","","","","","U-NEXT Pirates"],
+  "石橋伸洋":["U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","","","","",""],
+  "瑞原明奈":["","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates"],
+  "仲林圭":["","","","","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates"],
+  "鈴木優":["","","","","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates","U-NEXT Pirates"],
+  "岡田紗佳":["","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ"],
+  "沢崎誠":["","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","","","","",""],
+  "堀慎吾":["","","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ"],
+  "渋川難波":["","","","","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ",""],
+  "阿久津翔太":["","","","","","","","KADOKAWAサクラナイツ","KADOKAWAサクラナイツ"],
+  "尻無濱航":["","","","","","","","","KADOKAWAサクラナイツ"],
+  "東城りお":["","","","セガサミーフェニックス","セガサミーフェニックス","セガサミーフェニックス","","BEAST X","BEAST X"],
+  "中田花奈":["","","","","","BEAST Japanext","BEAST X","BEAST X","BEAST X"],
+  "猿川真寿":["","","","","","BEAST Japanext","BEAST X","",""],
+  "鈴木大介":["","","","","","","BEAST X","BEAST X","BEAST X"],
+  "菅原千瑛":["","","","","","","BEAST X","BEAST X",""],
+  "下石戟":["","","","","","","BEAST X","BEAST X","BEAST X"],
+  "石井一馬":["","","","","","","","","EARTH JETS"],
+  "三浦智博":["","","","","","","","","EARTH JETS"],
+  "逢川恵夢":["","","","","","","","","EARTH JETS"],
+  "HIRO柴田":["","","","","","","","","EARTH JETS"],
+};
+const ML_AWARDS = [
+  {s:"2018-19",p:"多井隆晴",a:"MVP",prize:0},{s:"2018-19",p:"茅森早香",a:"平均打点",prize:0},{s:"2018-19",p:"滝沢和典",a:"4着回避率",prize:0},
+  {s:"2019-20",p:"魚谷侑未",a:"MVP",prize:0},{s:"2019-20",p:"魚谷侑未",a:"最高スコア",prize:0},{s:"2019-20",p:"近藤誠一",a:"4着回避率",prize:0},
+  {s:"2020-21",p:"佐々木寿人",a:"MVP",prize:0},{s:"2020-21",p:"佐々木寿人",a:"最高スコア",prize:0},{s:"2020-21",p:"小林剛",a:"4着回避率",prize:0},
+  {s:"2021-22",p:"瑞原明奈",a:"MVP",prize:0},{s:"2021-22",p:"伊達朱里紗",a:"最高スコア",prize:0},{s:"2021-22",p:"多井隆晴",a:"4着回避率",prize:0},
+  {s:"2022-23",p:"伊達朱里紗",a:"MVP",prize:0},{s:"2022-23",p:"黒沢咲",a:"最高スコア",prize:0},{s:"2022-23",p:"勝又健志",a:"4着回避率",prize:0},
+  {s:"2023-24",p:"鈴木優",a:"MVP",prize:0},{s:"2023-24",p:"鈴木たろう",a:"最高スコア",prize:0},{s:"2023-24",p:"伊達朱里紗",a:"4着回避率",prize:0},
+  {s:"2024-25",p:"醍醐大",a:"MVP",prize:1000000},{s:"2024-25",p:"鈴木大介",a:"最高スコア",prize:500000},{s:"2024-25",p:"日向藍子",a:"4着回避率",prize:500000},
+  {s:"2025-26",p:"下石戟",a:"MVP",prize:2000000},{s:"2025-26",p:"内川幸太郎",a:"最高スコア",prize:1000000},{s:"2025-26",p:"白鳥翔",a:"4着回避率",prize:1000000},{s:"2025-26",p:"滝沢和典",a:"最多トップ",prize:1000000},
+];
+function mlTeamColor(teamName) {
+  const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
+  return t ? t.color : "#888";
+}
+function renderMLeagueHistory(playerName) {
+  const key = playerName.replace(/\s/g, "");
+  const hist = ML_PLAYER_HISTORY[key];
+  if (!hist) return "";
+  const awards = ML_AWARDS.filter(a => a.p === key);
+  const seasons = hist.filter(h => h).length;
+  let html = '<div class="ml-history"><h3>Mリーグ変遷（' + seasons + '期）</h3>';
+  html += '<div class="ml-timeline">';
+  html += '<div class="ml-row ml-header"><span class="ml-label"></span>';
+  ML_SEASONS.forEach(s => { html += '<span class="ml-cell">' + s.slice(2) + '</span>'; });
+  html += '</div>';
+  html += '<div class="ml-row"><span class="ml-label">所属</span>';
+  ML_SEASONS.forEach((s, i) => {
+    const team = hist[i];
+    if (team) {
+      const c = mlTeamColor(team);
+      const short = team.replace("KADOKAWAサクラナイツ","桜").replace("KONAMI麻雀格闘倶楽部","格").replace("セガサミーフェニックス","鳳").replace("EX風林火山","風").replace("赤坂ドリブンズ","D").replace("渋谷ABEMAS","A").replace("TEAM RAIDEN/雷電","雷").replace("U-NEXT Pirates","U").replace("U-NEXTパイレーツ","U").replace("BEAST Japanext","B").replace("BEAST X","B").replace("EARTH JETS","E");
+      html += '<span class="ml-cell ml-team" style="background:' + c + ';color:#fff" title="' + team + '">' + short + '</span>';
+    } else {
+      html += '<span class="ml-cell ml-empty">-</span>';
+    }
+  });
+  html += '</div>';
+  html += '<div class="ml-row"><span class="ml-label">順位</span>';
+  ML_SEASONS.forEach((s, i) => {
+    const team = hist[i];
+    if (team && ML_STANDINGS[s]) {
+      const teamMatch = team === "BEAST Japanext" ? "BEAST Japanext" : team;
+      let rank = ML_STANDINGS[s].indexOf(teamMatch) + 1;
+      if (!rank && team === "BEAST X") rank = ML_STANDINGS[s].indexOf("BEAST X") + 1;
+      if (!rank && team === "BEAST Japanext") rank = ML_STANDINGS[s].indexOf("BEAST Japanext") + 1;
+      const cls = rank === 1 ? "ml-gold" : rank === 2 ? "ml-silver" : rank === 3 ? "ml-bronze" : "";
+      html += '<span class="ml-cell ' + cls + '">' + (rank || "-") + '位</span>';
+    } else if (s === "2026") {
+      html += '<span class="ml-cell ml-empty">' + (hist[i] ? "—" : "-") + '</span>';
+    } else {
+      html += '<span class="ml-cell ml-empty">-</span>';
+    }
+  });
+  html += '</div>';
+  if (awards.length) {
+    html += '<div class="ml-row"><span class="ml-label">個人賞</span>';
+    ML_SEASONS.forEach((s, i) => {
+      const seasonStr = s + "-" + String(parseInt(s)+1).slice(2);
+      const aw = awards.filter(a => a.s === seasonStr);
+      if (aw.length && hist[i]) {
+        html += '<span class="ml-cell ml-award" title="' + aw.map(a=>a.a).join("・") + '">🏅</span>';
+      } else {
+        html += '<span class="ml-cell ml-empty"></span>';
+      }
+    });
+    html += '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
 // M関係: 実況
 const MCAST = new Set([
   "小林未沙","松嶋桃","日吉辰哉","古橋崇志",
@@ -1211,6 +1352,7 @@ function renderDetail(p) {
   }
 
   html += renderProfile(p);
+  html += renderMLeagueHistory(p.name);
 
   if (isMultiOrg) {
     html += '<div class="summary">';

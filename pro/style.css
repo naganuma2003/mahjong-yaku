@@ -476,6 +476,22 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .ranking-table td:first-child, .ranking-table th:first-child { width: 36px; text-align: center; }
 .force-dark .ranking-table tr[data-id]:hover { background: #333; }
 
+/* Mリーグ変遷 */
+.ml-history { margin: 16px 0; padding: 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+.ml-history h3 { font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text); }
+.ml-timeline { display: flex; flex-direction: column; gap: 2px; overflow-x: auto; }
+.ml-row { display: flex; align-items: center; gap: 2px; min-height: 28px; }
+.ml-header { font-size: 11px; color: var(--muted); font-weight: 600; }
+.ml-label { width: 48px; min-width: 48px; font-size: 11px; color: var(--muted); text-align: right; padding-right: 6px; }
+.ml-cell { flex: 1; min-width: 32px; text-align: center; font-size: 11px; padding: 4px 2px; border-radius: 4px; }
+.ml-team { font-weight: 700; font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.ml-empty { color: var(--muted); }
+.ml-gold { background: #ffd700; color: #000; font-weight: 700; }
+.ml-silver { background: #c0c0c0; color: #000; font-weight: 600; }
+.ml-bronze { background: #cd7f32; color: #fff; font-weight: 600; }
+.ml-award { font-size: 14px; }
+.force-dark .ml-history { background: #1e1e1e; border-color: #333; }
+
 /* チームメイト */
 .teammates-section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }
 .teammates-head { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
