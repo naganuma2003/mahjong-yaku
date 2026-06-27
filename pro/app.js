@@ -71,7 +71,7 @@ const TOPLEAGUE_COUNT = DATA.players.filter(p => {
   });
 }).length;
 
-const state = { org: "all", mleagueC: true, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mRelated: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null, minRec: null, extraOpen: false };
+const state = { org: "all", mleagueC: true, mleagueF: false, mtourn: false, topLeague: false, wleague: false, playoff: false, ongoingOnly: false, mRelated: false, mteam: null, teamOpen: false, query: "", year: "", selectedId: null, sort: "name", favOnly: false, showAll: false, debutDecade: null, positivePts: false, recentActive: false, hasTitle: false, ageMin: null, ageMax: null, minRec: null, extraOpen: false, filterMode: "and" };
 
 // Mリーグ 2026-27 現役選手
 const MLEAGUE_CURRENT = new Set([
@@ -240,7 +240,7 @@ function filteredPlayers() {
   const favsKey = state.favOnly ? [...getFavs()].sort().join(",") : "";
   const stateKey = JSON.stringify([state.org, state.mleagueC, state.mleagueF, state.mtourn,
     state.topLeague, state.wleague, state.playoff, state.ongoingOnly, state.mRelated,
-    state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.ageMin, state.ageMax, state.minRec, state.query, state.sort, favsKey]);
+    state.mteam, state.year, state.favOnly, state.debutDecade, state.positivePts, state.recentActive, state.hasTitle, state.ageMin, state.ageMax, state.minRec, state.query, state.sort, state.filterMode, favsKey]);
   if (_filteredStateKey === stateKey && _filteredCache) return _filteredCache;
   _filteredStateKey = stateKey;
   // スペース区切りでAND検索（各語を個別にnormalize）
@@ -250,59 +250,68 @@ function filteredPlayers() {
   const activeTeam = state.mteam ? MLEAGUE_TEAMS.find(t => t.id === state.mteam) : null;
   const favs = state.favOnly ? getFavs() : null;
 
+  // --- 個別フィルタ判定関数 ---
+  function chkMleague(p) {
+    if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mRelated && !activeTeam) return null;
+    const n = normalize(p.name);
+    return (state.mleagueC  && MLEAGUE_CURRENT.has(n))      ||
+           (state.mleagueF  && MLEAGUE_FORMER.has(n))        ||
+           (state.mtourn    && MTOURNAMENT.has(n))            ||
+           (state.mRelated  && (MCAST.has(n) || MANALYST.has(n) || MREPORTER.has(n))) ||
+           (activeTeam      && playerTeamStatus(n, activeTeam) !== null);
+  }
+  function chkTopLeague(p) { return !state.topLeague ? null : isTopLeague(p); }
+  function chkWleague(p) { return !state.wleague ? null : !!(p.wrecords && p.wrecords.length > 0); }
+  function chkFav(p) { return !state.favOnly ? null : !!(favs && favs.has(p.id)); }
+  function chkPlayoff(p) { return !state.playoff ? null : (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff"); }
+  function chkOngoing(p) { return !state.ongoingOnly ? null : (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing); }
+  function chkPosPts(p) {
+    if (!state.positivePts) return null;
+    const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+    if (recs.length < 2) return false;
+    return recs.reduce((s, r) => s + r.points, 0) > 0;
+  }
+  function chkRecent(p) {
+    if (!state.recentActive) return null;
+    const RECENT_CUTOFF = 2026 - 5;
+    const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+      .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+      .filter(y => y > 1000);
+    return yrs.some(y => y >= RECENT_CUTOFF) || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
+  }
+  function chkTitle(p) { return !state.hasTitle ? null : !!(p.profile && p.profile.titles && p.profile.titles.length > 0); }
+  function chkAge(p) {
+    if (state.ageMin == null && state.ageMax == null) return null;
+    if (!p.profile || !p.profile.birth) return false;
+    const bd = p.profile.birth.split("-");
+    if (bd.length < 1) return false;
+    const now = new Date();
+    const age = now.getFullYear() - parseInt(bd[0]) - (now < new Date(parseInt(bd[0]), parseInt(bd[1]||1) - 1, parseInt(bd[2]||1)) ? 1 : 0);
+    return (state.ageMin == null || age >= state.ageMin) && (state.ageMax == null || age <= state.ageMax);
+  }
+  function chkDecade(p) {
+    if (!state.debutDecade) return null;
+    const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
+      .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
+      .filter(y => y > 1000);
+    if (!yrs.length) return false;
+    const debut = Math.min(...yrs);
+    return Math.floor(debut / 10) * 10 === state.debutDecade;
+  }
+  function chkMinRec(p) {
+    if (!state.minRec) return null;
+    const cnt = (p.records || []).length + (p.wrecords || []).length;
+    return cnt >= state.minRec;
+  }
+  const allChecks = [chkMleague, chkTopLeague, chkWleague, chkFav, chkPlayoff, chkOngoing, chkPosPts, chkRecent, chkTitle, chkAge, chkDecade, chkMinRec];
+
   const result = DATA.players
     .filter(p => state.org === "all" || playerOrgIds(p).includes(state.org))
     .filter(p => {
-      if (!state.mleagueC && !state.mleagueF && !state.mtourn && !state.mRelated && !activeTeam) return true;
-      const n = normalize(p.name);
-      return (state.mleagueC  && MLEAGUE_CURRENT.has(n))      ||
-             (state.mleagueF  && MLEAGUE_FORMER.has(n))        ||
-             (state.mtourn    && MTOURNAMENT.has(n))            ||
-             (state.mRelated  && (MCAST.has(n) || MANALYST.has(n) || MREPORTER.has(n))) ||
-             (activeTeam      && playerTeamStatus(n, activeTeam) !== null);
-    })
-    .filter(p => !state.topLeague || isTopLeague(p))
-    .filter(p => !state.wleague || (p.wrecords && p.wrecords.length > 0))
-    .filter(p => !state.favOnly || (favs && favs.has(p.id)))
-    .filter(p => !state.playoff || (p.records || []).some(r => r.category === "playoff") || (p.wrecords || []).some(r => r.category === "playoff"))
-    .filter(p => !state.ongoingOnly || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing))
-    .filter(p => {
-      if (!state.positivePts) return true;
-      const recs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
-      if (recs.length < 2) return false;
-      return recs.reduce((s, r) => s + r.points, 0) > 0;
-    })
-    .filter(p => {
-      if (!state.recentActive) return true;
-      const RECENT_CUTOFF = 2026 - 5;
-      const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
-        .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
-        .filter(y => y > 1000);
-      return yrs.some(y => y >= RECENT_CUTOFF) || (p.records || []).some(r => r.ongoing) || (p.wrecords || []).some(r => r.ongoing);
-    })
-    .filter(p => !state.hasTitle || (p.profile && p.profile.titles && p.profile.titles.length > 0))
-    .filter(p => {
-      if (state.ageMin == null && state.ageMax == null) return true;
-      if (!p.profile || !p.profile.birth) return false;
-      const bd = p.profile.birth.split("-");
-      if (bd.length < 1) return false;
-      const now = new Date();
-      const age = now.getFullYear() - parseInt(bd[0]) - (now < new Date(parseInt(bd[0]), parseInt(bd[1]||1) - 1, parseInt(bd[2]||1)) ? 1 : 0);
-      return (state.ageMin == null || age >= state.ageMin) && (state.ageMax == null || age <= state.ageMax);
-    })
-    .filter(p => {
-      if (!state.debutDecade) return true;
-      const yrs = (p.records || []).map(r => termToYear(r.orgId || p.org, r.term))
-        .concat((p.wrecords || []).map(r => wTermToYear(p.wleague || {}, r.term)))
-        .filter(y => y > 1000);
-      if (!yrs.length) return false;
-      const debut = Math.min(...yrs);
-      return Math.floor(debut / 10) * 10 === state.debutDecade;
-    })
-    .filter(p => {
-      if (!state.minRec) return true;
-      const cnt = (p.records || []).length + (p.wrecords || []).length;
-      return cnt >= state.minRec;
+      const results = allChecks.map(fn => fn(p));
+      const active = results.filter(r => r !== null);
+      if (!active.length) return true;
+      return state.filterMode === "or" ? active.some(Boolean) : active.every(Boolean);
     })
     .filter(p => {
       if (!state.year) return true;
@@ -321,11 +330,9 @@ function filteredPlayers() {
         const org = ORGS[oid] || {};
         return (org.name || "") + (org.shortName || "") + ((org.league || {}).name || "");
       }).join("") + ((p.wleague || {}).name || "");
-      // 最新ティア（検索用）
       const latestRecQ = (p.records || []).filter(r => !r.ongoing)
         .sort((a, b) => termToYear(b.orgId || p.org, b.term) - termToYear(a.orgId || p.org, a.term))[0];
       const latestTierQ = latestRecQ ? normalize((latestRecQ.tier === "後期" || latestRecQ.tier === "前期") ? (latestRecQ.result || latestRecQ.tier) : latestRecQ.tier) : "";
-      // 全語がいずれかのフィールドにマッチ（AND）
       return qTerms.every(term =>
         pName.includes(term) || titles.includes(term) || nick.includes(term) || orgText.includes(term) || latestTierQ === term
       );
@@ -580,16 +587,32 @@ function renderOrgFilter() {
   el.orgFilter.appendChild(htBtn);
 
   // 詳細フィルター（折りたたみ: デビュー年代・年齢・出場期数）
-  const extraOpen = state.extraOpen || !!state.debutDecade || state.ageMin != null || state.minRec != null;
+  const extraOpen = state.extraOpen || !!state.debutDecade || state.ageMin != null || state.minRec != null || state.filterMode === "or";
   const extraLabel = document.createElement("button");
   extraLabel.className = "filter-section-label filter-section-toggle";
-  extraLabel.textContent = (extraOpen ? "▲" : "▼") + " デビュー年代・年齢・期数";
+  extraLabel.textContent = (extraOpen ? "▲" : "▼") + " 絞り込みモード・年代・年齢・期数";
   extraLabel.onclick = () => { state.extraOpen = !state.extraOpen; renderOrgFilter(); };
   el.orgFilter.appendChild(extraLabel);
 
   const extraWrap = document.createElement("div");
   extraWrap.style.cssText = "display:" + (extraOpen ? "block" : "none") + ";width:100%";
   el.orgFilter.appendChild(extraWrap);
+
+  // AND/OR切り替え
+  const modeLabel = document.createElement("span");
+  modeLabel.className = "filter-section-label";
+  modeLabel.textContent = "絞り込みモード";
+  extraWrap.appendChild(modeLabel);
+  const modeWrap = document.createElement("div");
+  modeWrap.style.cssText = "display:flex;gap:6px;width:100%;margin-bottom:8px";
+  extraWrap.appendChild(modeWrap);
+  [{ key:"and", label:"AND（すべて満たす）" }, { key:"or", label:"OR（いずれか満たす）" }].forEach(m => {
+    const mb = document.createElement("button");
+    mb.className = "org-btn" + (state.filterMode === m.key ? " active" : "");
+    mb.textContent = m.label;
+    mb.onclick = () => { state.filterMode = m.key; renderOrgFilter(); resetAndRenderList(); };
+    modeWrap.appendChild(mb);
+  });
 
   // デビュー年代
   const decLabel = document.createElement("span");
