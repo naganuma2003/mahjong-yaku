@@ -2656,7 +2656,11 @@ function showPlaceholder() {
     quickTags.map(t => '<button class="recent-btn quick-tag" data-qt="' + t.type + '" data-ql="' + t.label + '">' + t.label + '</button>').join('') +
     '</div></div>';
 
-  el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + orgTopSection + birthdaySection + dailySection + pickupSection + ongoingSection + quickSection;
+  if (state.sort !== "name") {
+    renderRanking();
+  } else {
+    el.detail.innerHTML = '<div class="placeholder">← 選手を選択してください</div>' + statBar + recent + favSection + orgTopSection + birthdaySection + dailySection + pickupSection + ongoingSection + quickSection;
+  }
   el.detail.querySelectorAll(".recent-btn[data-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       const p = DATA.players.find(x => x.id === btn.dataset.id);
