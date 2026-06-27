@@ -122,7 +122,7 @@ const MLEAGUE_TEAMS = [
     former: new Set([]) },
   { id:"beast",   name:"BEAST X",                short:"BEAST X",    color:"#1A1A1A",
     current:new Set(["鈴木大介","中田花奈","下石戟","東城りお"]),
-    former: new Set(["猿川真寿","菅原千瑛","萩原聖人"]) },
+    former: new Set(["猿川真寿","菅原千瑛"]) },
   { id:"earthjets", name:"EARTH JETS",           short:"アースジェッツ", color:"#006400",
     current:new Set(["石井一馬","三浦智博","逢川恵夢","HIRO柴田"]),
     former: new Set([]) },
