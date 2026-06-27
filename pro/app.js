@@ -2600,7 +2600,8 @@ function showPlaceholder() {
     '</div>';
   // クイック検索タグ（タイトル・フィルター）
   const quickTags = [
-    { label: "雀王", type: "q" }, { label: "最高位", type: "q" }, { label: "鳳凰位", type: "q" }, { label: "十段位", type: "q" },
+    { label: "雀王", type: "q" }, { label: "最高位", type: "q" }, { label: "最強位", type: "q" }, { label: "鳳凰位", type: "q" }, { label: "十段位", type: "q" },
+    { label: "Mトーナメント", type: "mtourn" },
     { label: "今期出場中", type: "ongoing" }, { label: "通算プラス", type: "pos" }, { label: "タイトル保有", type: "titled" },
   ];
   const quickSection = '<div class="recent-section"><div class="recent-head">🔍 クイック検索</div><div class="recent-list">' +
@@ -2618,6 +2619,7 @@ function showPlaceholder() {
     btn.addEventListener("click", () => {
       const qt = btn.dataset.qt, ql = btn.dataset.ql;
       if (qt === "q") { state.query = ql; el.search.value = ql; }
+      else if (qt === "mtourn") { state.mtourn = true; renderOrgFilter(); }
       else if (qt === "ongoing") { state.ongoingOnly = true; renderOrgFilter(); }
       else if (qt === "pos") { state.positivePts = true; renderOrgFilter(); }
       else if (qt === "titled") { state.hasTitle = true; renderOrgFilter(); }
