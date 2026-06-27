@@ -2923,19 +2923,11 @@ el.search.addEventListener("keydown", e => {
     }
   }
 });
-// ソート設定をlocalStorageに保存・復元
-(function() {
-  try {
-    const saved = localStorage.getItem("mj_sort");
-    if (saved && el.sortSelect.querySelector('option[value="' + saved + '"]')) {
-      state.sort = saved;
-      el.sortSelect.value = saved;
-    }
-  } catch(e) {}
-})();
+// ソートは毎回デフォルト（名前順）で開始する。
+// 以前の選択を保存・復元するとフォロワー順などが既定になってしまうため永続化しない。
+try { localStorage.removeItem("mj_sort"); } catch(e) {}
 el.sortSelect.addEventListener("change", e => {
   state.sort = e.target.value;
-  try { localStorage.setItem("mj_sort", state.sort); } catch(e) {}
   renderList();
   if (!state.selectedId) renderRanking();
 });
