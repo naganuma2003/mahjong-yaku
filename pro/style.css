@@ -459,6 +459,7 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
   font-weight: 600;
 }
 .profile-links a:hover { background: #2c5fa8; color: #fff; }
+.sns-count { margin-left: 5px; font-size: 11px; opacity: 0.75; font-weight: 700; }
 
 /* 閲覧履歴 */
 .recent-section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }

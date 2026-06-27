@@ -2181,10 +2181,11 @@ function renderProfile(p) {
   if (pf.jantama) html += profileRow("雀魂", pf.jantama);
   html += '</div>';
 
+  const fmtFollow = v => !v ? "" : '<span class="sns-count">' + (v >= 10000 ? (v / 10000).toFixed(v >= 100000 ? 0 : 1) + "万" : (v >= 1000 ? (v / 1000).toFixed(1) + "千" : v)) + '</span>';
   const links = [];
-  if (pf.x_url) links.push('<a href="' + pf.x_url + '" target="_blank" rel="noopener">𝕏</a>');
-  if (pf.youtube_url) links.push('<a href="' + pf.youtube_url + '" target="_blank" rel="noopener">YouTube</a>');
-  if (pf.instagram_url) links.push('<a href="' + pf.instagram_url + '" target="_blank" rel="noopener">Instagram</a>');
+  if (pf.x_url) links.push('<a href="' + pf.x_url + '" target="_blank" rel="noopener">𝕏' + fmtFollow(pf.x_followers) + '</a>');
+  if (pf.youtube_url) links.push('<a href="' + pf.youtube_url + '" target="_blank" rel="noopener">YouTube' + fmtFollow(pf.yt_subscribers) + '</a>');
+  if (pf.instagram_url) links.push('<a href="' + pf.instagram_url + '" target="_blank" rel="noopener">Instagram' + fmtFollow(pf.ig_followers) + '</a>');
   if (links.length) html += '<div class="profile-links">' + links.join(' ') + '</div>';
 
   html += '</div>';
