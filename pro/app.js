@@ -1032,6 +1032,54 @@ function scrollToSelected() {
   if (li) li.scrollIntoView({ block: "nearest" });
 }
 
+function renderRanking() {
+  if (state.sort === "name") return;
+  const list = filteredPlayers().slice(0, 50);
+  if (!list.length) return;
+  const sortLabels = {
+    recent:"最近活動順", debut:"デビュー年順", records:"出場期数順",
+    tier:"最高ティア順", playoff:"決定戦回数順", pts:"今期pt順",
+    avgpts:"平均pt順", avgrank:"平均順位順", totalpts:"通算pt順",
+    titles:"タイトル数順", career:"活動年数順", recentavg:"直近5期平均pt順",
+    xfollow:"Xフォロワー順", ytfollow:"YouTube登録者順", igfollow:"Instagramフォロワー順"
+  };
+  const title = sortLabels[state.sort] || state.sort;
+  let html = '<div class="ranking-panel"><h2 class="ranking-title">📊 ' + title + ' TOP ' + list.length + '</h2>';
+  html += '<table class="ranking-table"><thead><tr><th>#</th><th>選手名</th><th>団体</th><th>値</th></tr></thead><tbody>';
+  list.forEach((p, i) => {
+    const org = ORGS[currentOrgId(p)];
+    const orgName = org ? org.shortName : "";
+    let val = "";
+    const allRecs = (p.records || []).concat(p.wrecords || []).filter(r => !r.ongoing && r.points != null);
+    if (state.sort === "xfollow") { const v = (p.profile || {}).x_followers || 0; val = v >= 10000 ? (v/10000).toFixed(1)+"万" : v.toLocaleString(); }
+    else if (state.sort === "ytfollow") { const v = (p.profile || {}).yt_subscribers || 0; val = v >= 10000 ? (v/10000).toFixed(1)+"万" : v.toLocaleString(); }
+    else if (state.sort === "igfollow") { const v = (p.profile || {}).ig_followers || 0; val = v >= 10000 ? (v/10000).toFixed(1)+"万" : v.toLocaleString(); }
+    else if (state.sort === "totalpts" && allRecs.length) { const t = allRecs.reduce((s,r)=>s+r.points,0); val = (t>=0?"+":"") + t.toFixed(1); }
+    else if (state.sort === "avgpts" && allRecs.length >= 3) { const a = allRecs.reduce((s,r)=>s+r.points,0)/allRecs.length; val = (a>=0?"+":"") + a.toFixed(1); }
+    else if (state.sort === "pts") { const o = (p.records||[]).find(r=>r.ongoing); if (o && o.points!=null) val = (o.points>=0?"+":"") + o.points.toFixed(1); }
+    else if (state.sort === "playoff") { val = (p.records||[]).filter(r=>r.category==="playoff").length + (p.wrecords||[]).filter(r=>r.category==="playoff").length + "回"; }
+    else if (state.sort === "titles") { val = (p.profile && p.profile.titles) ? p.profile.titles.length + "個" : "0"; }
+    else if (state.sort === "records") { val = ((p.records||[]).length + (p.wrecords||[]).length) + "期"; }
+    else if (state.sort === "career") { const ys = (p.records||[]).map(r=>termToYear(r.orgId||p.org,r.term)).concat((p.wrecords||[]).map(r=>wTermToYear(p.wleague||{},r.term))).filter(y=>y>1000); val = ys.length>1 ? (Math.max(...ys)-Math.min(...ys)+1)+"年" : ""; }
+    else if (state.sort === "debut") { const ys = (p.records||[]).map(r=>termToYear(r.orgId||p.org,r.term)).concat((p.wrecords||[]).map(r=>wTermToYear(p.wleague||{},r.term))).filter(y=>y>1000); val = ys.length ? Math.min(...ys)+"年" : ""; }
+    else if (state.sort === "recentavg") { const r5 = allRecs.slice().sort((a,b)=>{const ya=termToYear(a.orgId||p.org,a.term)||wTermToYear(p.wleague||{},a.term); const yb=termToYear(b.orgId||p.org,b.term)||wTermToYear(p.wleague||{},b.term); return yb-ya;}).slice(0,5); if(r5.length>=2){const a=r5.reduce((s,r)=>s+r.points,0)/r5.length; val=(a>=0?"+":"")+a.toFixed(1);} }
+    else if (state.sort === "avgrank") { const rr = (p.records||[]).concat(p.wrecords||[]).filter(r=>!r.ongoing&&r.rank!=null); if(rr.length>=2){ val = (rr.reduce((s,r)=>s+r.rank,0)/rr.length).toFixed(2)+"位"; } }
+    else if (state.sort === "tier") { const latR = (p.records||[]).filter(r=>!r.ongoing).sort((a,b)=>termToYear(b.orgId||p.org,b.term)-termToYear(a.orgId||p.org,a.term))[0]; val = latR ? ((latR.tier==="後期"||latR.tier==="前期")?(latR.result||latR.tier):latR.tier) : ""; }
+    else if (state.sort === "recent") { const ys = (p.records||[]).map(r=>termToYear(r.orgId||p.org,r.term)).concat((p.wrecords||[]).map(r=>wTermToYear(p.wleague||{},r.term))).filter(y=>y>1000); val = ys.length ? Math.max(...ys)+"年" : ""; }
+    const medal = i < 3 ? ["🥇","🥈","🥉"][i] : (i+1);
+    const valCls = (state.sort==="totalpts"||state.sort==="avgpts"||state.sort==="pts"||state.sort==="recentavg") && val.startsWith("+") ? ' class="pos"' : (val.startsWith("-") ? ' class="neg"' : '');
+    html += '<tr data-id="' + p.id + '" style="cursor:pointer"><td>' + medal + '</td><td>' + p.name + '</td><td>' + orgName + '</td><td' + valCls + '>' + val + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  el.detail.innerHTML = html;
+  el.detail.querySelectorAll(".ranking-table tr[data-id]").forEach(tr => {
+    tr.addEventListener("click", () => {
+      const p = DATA.players.find(x => x.id === tr.dataset.id);
+      if (p) { state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+    });
+  });
+}
+
 function renderDetail(p) {
   const url = "?p=" + encodeURIComponent(p.id);
   if (location.search !== url) history.pushState({ playerId: p.id }, "", url);
@@ -2743,6 +2791,7 @@ el.sortSelect.addEventListener("change", e => {
   state.sort = e.target.value;
   try { localStorage.setItem("mj_sort", state.sort); } catch(e) {}
   renderList();
+  if (!state.selectedId) renderRanking();
 });
 // タッチスワイプで前後の選手に移動（モバイル向け）
 {
