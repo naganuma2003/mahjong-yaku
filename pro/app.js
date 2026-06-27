@@ -219,7 +219,7 @@ function renderMLeagueHistory(playerName) {
   if (!hist) return "";
   const awards = ML_AWARDS.filter(a => a.p === key);
   const seasons = hist.filter(h => h).length;
-  let html = '<div class="ml-history"><h3>Mリーグ変遷（' + seasons + '期）</h3>';
+  let html = '<details class="ml-history"><summary>Mリーグ変遷（' + seasons + '期）</summary>';
   html += '<div class="ml-timeline">';
   html += '<div class="ml-row ml-header"><span class="ml-label"></span>';
   ML_SEASONS.forEach(s => { html += '<span class="ml-cell">' + s.slice(2) + '</span>'; });
@@ -266,7 +266,7 @@ function renderMLeagueHistory(playerName) {
     });
     html += '</div>';
   }
-  html += '</div></div>';
+  html += '</div></details>';
   return html;
 }
 
