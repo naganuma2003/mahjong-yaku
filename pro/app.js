@@ -213,60 +213,122 @@ function mlTeamColor(teamName) {
   const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
   return t ? t.color : "#888";
 }
-function renderMLeagueHistory(playerName) {
-  const key = playerName.replace(/\s/g, "");
-  const hist = ML_PLAYER_HISTORY[key];
-  if (!hist) return "";
-  const awards = ML_AWARDS.filter(a => a.p === key);
-  const seasons = hist.filter(h => h).length;
-  let html = '<details class="ml-history"><summary>Mリーグ変遷（' + seasons + '期）</summary>';
-  html += '<div class="ml-timeline">';
-  html += '<div class="ml-row ml-header"><span class="ml-label"></span>';
-  ML_SEASONS.forEach(s => { html += '<span class="ml-cell">' + s.slice(2) + '</span>'; });
-  html += '</div>';
-  html += '<div class="ml-row"><span class="ml-label">所属</span>';
-  ML_SEASONS.forEach((s, i) => {
-    const team = hist[i];
-    if (team) {
-      const c = mlTeamColor(team);
-      const short = team.replace("KADOKAWAサクラナイツ","桜").replace("KONAMI麻雀格闘倶楽部","格").replace("セガサミーフェニックス","鳳").replace("EX風林火山","風").replace("赤坂ドリブンズ","D").replace("渋谷ABEMAS","A").replace("TEAM RAIDEN/雷電","雷").replace("U-NEXT Pirates","U").replace("U-NEXTパイレーツ","U").replace("BEAST Japanext","B").replace("BEAST X","B").replace("EARTH JETS","E");
-      html += '<span class="ml-cell ml-team" style="background:' + c + ';color:#fff" title="' + team + '">' + short + '</span>';
-    } else {
-      html += '<span class="ml-cell ml-empty">-</span>';
-    }
+function mlTeamShort(team) {
+  return team.replace("KADOKAWAサクラナイツ","桜").replace("KONAMI麻雀格闘倶楽部","格").replace("セガサミーフェニックス","鳳").replace("EX風林火山","風").replace("赤坂ドリブンズ","D").replace("渋谷ABEMAS","A").replace("TEAM RAIDEN/雷電","雷").replace("U-NEXT Pirates","U").replace("U-NEXTパイレーツ","U").replace("BEAST Japanext","B").replace("BEAST X","B").replace("EARTH JETS","E");
+}
+function mlTeamRank(team, season) {
+  if (!team || !ML_STANDINGS[season]) return 0;
+  return ML_STANDINGS[season].indexOf(team) + 1;
+}
+function mlLatestTeam(hist) {
+  for (let i = hist.length - 1; i >= 0; i--) if (hist[i]) return { team: hist[i], idx: i };
+  return null;
+}
+// spaceless名 → DATAの選手id
+let _mlNameToId = null;
+function mlPlayerId(spacelessName) {
+  if (!_mlNameToId) {
+    _mlNameToId = {};
+    DATA.players.forEach(p => { _mlNameToId[p.name.replace(/\s/g, "")] = p.id; });
+  }
+  return _mlNameToId[spacelessName] || null;
+}
+function openMLeaguePage() {
+  const content = document.getElementById("mleagueContent");
+  if (content && !content.dataset.rendered) {
+    content.innerHTML = renderMLeagueMatrix();
+    content.dataset.rendered = "1";
+    content.querySelectorAll("[data-mlid]").forEach(el => {
+      el.addEventListener("click", () => {
+        const p = DATA.players.find(x => x.id === el.dataset.mlid);
+        if (p) { closeMLeaguePage(); state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+      });
+    });
+  }
+  document.getElementById("mleagueOverlay").style.display = "block";
+  document.body.style.overflow = "hidden";
+  window.scrollTo(0, 0);
+}
+function closeMLeaguePage() {
+  document.getElementById("mleagueOverlay").style.display = "none";
+  document.body.style.overflow = "";
+}
+function renderMLeagueMatrix() {
+  // 最新所属チームごとに選手をグループ化
+  const teamOrder = ["赤坂ドリブンズ","EX風林火山","KADOKAWAサクラナイツ","KONAMI麻雀格闘倶楽部","渋谷ABEMAS","セガサミーフェニックス","U-NEXT Pirates","TEAM RAIDEN/雷電","BEAST X","EARTH JETS"];
+  const groups = {};
+  Object.keys(ML_PLAYER_HISTORY).forEach(name => {
+    const hist = ML_PLAYER_HISTORY[name];
+    const latest = mlLatestTeam(hist);
+    if (!latest) return;
+    let g = latest.team;
+    if (g === "BEAST Japanext") g = "BEAST X";
+    (groups[g] = groups[g] || []).push({ name, hist, latestIdx: latest.idx });
+  });
+  let html = '<div class="ml-page-intro">2018年の開幕から現在まで、Mリーガー各選手のシーズン別所属チームの変遷です。セルの色はそのシーズンの所属チーム、★は移籍を表します。選手名をタップすると詳細へ移動します。</div>';
+
+  // 凡例
+  html += '<div class="ml-legend">';
+  teamOrder.forEach(t => {
+    html += '<span class="ml-legend-item"><span class="ml-legend-dot" style="background:' + mlTeamColor(t) + '"></span>' + t + '</span>';
   });
   html += '</div>';
-  html += '<div class="ml-row"><span class="ml-label">順位</span>';
-  ML_SEASONS.forEach((s, i) => {
-    const team = hist[i];
-    if (team && ML_STANDINGS[s]) {
-      const teamMatch = team === "BEAST Japanext" ? "BEAST Japanext" : team;
-      let rank = ML_STANDINGS[s].indexOf(teamMatch) + 1;
-      if (!rank && team === "BEAST X") rank = ML_STANDINGS[s].indexOf("BEAST X") + 1;
-      if (!rank && team === "BEAST Japanext") rank = ML_STANDINGS[s].indexOf("BEAST Japanext") + 1;
-      const cls = rank === 1 ? "ml-gold" : rank === 2 ? "ml-silver" : rank === 3 ? "ml-bronze" : "";
-      html += '<span class="ml-cell ' + cls + '">' + (rank || "-") + '位</span>';
-    } else if (s === "2026") {
-      html += '<span class="ml-cell ml-empty">' + (hist[i] ? "—" : "-") + '</span>';
-    } else {
-      html += '<span class="ml-cell ml-empty">-</span>';
-    }
+
+  teamOrder.forEach(team => {
+    const members = groups[team];
+    if (!members || !members.length) return;
+    // 最新シーズン在籍を上に、その中でデータの並び順
+    members.sort((a, b) => b.latestIdx - a.latestIdx);
+    const color = mlTeamColor(team);
+    html += '<div class="ml-team-block">';
+    html += '<div class="ml-team-head" style="background:' + color + '">' + team + '</div>';
+    html += '<div class="ml-table-wrap"><table class="ml-matrix">';
+    html += '<thead><tr><th class="ml-name-col">選手</th>';
+    ML_SEASONS.forEach(s => { html += '<th>' + s.slice(2) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    members.forEach(({ name, hist }) => {
+      const pid = mlPlayerId(name);
+      const active2026 = !!hist[8];
+      const nameCell = pid
+        ? '<td class="ml-name-col ml-clickable" data-mlid="' + pid + '">' + name + '</td>'
+        : '<td class="ml-name-col">' + name + '</td>';
+      html += '<tr' + (active2026 ? '' : ' class="ml-former-row"') + '>' + nameCell;
+      hist.forEach((t, i) => {
+        if (!t) { html += '<td class="ml-x">·</td>'; return; }
+        const prev = i > 0 ? hist[i - 1] : null;
+        const moved = prev && prev !== t && prev !== "" ? '★' : '';
+        const seasonStr = ML_SEASONS[i] + "-" + String(parseInt(ML_SEASONS[i]) + 1).slice(2);
+        const aw = ML_AWARDS.filter(a => a.p === name && a.s === seasonStr);
+        const awMark = aw.length ? '<span class="ml-aw" title="' + aw.map(a => a.a).join("・") + '">🏅</span>' : '';
+        html += '<td class="ml-c" style="background:' + mlTeamColor(t) + '" title="' + t + (aw.length ? '：' + aw.map(a=>a.a).join("・") : '') + '">' + mlTeamShort(t) + '<span class="ml-move">' + moved + '</span>' + awMark + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div></div>';
   });
-  html += '</div>';
-  if (awards.length) {
-    html += '<div class="ml-row"><span class="ml-label">個人賞</span>';
-    ML_SEASONS.forEach((s, i) => {
-      const seasonStr = s + "-" + String(parseInt(s)+1).slice(2);
-      const aw = awards.filter(a => a.s === seasonStr);
-      if (aw.length && hist[i]) {
-        html += '<span class="ml-cell ml-award" title="' + aw.map(a=>a.a).join("・") + '">🏅</span>';
+
+  // チーム順位の推移
+  html += '<h3 class="ml-section-title">チーム順位の推移</h3>';
+  html += '<div class="ml-table-wrap"><table class="ml-matrix ml-standings"><thead><tr><th class="ml-name-col">チーム</th>';
+  ML_SEASONS.slice(0, 8).forEach(s => { html += '<th>' + s.slice(2) + '</th>'; });
+  html += '</tr></thead><tbody>';
+  teamOrder.forEach(team => {
+    let any = false;
+    let row = '<td class="ml-name-col" style="border-left:4px solid ' + mlTeamColor(team) + '">' + team + '</td>';
+    ML_SEASONS.slice(0, 8).forEach(s => {
+      const rank = mlTeamRank(team, s);
+      if (rank) {
+        any = true;
+        const cls = rank === 1 ? "ml-gold" : rank === 2 ? "ml-silver" : rank === 3 ? "ml-bronze" : "";
+        row += '<td class="' + cls + '">' + rank + '位</td>';
       } else {
-        html += '<span class="ml-cell ml-empty"></span>';
+        row += '<td class="ml-x">·</td>';
       }
     });
-    html += '</div>';
-  }
-  html += '</div></details>';
+    if (any) html += '<tr>' + row + '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<p class="ml-note">※ 2025-26シーズン（26）は開催中のため順位は未確定。</p>';
   return html;
 }
 
@@ -1352,7 +1414,6 @@ function renderDetail(p) {
   }
 
   html += renderProfile(p);
-  html += renderMLeagueHistory(p.name);
 
   if (isMultiOrg) {
     html += '<div class="summary">';
