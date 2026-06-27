@@ -520,10 +520,10 @@ function renderOrgFilter() {
   onBtn.onclick = () => { state.ongoingOnly = !state.ongoingOnly; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(onBtn);
 
-  // 女流あり
+  // 女性
   const wb = document.createElement("button");
   wb.className = "org-btn wleague-btn" + (state.wleague ? " active" : "");
-  wb.textContent = "女流あり (" + WLEAGUE_COUNT + ")"; wb.title = "女流リーグの成績データあり";
+  wb.textContent = "女性 (" + WLEAGUE_COUNT + ")"; wb.title = "女流リーグの成績データがある選手";
   wb.onclick = () => { state.wleague = !state.wleague; renderOrgFilter(); resetAndRenderList(); };
   el.orgFilter.appendChild(wb);
 
@@ -712,7 +712,7 @@ function renderList() {
   if (state.mteam)    { const t = MLEAGUE_TEAMS.find(x => x.id === state.mteam); if (t) filterTags.push({label: t.short, key: "mteam", val: null}); }
   if (state.mRelated) filterTags.push({label: "M関係", key: "mRelated", val: false});
   if (state.topLeague) filterTags.push({label: "最高リーグ", key: "topLeague", val: false});
-  if (state.wleague)   filterTags.push({label: "女流あり", key: "wleague", val: false});
+  if (state.wleague)   filterTags.push({label: "女性", key: "wleague", val: false});
   if (state.playoff)   filterTags.push({label: "決定戦経験", key: "playoff", val: false});
   if (state.ongoingOnly) filterTags.push({label: "今期出場中", key: "ongoingOnly", val: false});
   if (state.favOnly)   filterTags.push({label: "お気に入り", key: "favOnly", val: false});
