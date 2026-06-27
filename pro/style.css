@@ -512,6 +512,16 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .ml-silver { background: #c0c0c0; color: #000; font-weight: 600; }
 .ml-bronze { background: #cd7f32; color: #fff; font-weight: 600; }
 .ml-note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.ml-awards-list { display: flex; flex-direction: column; gap: 10px; }
+.ml-award-season { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.ml-award-year { min-width: 64px; font-weight: 700; font-size: 13px; color: var(--accent); padding-top: 3px; }
+.ml-award-items { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.ml-award-item { display: inline-flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 3px 10px; font-size: 12px; }
+.ml-award-name { color: var(--muted); font-size: 11px; }
+.ml-award-item b { color: var(--text); font-weight: 600; }
+.ml-award-prize { color: #2a7a3a; font-size: 11px; font-weight: 600; }
+.force-dark .ml-award-item { background: #242424; }
+.force-dark .ml-award-prize { color: #5cba6e; }
 .force-dark .ml-overlay { background: #181818; }
 .force-dark .ml-matrix { background: #1e1e1e; }
 .force-dark .ml-matrix th { background: #222; }

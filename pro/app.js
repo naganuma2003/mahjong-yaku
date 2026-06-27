@@ -214,7 +214,7 @@ function mlTeamColor(teamName) {
   return t ? t.color : "#888";
 }
 function mlTeamShort(team) {
-  return team.replace("KADOKAWAサクラナイツ","桜").replace("KONAMI麻雀格闘倶楽部","格").replace("セガサミーフェニックス","鳳").replace("EX風林火山","風").replace("赤坂ドリブンズ","D").replace("渋谷ABEMAS","A").replace("TEAM RAIDEN/雷電","雷").replace("U-NEXT Pirates","U").replace("U-NEXTパイレーツ","U").replace("BEAST Japanext","B").replace("BEAST X","B").replace("EARTH JETS","E");
+  return team.replace("KADOKAWAサクラナイツ","桜").replace("KONAMI麻雀格闘倶楽部","格").replace("セガサミーフェニックス","セ").replace("EX風林火山","風").replace("赤坂ドリブンズ","坂").replace("渋谷ABEMAS","渋").replace("TEAM RAIDEN/雷電","雷").replace("U-NEXT Pirates","海").replace("U-NEXTパイレーツ","海").replace("BEAST Japanext","B").replace("BEAST X","B").replace("EARTH JETS","J");
 }
 function mlTeamRank(team, season) {
   if (!team || !ML_STANDINGS[season]) return 0;
@@ -329,6 +329,25 @@ function renderMLeagueMatrix() {
   });
   html += '</tbody></table></div>';
   html += '<p class="ml-note">※ 2025-26シーズン（26）は開催中のため順位は未確定。</p>';
+
+  // 個人賞 歴代受賞者（各年）
+  html += '<h3 class="ml-section-title">個人賞 歴代受賞者</h3>';
+  html += '<div class="ml-awards-list">';
+  for (let i = ML_SEASONS.length - 1; i >= 0; i--) {
+    const s = ML_SEASONS[i];
+    const seasonStr = s + "-" + String(parseInt(s) + 1).slice(2);
+    const aw = ML_AWARDS.filter(a => a.s === seasonStr);
+    if (!aw.length) continue;
+    html += '<div class="ml-award-season"><div class="ml-award-year">' + seasonStr + '</div><div class="ml-award-items">';
+    aw.forEach(a => {
+      const pid = mlPlayerId(a.p);
+      const nm = pid ? '<b class="ml-clickable" data-mlid="' + pid + '">' + a.p + '</b>' : '<b>' + a.p + '</b>';
+      const prize = a.prize ? '<span class="ml-award-prize">' + (a.prize / 10000) + '万円</span>' : '';
+      html += '<span class="ml-award-item">🏅<span class="ml-award-name">' + a.a + '</span>' + nm + prize + '</span>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div>';
   return html;
 }
 
