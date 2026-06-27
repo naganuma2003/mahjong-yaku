@@ -450,6 +450,18 @@ function filteredPlayers() {
         };
         return recentAvg(b) - recentAvg(a);
       }
+      if (state.sort === "xfollow") {
+        const xf = p => (p.profile && p.profile.x_followers) || 0;
+        return xf(b) - xf(a);
+      }
+      if (state.sort === "ytfollow") {
+        const yf = p => (p.profile && p.profile.yt_subscribers) || 0;
+        return yf(b) - yf(a);
+      }
+      if (state.sort === "igfollow") {
+        const igf = p => (p.profile && p.profile.ig_followers) || 0;
+        return igf(b) - igf(a);
+      }
       return a.name.localeCompare(b.name, "ja");
     });
   _filteredCache = result;
@@ -823,7 +835,7 @@ function renderList() {
   const selectedIdx = state.selectedId ? list.findIndex(p => p.id === state.selectedId) : -1;
   const capEnd = state.showAll ? list.length : Math.max(LIST_CAP, selectedIdx + 1);
   const visibleList = list.length > capEnd ? list.slice(0, capEnd) : list;
-  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier", "titles", "recentavg"].includes(state.sort);
+  const showRank = ["pts", "totalpts", "avgpts", "avgrank", "playoff", "career", "tier", "titles", "recentavg", "xfollow", "ytfollow", "igfollow"].includes(state.sort);
   visibleList.forEach((p, listIdx) => {
     const li = document.createElement("li");
     if (p.id === state.selectedId) li.className = "selected";
@@ -902,6 +914,15 @@ function renderList() {
         const r5avg = recent5.reduce((s, r) => s + r.points, 0) / recent5.length;
         const sign = r5avg >= 0 ? "+" : "";
         contextBadge = '<span class="p-ctx' + (r5avg >= 0 ? " pos" : " neg") + '" title="直近' + recent5.length + '期平均">' + sign + r5avg.toFixed(1) + '</span>';
+      }
+    }
+    if (state.sort === "xfollow" || state.sort === "ytfollow" || state.sort === "igfollow") {
+      const pr = p.profile || {};
+      const val = state.sort === "xfollow" ? (pr.x_followers || 0) : state.sort === "ytfollow" ? (pr.yt_subscribers || 0) : (pr.ig_followers || 0);
+      if (val > 0) {
+        const fmt = val >= 10000 ? (val / 10000).toFixed(1) + "万" : val.toLocaleString();
+        const icon = state.sort === "xfollow" ? "𝕏" : state.sort === "ytfollow" ? "▶" : "📷";
+        contextBadge = '<span class="p-ctx neu">' + icon + ' ' + fmt + '</span>';
       }
     }
     // 最新のティアを取得
