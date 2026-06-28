@@ -253,6 +253,61 @@ function closeMLeaguePage() {
   document.getElementById("mleagueOverlay").style.display = "none";
   document.body.style.overflow = "";
 }
+// 指定リーグ・年の成績表をDB内データから構築して表示
+function showLeagueStandings(orgId, tier, year, highlightId) {
+  const org = ORGS[orgId] || {};
+  const leagueName = (org.league && org.league.name) || "";
+  const rows = [];
+  DATA.players.forEach(p => {
+    (p.records || []).forEach(r => {
+      const oid = r.orgId || p.org;
+      if (oid === orgId && r.tier === tier && !r.ongoing && termToYear(oid, r.term) === year) {
+        rows.push({ id: p.id, name: p.name, rank: r.rank, points: r.points, result: r.result || "" });
+      }
+    });
+  });
+  const vr = r => (r.rank != null && r.rank > 0); // 有効な順位（0や負値は無効データ扱い）
+  // 順位昇順（無効は最後）→ ポイント降順
+  rows.sort((a, b) => {
+    if (vr(a) && vr(b)) return a.rank - b.rank;
+    if (vr(a)) return -1;
+    if (vr(b)) return 1;
+    return (b.points != null ? b.points : -1e9) - (a.points != null ? a.points : -1e9);
+  });
+  const hasRank = rows.some(vr);
+  document.getElementById("stdTitle").textContent =
+    (org.shortName || "") + " " + leagueName + " " + tier + "リーグ ／ " + year + "年";
+  let html = "";
+  if (!rows.length) {
+    html = '<div class="std-empty">このリーグ・年の成績データがありません。</div>';
+  } else {
+    html = '<table class="std-table"><thead><tr><th>順位</th><th>選手</th><th>ポイント</th></tr></thead><tbody>';
+    rows.forEach((r, i) => {
+      const rk = vr(r) ? r.rank + "位" : "—";
+      const pts = r.points != null ? (r.points >= 0 ? "+" : "") + r.points.toFixed(1) : "—";
+      const ptsCls = r.points != null ? (r.points >= 0 ? "pos" : "neg") : "";
+      const hl = r.id === highlightId ? " std-hl" : "";
+      html += '<tr class="std-row' + hl + '" data-id="' + r.id + '"><td class="std-rank">' + rk + '</td>' +
+        '<td class="std-name">' + r.name + (r.result ? ' <span class="std-res">' + r.result + '</span>' : '') + '</td>' +
+        '<td class="std-pts ' + ptsCls + '">' + pts + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<div class="std-note">' + rows.length + '名（当データベース収録分）' +
+      (!hasRank ? '・順位データなしのためポイント順で表示' : '') + '</div>';
+  }
+  const body = document.getElementById("stdBody");
+  body.innerHTML = html;
+  body.querySelectorAll(".std-row[data-id]").forEach(tr => {
+    tr.addEventListener("click", () => {
+      const p = DATA.players.find(x => x.id === tr.dataset.id);
+      if (p) { closeStandings(); state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
+    });
+  });
+  document.getElementById("standingsModal").style.display = "flex";
+}
+function closeStandings() {
+  document.getElementById("standingsModal").style.display = "none";
+}
 function renderMLeagueMatrix() {
   // 最新所属チームごとに選手をグループ化
   const teamOrder = ["赤坂ドリブンズ","EX風林火山","KADOKAWAサクラナイツ","KONAMI麻雀格闘倶楽部","渋谷ABEMAS","セガサミーフェニックス","U-NEXT Pirates","TEAM RAIDEN/雷電","BEAST X","EARTH JETS"];
@@ -1775,7 +1830,12 @@ function renderDetail(p) {
         const halfHtml = (r.half && r.half !== "annual") ? ' <span class="half">' + r.half + "</span>" : "";
         const resultText = (r.result || "") + rankHtml + halfHtml || "—";
         const yr = termToYear(r.orgId || oid, r.term);
-        const yrHtml = yr > 1000 ? '<span class="rec-year yr-link" data-yr="' + yr + '" title="' + yr + '年で絞り込む">' + yr + '</span>' : '';
+        const stdEligible = yr >= 2020 && r.tier !== "後期" && r.tier !== "前期";
+        const yrHtml = yr > 1000
+          ? (stdEligible
+            ? '<span class="rec-year yr-std" data-std-org="' + (r.orgId || oid) + '" data-std-tier="' + r.tier + '" data-std-yr="' + yr + '" title="' + yr + '年 ' + r.tier + 'リーグの成績表を表示">' + yr + '</span>'
+            : '<span class="rec-year yr-link" data-yr="' + yr + '" title="' + yr + '年で絞り込む">' + yr + '</span>')
+          : '';
         const isYearMatch = state.year && yr === parseInt(state.year, 10);
         const isBestPts = bestPtsRec && !r.ongoing && r.points != null && r.term === bestPtsRec.term && r.points === bestPtsRec.points;
         let rowCls = r.ongoing ? ' class="ongoing"' : (isBestPts ? ' class="best-rec"' : "");
@@ -2098,6 +2158,12 @@ function renderDetail(p) {
       state.year = yr === state.year ? "" : yr;
       document.getElementById("yearFilter").value = state.year;
       renderList();
+    });
+  });
+  el.detail.querySelectorAll(".yr-std[data-std-yr]").forEach(span => {
+    span.addEventListener("click", e => {
+      e.stopPropagation();
+      showLeagueStandings(span.dataset.stdOrg, span.dataset.stdTier, parseInt(span.dataset.stdYr, 10), state.selectedId);
     });
   });
   el.detail.querySelectorAll(".teammate-btn[data-id]").forEach(btn => {

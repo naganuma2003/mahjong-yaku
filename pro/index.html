@@ -8,7 +8,7 @@
 <meta property="og:title" content="麻雀プロ検索">
 <meta property="og:description" content="最高位戦・連盟・協会・RMU・麻将連合のリーグ成績年表">
 <meta property="og:type" content="website">
-<link rel="stylesheet" href="style.css?v=20260627f">
+<link rel="stylesheet" href="style.css?v=20260628a">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c0392b">
 </head>
@@ -31,6 +31,13 @@
     <button class="ml-close-btn" onclick="closeMLeaguePage()">✕ 閉じる</button>
   </div>
   <div id="mleagueContent" class="ml-overlay-content"></div>
+</div>
+
+<div id="standingsModal" class="std-modal" style="display:none" onclick="if(event.target===this)closeStandings()">
+  <div class="std-modal-box">
+    <div class="std-modal-head"><span id="stdTitle"></span><button class="std-close" onclick="closeStandings()">✕</button></div>
+    <div id="stdBody" class="std-modal-body"></div>
+  </div>
 </div>
 
 <div class="layout">
@@ -103,8 +110,8 @@
   </main>
 </div>
 
-<script src="data.js?v=20260627f"></script>
-<script src="app.js?v=20260627f"></script>
+<script src="data.js?v=20260628a"></script>
+<script src="app.js?v=20260628a"></script>
 <script>
 document.getElementById('helpBtn').addEventListener('click', function() {
   var p = document.getElementById('helpPanel');
