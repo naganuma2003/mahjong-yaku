@@ -515,6 +515,15 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .ml-tab.active { background: #fff; color: var(--accent); }
 .ml-tab:hover:not(.active) { background: rgba(255,255,255,.28); }
 .tf-page { max-width: 760px; margin: 0 auto; }
+.tf-controls { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 4px 0 14px; }
+.tf-grp { display: flex; align-items: center; gap: 6px; }
+.tf-grp-label { font-size: 11px; color: var(--muted); margin-right: 2px; }
+.tf-toggle { border: 1px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 14px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.tf-toggle.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tf-toggle:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+.tf-official { margin-left: 28px; margin-top: 4px; font-size: 11px; color: var(--muted); }
+.tf-official b { color: var(--text); font-weight: 700; }
+.force-dark .tf-toggle { background: #2a2a2a; }
 .tf-legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin: 4px 0 16px; }
 .tf-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .tf-dot { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }

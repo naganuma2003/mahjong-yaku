@@ -209,6 +209,19 @@ const ML_AWARDS = [
   {s:"2024-25",p:"醍醐大",a:"MVP",prize:1000000},{s:"2024-25",p:"鈴木大介",a:"最高スコア",prize:500000},{s:"2024-25",p:"日向藍子",a:"4着回避率",prize:500000},
   {s:"2025-26",p:"下石戟",a:"MVP",prize:2000000},{s:"2025-26",p:"内川幸太郎",a:"最高スコア",prize:1000000},{s:"2025-26",p:"白鳥翔",a:"4着回避率",prize:1000000},{s:"2025-26",p:"滝沢和典",a:"最多トップ",prize:1000000},
 ];
+// チーム公式アカウントのフォロワー数（調査結果で更新）
+const ML_TEAM_OFFICIAL = {
+  "赤坂ドリブンズ": { x: 0, yt: 0, ig: 0 },
+  "EX風林火山": { x: 0, yt: 0, ig: 0 },
+  "KADOKAWAサクラナイツ": { x: 0, yt: 0, ig: 0 },
+  "KONAMI麻雀格闘倶楽部": { x: 0, yt: 0, ig: 0 },
+  "渋谷ABEMAS": { x: 0, yt: 0, ig: 0 },
+  "セガサミーフェニックス": { x: 0, yt: 0, ig: 0 },
+  "U-NEXT Pirates": { x: 0, yt: 0, ig: 0 },
+  "TEAM RAIDEN/雷電": { x: 0, yt: 0, ig: 0 },
+  "BEAST X": { x: 0, yt: 0, ig: 0 },
+  "EARTH JETS": { x: 0, yt: 0, ig: 0 },
+};
 function mlTeamColor(teamName) {
   const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
   return t ? t.color : "#888";
@@ -266,9 +279,20 @@ function closeMLeaguePage() {
   document.getElementById("mleagueOverlay").style.display = "none";
   document.body.style.overflow = "";
 }
-// 現メンバー（2026シーズン）のチーム別SNSフォロワー比較
+// チーム別フォロワー比較の表示オプション
+const _tfOpt = { members: true, official: true, x: true, yt: true, ig: true };
+function tfToggle(k) {
+  _tfOpt[k] = !_tfOpt[k];
+  // 全SNSオフを防止（最低1つ）
+  if (!_tfOpt.x && !_tfOpt.yt && !_tfOpt.ig) _tfOpt[k] = true;
+  if (!_tfOpt.members && !_tfOpt.official) _tfOpt[k] = true;
+  renderMLTab();
+}
+// 現メンバー（2026シーズン）＋チーム公式 のチーム別SNSフォロワー比較
 function renderTeamFollowers() {
   const teamOrder = ["赤坂ドリブンズ","EX風林火山","KADOKAWAサクラナイツ","KONAMI麻雀格闘倶楽部","渋谷ABEMAS","セガサミーフェニックス","U-NEXT Pirates","TEAM RAIDEN/雷電","BEAST X","EARTH JETS"];
+  const plats = ["x", "yt", "ig"].filter(p => _tfOpt[p]);
+  const psum = o => plats.reduce((s, p) => s + (o[p] || 0), 0);
   const teams = {};
   Object.keys(ML_PLAYER_HISTORY).forEach(name => {
     const team = ML_PLAYER_HISTORY[name][8]; // index8 = 2026
@@ -277,31 +301,54 @@ function renderTeamFollowers() {
     const pid = mlPlayerId(name);
     const p = pid ? DATA.players.find(x => x.id === pid) : null;
     const pr = (p && p.profile) || {};
-    const x = pr.x_followers || 0, yt = pr.yt_subscribers || 0, ig = pr.ig_followers || 0;
-    (teams[g] = teams[g] || []).push({ name, pid, x, yt, ig, total: x + yt + ig });
+    (teams[g] = teams[g] || []).push({ name, pid, x: pr.x_followers || 0, yt: pr.yt_subscribers || 0, ig: pr.ig_followers || 0 });
   });
   const rows = [];
   teamOrder.forEach(tm => {
-    const ms = teams[tm];
-    if (!ms || !ms.length) return;
-    const s = ms.reduce((a, b) => ({ x: a.x + b.x, yt: a.yt + b.yt, ig: a.ig + b.ig, total: a.total + b.total }), { x: 0, yt: 0, ig: 0, total: 0 });
-    ms.sort((a, b) => b.total - a.total);
-    rows.push({ team: tm, n: ms.length, ...s, members: ms });
+    const ms = teams[tm] || [];
+    const off = (typeof ML_TEAM_OFFICIAL !== "undefined" && ML_TEAM_OFFICIAL[tm]) || { x: 0, yt: 0, ig: 0 };
+    const per = { x: 0, yt: 0, ig: 0 };
+    if (_tfOpt.members) ms.forEach(m => { per.x += m.x; per.yt += m.yt; per.ig += m.ig; });
+    if (_tfOpt.official) { per.x += off.x || 0; per.yt += off.yt || 0; per.ig += off.ig || 0; }
+    const total = psum(per);
+    if (!ms.length && !(off.x || off.yt || off.ig)) return;
+    ms.sort((a, b) => psum(b) - psum(a));
+    rows.push({ team: tm, members: ms, off, per, total });
   });
   rows.sort((a, b) => b.total - a.total);
-  const maxT = rows.length ? rows[0].total : 1;
+  const maxT = rows.length ? (rows[0].total || 1) : 1;
   const fmt = v => !v ? "0" : (v >= 10000 ? (v / 10000).toFixed(1) + "万" : v.toLocaleString());
+  const tbtn = (k, label) => '<button class="tf-toggle' + (_tfOpt[k] ? ' active' : '') + '" onclick="tfToggle(\'' + k + '\')">' + label + '</button>';
   let html = '<div class="tf-page">';
-  html += '<div class="ml-page-intro">2026シーズンの各チーム現メンバー（4名）のSNSフォロワー合計（X＋YouTube＋Instagram）で比較。バーをタップでメンバー内訳。</div>';
-  html += '<div class="tf-legend"><span><i class="tf-dot" style="background:#2a78d6"></i>X</span><span><i class="tf-dot" style="background:#e34948"></i>YouTube</span><span><i class="tf-dot" style="background:#e87ba4"></i>Instagram</span></div>';
+  html += '<div class="ml-page-intro">2026シーズン各チームの現メンバー＋チーム公式アカウントのSNSフォロワーを比較。下のボタンで対象とSNSを切り替え。バーをタップでメンバー内訳。</div>';
+  html += '<div class="tf-controls"><div class="tf-grp"><span class="tf-grp-label">対象</span>' +
+    tbtn("members", "メンバー") + tbtn("official", "チーム公式") + '</div>' +
+    '<div class="tf-grp"><span class="tf-grp-label">SNS</span>' +
+    tbtn("x", "X") + tbtn("yt", "YouTube") + tbtn("ig", "Instagram") + '</div></div>';
+  const legend = [];
+  if (_tfOpt.x) legend.push('<span><i class="tf-dot" style="background:#2a78d6"></i>X</span>');
+  if (_tfOpt.yt) legend.push('<span><i class="tf-dot" style="background:#e34948"></i>YouTube</span>');
+  if (_tfOpt.ig) legend.push('<span><i class="tf-dot" style="background:#e87ba4"></i>Instagram</span>');
+  html += '<div class="tf-legend">' + legend.join("") + '</div>';
   rows.forEach((r, i) => {
     const color = mlTeamColor(r.team);
     const seg = (v, c) => v > 0 ? '<span class="tf-seg" style="width:' + (v / maxT * 100) + '%;background:' + c + '"></span>' : '';
-    const memberStr = r.members.map(m => m.name + " " + fmt(m.total)).join(" ／ ");
+    let bars = "";
+    if (_tfOpt.x) bars += seg(r.per.x, "#2a78d6");
+    if (_tfOpt.yt) bars += seg(r.per.yt, "#e34948");
+    if (_tfOpt.ig) bars += seg(r.per.ig, "#e87ba4");
     html += '<div class="tf-item">';
     html += '<div class="tf-head"><span class="tf-rank">' + (i + 1) + '</span><span class="tf-team" style="color:' + color + '">' + r.team + '</span><span class="tf-total">' + fmt(r.total) + '</span></div>';
-    html += '<div class="tf-bar" title="' + memberStr + '">' + seg(r.x, "#2a78d6") + seg(r.yt, "#e34948") + seg(r.ig, "#e87ba4") + '</div>';
-    html += '<div class="tf-members">' + r.members.map(m => (m.pid ? '<span class="tf-mem ml-clickable" data-mlid="' + m.pid + '">' : '<span class="tf-mem">') + m.name + ' <b>' + fmt(m.total) + '</b></span>').join("") + '</div>';
+    html += '<div class="tf-bar">' + (bars || '<span class="tf-seg" style="width:0"></span>') + '</div>';
+    if (_tfOpt.members && r.members.length) {
+      html += '<div class="tf-members">' + r.members.map(m => (m.pid ? '<span class="tf-mem ml-clickable" data-mlid="' + m.pid + '">' : '<span class="tf-mem">') + m.name + ' <b>' + fmt(psum(m)) + '</b></span>').join("") + '</div>';
+    }
+    if (_tfOpt.official && (r.off.x || r.off.yt || r.off.ig)) {
+      html += '<div class="tf-official">公式 <b>' + fmt(psum(r.off)) + '</b>' +
+        (_tfOpt.x && r.off.x ? ' ｜X ' + fmt(r.off.x) : '') +
+        (_tfOpt.yt && r.off.yt ? ' ｜YT ' + fmt(r.off.yt) : '') +
+        (_tfOpt.ig && r.off.ig ? ' ｜IG ' + fmt(r.off.ig) : '') + '</div>';
+    }
     html += '</div>';
   });
   html += '<p class="ml-note">※ SNSデータは当データベース収録の概数。X直接取得不可のため集計サイト等に依拠。</p>';
