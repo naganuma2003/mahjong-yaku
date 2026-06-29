@@ -544,8 +544,12 @@
 
 <!-- プロ検索タブ -->
 <div id="tab-pro" class="tab-section active">
-  <iframe src="pro/index.html" title="麻雀プロ検索"></iframe>
+  <iframe id="proFrame" title="麻雀プロ検索"></iframe>
 </div>
+<script>
+  // pro/index.html はキャッシュさせず常に最新を取得（中のapp.js/data.jsは?v=でキャッシュ）
+  document.getElementById('proFrame').src = 'pro/index.html?_=' + Date.now();
+</script>
 
 <!-- ドリルタブ -->
 <div id="tab-drill" class="tab-section">
