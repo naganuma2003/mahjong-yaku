@@ -11,8 +11,11 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
-  header { position: relative; overflow: hidden; background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#15531a 0%,#2e7d32 55%,#43a047 100%); color: white; padding: 38px 20px; text-align: center; transition: background .45s ease; }
-  header::after { content: ""; position: absolute; right: -80px; top: -90px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.10), rgba(255,255,255,0) 70%); pointer-events: none; }
+  header { position: relative; overflow: hidden; background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#15531a 0%,#2e7d32 55%,#43a047 100%); color: white; padding: 40px 20px; text-align: center; transition: background .45s ease; box-shadow: inset 0 -1px 0 rgba(255,255,255,.22), 0 6px 22px rgba(0,0,0,.16); }
+  header::before { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px); pointer-events: none; }
+  header::after { content: ""; position: absolute; top: -50%; left: -60%; width: 38%; height: 200%; transform: rotate(18deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,.20), transparent); animation: hdrSweep 7s ease-in-out infinite; pointer-events: none; }
+  @keyframes hdrSweep { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+  @media (prefers-reduced-motion: reduce) { header::after { animation: none; opacity: 0; } }
   header.score { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#0a2e6b 0%,#1565c0 55%,#1e88e5 100%); }
   header.play { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#6a0000 0%,#b71c1c 55%,#e53935 100%); }
   header.drill { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), linear-gradient(135deg,#c44900 0%,#f57f17 55%,#ffa726 100%); }
