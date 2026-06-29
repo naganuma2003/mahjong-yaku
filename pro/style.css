@@ -98,7 +98,7 @@ html.force-dark mark.hl { background: #4a4010; color: #f0d060; }
 .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .dark-toggle-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 14px; cursor: pointer; color: var(--muted); }
 .dark-toggle-btn:hover { border-color: var(--accent); }
-.mleague-btn { background: var(--accent); border: 1px solid var(--accent); border-radius: 6px; padding: 3px 12px; font-size: 13px; font-weight: 600; cursor: pointer; color: #fff; }
+.mleague-btn { background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 18px; font-size: 16px; font-weight: 700; cursor: pointer; color: #fff; }
 .mleague-btn:hover { opacity: 0.88; }
 
 * { box-sizing: border-box; }
@@ -111,15 +111,15 @@ body {
 }
 
 .app-header {
-  padding: 16px 24px;
+  padding: 8px 20px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
-.app-header h1 { margin: 0; font-size: 20px; }
-.header-top { margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.app-header h1 { margin: 0; font-size: 16px; }
+.header-top { margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
 .back-link { font-size: 12px; color: var(--muted); text-decoration: none; }
 .back-link:hover { color: var(--accent); }
-.subtitle { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.subtitle { margin: 1px 0 0; color: var(--muted); font-size: 11px; }
 
 .layout {
   display: flex;
