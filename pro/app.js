@@ -211,16 +211,16 @@ const ML_AWARDS = [
 ];
 // チーム公式アカウントのフォロワー数（調査結果で更新）
 const ML_TEAM_OFFICIAL = {
-  "赤坂ドリブンズ": { x: 66000, yt: 35900, ig: 0 },
-  "EX風林火山": { x: 65500, yt: 29300, ig: 0 },
-  "KADOKAWAサクラナイツ": { x: 94000, yt: 115000, ig: 3036 },
-  "KONAMI麻雀格闘倶楽部": { x: 126000, yt: 0, ig: 0 },
-  "渋谷ABEMAS": { x: 111000, yt: 64200, ig: 0 },
-  "セガサミーフェニックス": { x: 86500, yt: 33700, ig: 0 },
-  "U-NEXT Pirates": { x: 73100, yt: 33600, ig: 0 },
-  "TEAM RAIDEN/雷電": { x: 74600, yt: 38500, ig: 9584 },
-  "BEAST X": { x: 66600, yt: 21900, ig: 0 },
-  "EARTH JETS": { x: 25000, yt: 7680, ig: 961 },
+  "赤坂ドリブンズ": { x: 66000, yt: 35900, ig: 0, x_url: "https://x.com/AkasakaDrivens", yt_url: "https://www.youtube.com/@akasakadrivens", ig_url: "" },
+  "EX風林火山": { x: 65500, yt: 29300, ig: 0, x_url: "https://x.com/EX_Furinkazan", yt_url: "https://www.youtube.com/@ex4718", ig_url: "" },
+  "KADOKAWAサクラナイツ": { x: 94000, yt: 115000, ig: 3036, x_url: "https://x.com/kadokawa_sk", yt_url: "https://www.youtube.com/@kadokawa_sk", ig_url: "https://www.instagram.com/kadokawa_sk/" },
+  "KONAMI麻雀格闘倶楽部": { x: 126000, yt: 0, ig: 0, x_url: "https://x.com/mfcmleague1", yt_url: "", ig_url: "" },
+  "渋谷ABEMAS": { x: 111000, yt: 64200, ig: 0, x_url: "https://x.com/shibuya_Abemas", yt_url: "https://www.youtube.com/@Shibuya_Abemas", ig_url: "" },
+  "セガサミーフェニックス": { x: 86500, yt: 33700, ig: 0, x_url: "https://x.com/SEGASAMMY_PNX", yt_url: "https://www.youtube.com/@SEGASAMMY_PNX", ig_url: "" },
+  "U-NEXT Pirates": { x: 73100, yt: 33600, ig: 0, x_url: "https://x.com/unext_pirates", yt_url: "https://www.youtube.com/@unext_pirates", ig_url: "" },
+  "TEAM RAIDEN/雷電": { x: 74600, yt: 38500, ig: 9584, x_url: "https://x.com/RaidenTeam", yt_url: "https://www.youtube.com/@TEAM-oq4hu", ig_url: "https://www.instagram.com/teamraiden_official/" },
+  "BEAST X": { x: 66600, yt: 21900, ig: 0, x_url: "https://x.com/BEAST_X_TEN", yt_url: "https://www.youtube.com/@BEASTX_YouTube", ig_url: "" },
+  "EARTH JETS": { x: 25000, yt: 7680, ig: 961, x_url: "https://x.com/EarthJets", yt_url: "https://www.youtube.com/@earthjets", ig_url: "https://www.instagram.com/earthjets/" },
 };
 function mlTeamColor(teamName) {
   const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
@@ -364,10 +364,13 @@ function renderTeamFollowers() {
       }
     }
     if (_tfOpt.official && (r.off.x || r.off.yt || r.off.ig)) {
+      const lnk = (label, val, url) => url
+        ? ' ｜<a href="' + url + '" target="_blank" rel="noopener" class="tf-off-link">' + label + ' ' + fmt(val) + ' ↗</a>'
+        : ' ｜' + label + ' ' + fmt(val);
       html += '<div class="tf-official">公式 <b>' + fmt(psum(r.off)) + '</b>' +
-        (_tfOpt.x && r.off.x ? ' ｜X ' + fmt(r.off.x) : '') +
-        (_tfOpt.yt && r.off.yt ? ' ｜YT ' + fmt(r.off.yt) : '') +
-        (_tfOpt.ig && r.off.ig ? ' ｜IG ' + fmt(r.off.ig) : '') + '</div>';
+        (_tfOpt.x && r.off.x ? lnk("X", r.off.x, r.off.x_url) : '') +
+        (_tfOpt.yt && r.off.yt ? lnk("YT", r.off.yt, r.off.yt_url) : '') +
+        (_tfOpt.ig && r.off.ig ? lnk("IG", r.off.ig, r.off.ig_url) : '') + '</div>';
     }
     html += '</div>';
   });
