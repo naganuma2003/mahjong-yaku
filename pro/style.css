@@ -100,6 +100,7 @@ html.force-dark mark.hl { background: #4a4010; color: #f0d060; }
 .dark-toggle-btn:hover { border-color: var(--accent); }
 .mleague-btn { background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 18px; font-size: 16px; font-weight: 700; cursor: pointer; color: #fff; }
 .mleague-btn:hover { opacity: 0.88; }
+#mleagueBtn { color: #000; }
 
 * { box-sizing: border-box; }
 
