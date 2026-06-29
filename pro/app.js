@@ -223,7 +223,9 @@ const ML_TEAM_OFFICIAL = {
   "EARTH JETS": { x: 25000, yt: 7680, ig: 961, x_url: "https://x.com/EarthJets", yt_url: "https://www.youtube.com/@earthjets", ig_url: "https://www.instagram.com/earthjets/" },
 };
 function mlTeamColor(teamName) {
-  const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
+  const t = MLEAGUE_TEAMS.find(x => x.name === teamName
+    || (teamName === "BEAST Japanext" && x.id === "beast")
+    || ((teamName === "U-NEXT Pirates" || teamName === "U-NEXTパイレーツ") && x.id === "pirates"));
   return t ? t.color : "#888";
 }
 function mlTeamShort(team) {
