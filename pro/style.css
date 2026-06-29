@@ -534,11 +534,16 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 .tf-total { margin-left: auto; font-weight: 700; font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
 .tf-bar { display: flex; height: 18px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-left: 28px; }
 .tf-seg { height: 100%; }
-.tf-members { margin-left: 28px; margin-top: 5px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--muted); }
-.tf-mem b { color: var(--text); font-weight: 600; }
-.tf-mem.ml-clickable { cursor: pointer; }
-.tf-mem.ml-clickable:hover { color: var(--accent); }
+.tf-expand { margin-left: 28px; margin-top: 5px; background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; padding: 2px 0; }
+.tf-expand:hover { color: var(--accent); }
+.tf-members { margin-left: 28px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 5px; }
+.tf-mem-tog { border: 1px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 12px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
+.tf-mem-tog b { font-weight: 700; }
+.tf-mem-tog.active { border-color: var(--accent); color: var(--text); }
+.tf-mem-tog.active b { color: var(--accent); }
+.tf-mem-tog:not(.active) { opacity: .55; text-decoration: line-through; }
 .force-dark .tf-bar { background: #2a2a2a; }
+.force-dark .tf-mem-tog { background: #2a2a2a; }
 .ml-close-btn { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.5); color: #fff; border-radius: 6px; padding: 6px 14px; font-size: 14px; cursor: pointer; font-weight: 600; }
 .ml-close-btn:hover { background: rgba(255,255,255,.35); }
 .ml-overlay-content { max-width: 1100px; margin: 0 auto; padding: 20px; }

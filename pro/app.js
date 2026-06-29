@@ -255,19 +255,20 @@ function _mlBindPlayerLinks(content) {
     });
   });
 }
-function renderMLTab() {
+function renderMLTab(keepScroll) {
   const content = document.getElementById("mleagueContent");
   if (!content) return;
+  const overlay = document.getElementById("mleagueOverlay");
+  const sc = overlay ? overlay.scrollTop : 0;
   content.innerHTML = _mlTab === "followers" ? renderTeamFollowers() : renderMLeagueMatrix();
-  content.scrollTop = 0;
   _mlBindPlayerLinks(content);
   const m = document.getElementById("mlTabMatrix"), f = document.getElementById("mlTabFollowers");
   if (m && f) { m.classList.toggle("active", _mlTab === "matrix"); f.classList.toggle("active", _mlTab === "followers"); }
+  if (overlay) overlay.scrollTop = keepScroll ? sc : 0;
 }
 function switchMLTab(tab) {
   _mlTab = tab;
   renderMLTab();
-  document.getElementById("mleagueOverlay").scrollTop = 0;
 }
 function openMLeaguePage() {
   renderMLTab();
@@ -281,12 +282,22 @@ function closeMLeaguePage() {
 }
 // チーム別フォロワー比較の表示オプション
 const _tfOpt = { members: true, official: true, x: true, yt: true, ig: true };
+const _tfExpanded = new Set();   // メンバー内訳を展開中のチーム
+const _tfOffMembers = new Set(); // 集計から除外したメンバー名
 function tfToggle(k) {
   _tfOpt[k] = !_tfOpt[k];
   // 全SNSオフを防止（最低1つ）
   if (!_tfOpt.x && !_tfOpt.yt && !_tfOpt.ig) _tfOpt[k] = true;
   if (!_tfOpt.members && !_tfOpt.official) _tfOpt[k] = true;
-  renderMLTab();
+  renderMLTab(true);
+}
+function tfExpand(team) {
+  if (_tfExpanded.has(team)) _tfExpanded.delete(team); else _tfExpanded.add(team);
+  renderMLTab(true);
+}
+function tfMember(name) {
+  if (_tfOffMembers.has(name)) _tfOffMembers.delete(name); else _tfOffMembers.add(name);
+  renderMLTab(true);
 }
 // 現メンバー（2026シーズン）＋チーム公式 のチーム別SNSフォロワー比較
 function renderTeamFollowers() {
@@ -308,7 +319,7 @@ function renderTeamFollowers() {
     const ms = teams[tm] || [];
     const off = (typeof ML_TEAM_OFFICIAL !== "undefined" && ML_TEAM_OFFICIAL[tm]) || { x: 0, yt: 0, ig: 0 };
     const per = { x: 0, yt: 0, ig: 0 };
-    if (_tfOpt.members) ms.forEach(m => { per.x += m.x; per.yt += m.yt; per.ig += m.ig; });
+    if (_tfOpt.members) ms.forEach(m => { if (_tfOffMembers.has(m.name)) return; per.x += m.x; per.yt += m.yt; per.ig += m.ig; });
     if (_tfOpt.official) { per.x += off.x || 0; per.yt += off.yt || 0; per.ig += off.ig || 0; }
     const total = psum(per);
     if (!ms.length && !(off.x || off.yt || off.ig)) return;
@@ -320,7 +331,7 @@ function renderTeamFollowers() {
   const fmt = v => !v ? "0" : (v >= 10000 ? (v / 10000).toFixed(1) + "万" : v.toLocaleString());
   const tbtn = (k, label) => '<button class="tf-toggle' + (_tfOpt[k] ? ' active' : '') + '" onclick="tfToggle(\'' + k + '\')">' + label + '</button>';
   let html = '<div class="tf-page">';
-  html += '<div class="ml-page-intro">2026シーズン各チームの現メンバー＋チーム公式アカウントのSNSフォロワーを比較。下のボタンで対象とSNSを切り替え。バーをタップでメンバー内訳。</div>';
+  html += '<div class="ml-page-intro">2026シーズン各チームの現メンバー＋チーム公式アカウントのSNSフォロワーを比較。下のボタンで対象とSNSを切替。「メンバー内訳」を開くと各選手を個別にON/OFFできます。</div>';
   html += '<div class="tf-controls"><div class="tf-grp"><span class="tf-grp-label">対象</span>' +
     tbtn("members", "メンバー") + tbtn("official", "チーム公式") + '</div>' +
     '<div class="tf-grp"><span class="tf-grp-label">SNS</span>' +
@@ -341,7 +352,16 @@ function renderTeamFollowers() {
     html += '<div class="tf-head"><span class="tf-rank">' + (i + 1) + '</span><span class="tf-team" style="color:' + color + '">' + r.team + '</span><span class="tf-total">' + fmt(r.total) + '</span></div>';
     html += '<div class="tf-bar">' + (bars || '<span class="tf-seg" style="width:0"></span>') + '</div>';
     if (_tfOpt.members && r.members.length) {
-      html += '<div class="tf-members">' + r.members.map(m => (m.pid ? '<span class="tf-mem ml-clickable" data-mlid="' + m.pid + '">' : '<span class="tf-mem">') + m.name + ' <b>' + fmt(psum(m)) + '</b></span>').join("") + '</div>';
+      const expanded = _tfExpanded.has(r.team);
+      const offCnt = r.members.filter(m => _tfOffMembers.has(m.name)).length;
+      html += '<button class="tf-expand" onclick="tfExpand(\'' + r.team.replace(/'/g, "\\'") + '\')">' +
+        (expanded ? "▼" : "▶") + ' メンバー内訳（' + r.members.length + '名' + (offCnt ? '・' + offCnt + '名OFF' : '') + '）</button>';
+      if (expanded) {
+        html += '<div class="tf-members">' + r.members.map(m => {
+          const on = !_tfOffMembers.has(m.name);
+          return '<button class="tf-mem-tog' + (on ? ' active' : '') + '" onclick="tfMember(\'' + m.name.replace(/'/g, "\\'") + '\')" title="クリックでON/OFF">' + m.name + ' <b>' + fmt(psum(m)) + '</b></button>';
+        }).join("") + '</div>';
+      }
     }
     if (_tfOpt.official && (r.off.x || r.off.yt || r.off.ig)) {
       html += '<div class="tf-official">公式 <b>' + fmt(psum(r.off)) + '</b>' +
