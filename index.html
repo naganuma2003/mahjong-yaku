@@ -11,13 +11,14 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
-  header { background: linear-gradient(135deg,#1b5e20,#388e3c); color: white; padding: 36px 20px; text-align: center; transition: background .35s; }
-  header.score { background: linear-gradient(135deg,#0d47a1,#1565c0); }
-  header.play { background: linear-gradient(135deg,#7f0000,#b71c1c); }
-  header.drill { background: linear-gradient(135deg,#e65100,#f57f17); }
-  header.pro { background: linear-gradient(135deg,#311b92,#5e35b1); }
-  header h1 { font-size: 28px; font-weight: 800; letter-spacing: .05em; }
-  header p { font-size: 14px; opacity: .8; margin-top: 8px; }
+  header { position: relative; overflow: hidden; background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#15531a 0%,#2e7d32 55%,#43a047 100%); color: white; padding: 38px 20px; text-align: center; transition: background .45s ease; }
+  header::after { content: ""; position: absolute; right: -80px; top: -90px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.10), rgba(255,255,255,0) 70%); pointer-events: none; }
+  header.score { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#0a2e6b 0%,#1565c0 55%,#1e88e5 100%); }
+  header.play { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#6a0000 0%,#b71c1c 55%,#e53935 100%); }
+  header.drill { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), linear-gradient(135deg,#c44900 0%,#f57f17 55%,#ffa726 100%); }
+  header.pro { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), linear-gradient(135deg,#241067 0%,#4527a0 48%,#7e57c2 100%); }
+  header h1 { position: relative; font-size: 28px; font-weight: 800; letter-spacing: .06em; text-shadow: 0 2px 8px rgba(0,0,0,.22); }
+  header p { position: relative; font-size: 14px; opacity: .85; margin-top: 8px; letter-spacing: .02em; }
 
   .tabs-nav { display: flex; background: white; border-bottom: 2px solid #dce3eb; }
   .tab-nav-btn { flex: 1; padding: 14px; border: none; background: none; cursor: pointer; font: 600 15px/1 inherit; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
