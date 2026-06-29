@@ -211,16 +211,16 @@ const ML_AWARDS = [
 ];
 // チーム公式アカウントのフォロワー数（調査結果で更新）
 const ML_TEAM_OFFICIAL = {
-  "赤坂ドリブンズ": { x: 0, yt: 0, ig: 0 },
-  "EX風林火山": { x: 0, yt: 0, ig: 0 },
-  "KADOKAWAサクラナイツ": { x: 0, yt: 0, ig: 0 },
-  "KONAMI麻雀格闘倶楽部": { x: 0, yt: 0, ig: 0 },
-  "渋谷ABEMAS": { x: 0, yt: 0, ig: 0 },
-  "セガサミーフェニックス": { x: 0, yt: 0, ig: 0 },
-  "U-NEXT Pirates": { x: 0, yt: 0, ig: 0 },
-  "TEAM RAIDEN/雷電": { x: 0, yt: 0, ig: 0 },
-  "BEAST X": { x: 0, yt: 0, ig: 0 },
-  "EARTH JETS": { x: 0, yt: 0, ig: 0 },
+  "赤坂ドリブンズ": { x: 66000, yt: 35900, ig: 0 },
+  "EX風林火山": { x: 65500, yt: 29300, ig: 0 },
+  "KADOKAWAサクラナイツ": { x: 94000, yt: 115000, ig: 3036 },
+  "KONAMI麻雀格闘倶楽部": { x: 126000, yt: 0, ig: 0 },
+  "渋谷ABEMAS": { x: 111000, yt: 64200, ig: 0 },
+  "セガサミーフェニックス": { x: 86500, yt: 33700, ig: 0 },
+  "U-NEXT Pirates": { x: 73100, yt: 33600, ig: 0 },
+  "TEAM RAIDEN/雷電": { x: 74600, yt: 38500, ig: 9584 },
+  "BEAST X": { x: 66600, yt: 21900, ig: 0 },
+  "EARTH JETS": { x: 25000, yt: 7680, ig: 961 },
 };
 function mlTeamColor(teamName) {
   const t = MLEAGUE_TEAMS.find(x => x.name === teamName || (teamName === "BEAST Japanext" && x.id === "beast") || (teamName === "U-NEXTパイレーツ" && x.name === "U-NEXTパイレーツ"));
