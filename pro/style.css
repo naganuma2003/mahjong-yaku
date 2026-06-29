@@ -508,8 +508,28 @@ mark.hl { background: #fff176; color: inherit; border-radius: 2px; padding: 0 1p
 
 /* Mリーグ変遷ページ（オーバーレイ） */
 .ml-overlay { position: fixed; inset: 0; z-index: 1000; background: var(--bg); overflow-y: auto; }
-.ml-overlay-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.ml-overlay-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 10px 16px; background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .ml-overlay-bar h2 { margin: 0; font-size: 18px; }
+.ml-tabs { display: flex; gap: 6px; }
+.ml-tab { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ml-tab.active { background: #fff; color: var(--accent); }
+.ml-tab:hover:not(.active) { background: rgba(255,255,255,.28); }
+.tf-page { max-width: 760px; margin: 0 auto; }
+.tf-legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin: 4px 0 16px; }
+.tf-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.tf-dot { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+.tf-item { margin-bottom: 16px; }
+.tf-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.tf-rank { width: 20px; font-size: 12px; color: var(--muted); font-weight: 700; text-align: center; }
+.tf-team { font-weight: 700; font-size: 14px; }
+.tf-total { margin-left: auto; font-weight: 700; font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
+.tf-bar { display: flex; height: 18px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-left: 28px; }
+.tf-seg { height: 100%; }
+.tf-members { margin-left: 28px; margin-top: 5px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--muted); }
+.tf-mem b { color: var(--text); font-weight: 600; }
+.tf-mem.ml-clickable { cursor: pointer; }
+.tf-mem.ml-clickable:hover { color: var(--accent); }
+.force-dark .tf-bar { background: #2a2a2a; }
 .ml-close-btn { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.5); color: #fff; border-radius: 6px; padding: 6px 14px; font-size: 14px; cursor: pointer; font-weight: 600; }
 .ml-close-btn:hover { background: rgba(255,255,255,.35); }
 .ml-overlay-content { max-width: 1100px; margin: 0 auto; padding: 20px; }

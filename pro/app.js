@@ -233,18 +233,31 @@ function mlPlayerId(spacelessName) {
   }
   return _mlNameToId[spacelessName] || null;
 }
-function openMLeaguePage() {
-  const content = document.getElementById("mleagueContent");
-  if (content && !content.dataset.rendered) {
-    content.innerHTML = renderMLeagueMatrix();
-    content.dataset.rendered = "1";
-    content.querySelectorAll("[data-mlid]").forEach(el => {
-      el.addEventListener("click", () => {
-        const p = DATA.players.find(x => x.id === el.dataset.mlid);
-        if (p) { closeMLeaguePage(); state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
-      });
+let _mlTab = "matrix";
+function _mlBindPlayerLinks(content) {
+  content.querySelectorAll("[data-mlid]").forEach(el => {
+    el.addEventListener("click", () => {
+      const p = DATA.players.find(x => x.id === el.dataset.mlid);
+      if (p) { closeMLeaguePage(); state.selectedId = p.id; renderList(); scrollToSelected(); renderDetail(p); }
     });
-  }
+  });
+}
+function renderMLTab() {
+  const content = document.getElementById("mleagueContent");
+  if (!content) return;
+  content.innerHTML = _mlTab === "followers" ? renderTeamFollowers() : renderMLeagueMatrix();
+  content.scrollTop = 0;
+  _mlBindPlayerLinks(content);
+  const m = document.getElementById("mlTabMatrix"), f = document.getElementById("mlTabFollowers");
+  if (m && f) { m.classList.toggle("active", _mlTab === "matrix"); f.classList.toggle("active", _mlTab === "followers"); }
+}
+function switchMLTab(tab) {
+  _mlTab = tab;
+  renderMLTab();
+  document.getElementById("mleagueOverlay").scrollTop = 0;
+}
+function openMLeaguePage() {
+  renderMLTab();
   document.getElementById("mleagueOverlay").style.display = "block";
   document.body.style.overflow = "hidden";
   window.scrollTo(0, 0);
@@ -252,6 +265,48 @@ function openMLeaguePage() {
 function closeMLeaguePage() {
   document.getElementById("mleagueOverlay").style.display = "none";
   document.body.style.overflow = "";
+}
+// 現メンバー（2026シーズン）のチーム別SNSフォロワー比較
+function renderTeamFollowers() {
+  const teamOrder = ["赤坂ドリブンズ","EX風林火山","KADOKAWAサクラナイツ","KONAMI麻雀格闘倶楽部","渋谷ABEMAS","セガサミーフェニックス","U-NEXT Pirates","TEAM RAIDEN/雷電","BEAST X","EARTH JETS"];
+  const teams = {};
+  Object.keys(ML_PLAYER_HISTORY).forEach(name => {
+    const team = ML_PLAYER_HISTORY[name][8]; // index8 = 2026
+    if (!team) return;
+    let g = team === "BEAST Japanext" ? "BEAST X" : team;
+    const pid = mlPlayerId(name);
+    const p = pid ? DATA.players.find(x => x.id === pid) : null;
+    const pr = (p && p.profile) || {};
+    const x = pr.x_followers || 0, yt = pr.yt_subscribers || 0, ig = pr.ig_followers || 0;
+    (teams[g] = teams[g] || []).push({ name, pid, x, yt, ig, total: x + yt + ig });
+  });
+  const rows = [];
+  teamOrder.forEach(tm => {
+    const ms = teams[tm];
+    if (!ms || !ms.length) return;
+    const s = ms.reduce((a, b) => ({ x: a.x + b.x, yt: a.yt + b.yt, ig: a.ig + b.ig, total: a.total + b.total }), { x: 0, yt: 0, ig: 0, total: 0 });
+    ms.sort((a, b) => b.total - a.total);
+    rows.push({ team: tm, n: ms.length, ...s, members: ms });
+  });
+  rows.sort((a, b) => b.total - a.total);
+  const maxT = rows.length ? rows[0].total : 1;
+  const fmt = v => !v ? "0" : (v >= 10000 ? (v / 10000).toFixed(1) + "万" : v.toLocaleString());
+  let html = '<div class="tf-page">';
+  html += '<div class="ml-page-intro">2026シーズンの各チーム現メンバー（4名）のSNSフォロワー合計（X＋YouTube＋Instagram）で比較。バーをタップでメンバー内訳。</div>';
+  html += '<div class="tf-legend"><span><i class="tf-dot" style="background:#2a78d6"></i>X</span><span><i class="tf-dot" style="background:#e34948"></i>YouTube</span><span><i class="tf-dot" style="background:#e87ba4"></i>Instagram</span></div>';
+  rows.forEach((r, i) => {
+    const color = mlTeamColor(r.team);
+    const seg = (v, c) => v > 0 ? '<span class="tf-seg" style="width:' + (v / maxT * 100) + '%;background:' + c + '"></span>' : '';
+    const memberStr = r.members.map(m => m.name + " " + fmt(m.total)).join(" ／ ");
+    html += '<div class="tf-item">';
+    html += '<div class="tf-head"><span class="tf-rank">' + (i + 1) + '</span><span class="tf-team" style="color:' + color + '">' + r.team + '</span><span class="tf-total">' + fmt(r.total) + '</span></div>';
+    html += '<div class="tf-bar" title="' + memberStr + '">' + seg(r.x, "#2a78d6") + seg(r.yt, "#e34948") + seg(r.ig, "#e87ba4") + '</div>';
+    html += '<div class="tf-members">' + r.members.map(m => (m.pid ? '<span class="tf-mem ml-clickable" data-mlid="' + m.pid + '">' : '<span class="tf-mem">') + m.name + ' <b>' + fmt(m.total) + '</b></span>').join("") + '</div>';
+    html += '</div>';
+  });
+  html += '<p class="ml-note">※ SNSデータは当データベース収録の概数。X直接取得不可のため集計サイト等に依拠。</p>';
+  html += '</div>';
+  return html;
 }
 // 指定リーグ・年の成績表をDB内データから構築して表示
 function showLeagueStandings(orgId, tier, year, highlightId) {
