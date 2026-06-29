@@ -1,4 +1,5 @@
 "use strict";
+const _INIT_ML = new URLSearchParams(location.search).get("ml"); // 起動直後に退避（後でURLが書き換わるため）
 // v2026-06-16w ティア別集計をスタックドバーで視覚化・org別トップ表示
 const DATA = window.MJ_DATA || { organizations: [], players: [] };
 const ORGS = {};
@@ -3365,6 +3366,14 @@ showPlaceholder();
   if (params.get("yr")) { const yr = params.get("yr"); state.year = yr; document.getElementById("yearFilter").value = yr; renderList(); }
   if (params.get("titled") === "1") { state.hasTitle = true; renderOrgFilter(); renderList(); }
   if (params.get("pos") === "1") { state.positivePts = true; renderOrgFilter(); renderList(); }
+  // ?ml=teams でMリーグ チーム画面を直接表示（親サイトのMチームタブ用）
+  if (_INIT_ML === "teams" || params.get("ml") === "teams") {
+    renderList();
+    openMLeaguePage();
+    const cb = document.querySelector("#mleagueOverlay .ml-close-btn");
+    if (cb) cb.style.display = "none"; // 専用タブなので閉じる不要
+    return;
+  }
   // ?p=選手ID で選手を直接選択
   const pid = params.get("p");
   if (pid) {

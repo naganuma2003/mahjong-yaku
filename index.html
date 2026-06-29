@@ -20,6 +20,7 @@
   header.play { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#6a0000 0%,#b71c1c 55%,#e53935 100%); }
   header.drill { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), linear-gradient(135deg,#c44900 0%,#f57f17 55%,#ffa726 100%); }
   header.pro { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), linear-gradient(135deg,#241067 0%,#4527a0 48%,#7e57c2 100%); }
+  header.teams { background: radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%), linear-gradient(135deg,#0a3f3a 0%,#0f766e 52%,#14b8a6 100%); }
   header h1 { position: relative; font-size: 28px; font-weight: 800; letter-spacing: .06em; text-shadow: 0 2px 8px rgba(0,0,0,.22); }
   header p { position: relative; font-size: 14px; opacity: .85; margin-top: 8px; letter-spacing: .02em; }
   .hdr-toggle { position: absolute; top: 10px; right: 14px; z-index: 3; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45); color: #fff; border-radius: 6px; padding: 2px 9px; font-size: 12px; cursor: pointer; line-height: 1.4; }
@@ -38,6 +39,7 @@
   .tab-nav-btn.drill-btn { border: none; border-bottom: 3px solid transparent; border-radius: 0; background: none; padding: 14px; margin-bottom: -2px; }
   .tab-nav-btn.drill-btn.active { color: #f57f17; border-bottom-color: #f57f17; }
   .tab-nav-btn.pro-btn.active { color: #5e35b1; border-bottom-color: #5e35b1; }
+  .tab-nav-btn.teams-btn.active { color: #0f766e; border-bottom-color: #0f766e; }
 
   .tab-section { display: none; }
   .tab-section.active { display: block; }
@@ -45,6 +47,9 @@
   #tab-play iframe { width: 100%; height: 100%; border: none; display: block; }
   #tab-pro { height: calc(100vh - 176px); overflow: hidden; }
   #tab-pro iframe { width: 100%; height: 100%; border: none; display: block; }
+  #tab-teams { height: calc(100vh - 176px); overflow: hidden; }
+  #tab-teams iframe { width: 100%; height: 100%; border: none; display: block; }
+  body.hdr-collapsed #tab-teams { height: calc(100vh - 80px); }
 
   /* ===== 点数計算ドリル ===== */
   .drill-card { padding: 0 !important; overflow: hidden; }
@@ -301,6 +306,7 @@
 
 <div class="tabs-nav">
   <button class="tab-nav-btn pro-btn active" onclick="showTab('pro',this)">麻雀プロ検索</button>
+  <button class="tab-nav-btn teams-btn" onclick="showTab('teams',this)">Mチーム</button>
   <button class="tab-nav-btn play-btn" onclick="showTab('play',this)">Play</button>
   <button class="tab-nav-btn drill-btn" onclick="showTab('drill',this)">ドリル</button>
   <button class="tab-nav-btn yaku-btn" onclick="showTab('yaku',this)">役一覧</button>
@@ -559,6 +565,11 @@
 <div id="tab-pro" class="tab-section active">
   <iframe id="proFrame" title="麻雀プロ検索"></iframe>
 </div>
+
+<!-- Mチームタブ -->
+<div id="tab-teams" class="tab-section">
+  <iframe id="teamsFrame" title="Mリーグチーム"></iframe>
+</div>
 <script>
   // pro/index.html はキャッシュさせず常に最新を取得（中のapp.js/data.jsは?v=でキャッシュ）
   document.getElementById('proFrame').src = 'pro/index.html?_=' + Date.now();
@@ -748,7 +759,7 @@ function setHan(v,btn){cHan=v;document.querySelectorAll('#han-btns .obtn').forEa
 function setFu(v,btn){cFu=v;document.querySelectorAll('.fu-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateCalc();}
 function setDealer(v){cDeal=v;document.querySelectorAll('#dealer-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
 function setTsumo(v){cTsumo=v;document.querySelectorAll('#tsumo-tgl .tbtn').forEach((b,i)=>b.classList.toggle('on',i===(v?1:0)));updateCalc();}
-function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');h.classList.toggle('score',id==='score');h.classList.toggle('play',id==='play');h.classList.toggle('drill',id==='drill');h.classList.toggle('pro',id==='pro');}
+function showTab(id,btn){document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const h=document.querySelector('header');['score','play','drill','pro','teams'].forEach(c=>h.classList.toggle(c,id===c));if(id==='teams'){const f=document.getElementById('teamsFrame');if(!f.getAttribute('src'))f.src='pro/index.html?ml=teams&_='+Date.now();}}
 function toggleHeader(){const c=document.body.classList.toggle('hdr-collapsed');try{localStorage.setItem('hdr_collapsed',c?'1':'0');}catch(e){}}
 try{if(localStorage.getItem('hdr_collapsed')==='1')document.body.classList.add('hdr-collapsed');}catch(e){}
 updateCalc();
